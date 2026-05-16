@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Weak Dimension Banner
-// Owner: YousefNijim (UI/UX & Dashboard)
+// Owner: Yousef (UI/UX & Dashboard)
 // ============================================================
 // TODO: Dashboard banner highlighting the user's weakest dimension
 

@@ -34,10 +34,10 @@ That single loop is the entire MVP. Everything below serves it.
 
 Users must experience, in one seamless product loop:
 
-1.  A scenario appears with constraints and timer
-2.  User writes a mandatory thinking trace
-3.  User writes a response
-4.  AI returns multi-dimensional scores with specific feedback
+1.  A scenario appears with constraints and timer\
+2.  User writes a mandatory thinking trace\
+3.  User writes a response\
+4.  AI returns multi-dimensional scores with specific feedback\
 5.  The Skill Fingerprint visibly updates to reflect growth
 
 If all 5 happen reliably and clearly, the MVP succeeds.
@@ -57,10 +57,10 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ### 4.2 Core Product Loop
 
-1.  Scenario screen
-2.  Thinking trace input (minimum 80 chars)
-3.  Response input
-4.  Submit to Claude API
+1.  Scenario screen\
+2.  Thinking trace input (minimum 80 chars)\
+3.  Response input\
+4.  Submit to Claude API\
 5.  Evaluation screen with scores + Skill Fingerprint update
 
 ### 4.3 AI Evaluation
@@ -184,38 +184,38 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 The MVP succeeds if:
 
-1.  Product is live and deployable
-2.  Full user loop functions without breakage
-3.  Skill Fingerprint updates clearly
-4.  AI feedback is scenario-specific
+1.  Product is live and deployable\
+2.  Full user loop functions without breakage\
+3.  Skill Fingerprint updates clearly\
+4.  AI feedback is scenario-specific\
 5.  Product experience is reliable and repeatable
 
 ------------------------------------------------------------------------
 
 ## 10. Known Product Risks
 
--   API latency
--   Parsing failures
--   User misuse
--   Visualization clarity
+-   API latency\
+-   Parsing failures\
+-   User misuse\
+-   Visualization clarity\
 -   Scoring inconsistency
 
 ### Mitigation:
 
--   Cached fallback
--   Validation
--   QA
--   Calibration
+-   Cached fallback\
+-   Validation\
+-   QA\
+-   Calibration\
 -   Deployment testing
 
 ------------------------------------------------------------------------
 
 ## 11. Decisions Needed Before Build
 
--   Claude API ownership
--   Deployment ownership
--   Scenario content owner
--   Evaluation prompt owner
+-   Claude API ownership\
+-   Deployment ownership\
+-   Scenario content owner\
+-   Evaluation prompt owner\
 -   Production environment readiness
 
 ------------------------------------------------------------------------

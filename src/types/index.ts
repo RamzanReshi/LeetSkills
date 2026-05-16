@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Shared TypeScript Types
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 
 /** A single scenario stored in scenarios.json */

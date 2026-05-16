@@ -46,7 +46,7 @@ src/utils/validation.ts                      ← Input validation utilities
 - [ ] Implement `src/components/scenario/ScenarioPrompt.tsx`
 - [ ] Implement `src/components/scenario/ThinkingTraceInput.tsx`
 - [ ] Implement `src/components/scenario/ResponseInput.tsx`
-- [ ] Integrate with reshiahmed's `useSkillStore` to save evaluation
+- [ ] Integrate with Reshi's `useSkillStore` to save evaluation
 - [ ] Create PR: `feat/evaluation → main`
 
 ## Phase 4 Tasks — Reliability (Week 4)
@@ -70,7 +70,7 @@ npm install
 cp .env.local.example .env.local
 # Edit .env.local and add your ANTHROPIC_API_KEY
 
-# Create your branch (after reshiahmed's foundation merges)
+# Create your branch (after Reshi's foundation merges)
 git checkout main
 git pull origin main
 git checkout -b feat/evaluation
@@ -109,7 +109,7 @@ Response:
 
 ## Integration Notes
 
-- **Wait for reshiahmed's `feat/foundation` to merge** before starting your branch.
+- **Wait for Reshi's `feat/foundation` to merge** before starting your branch.
 - Use the types from `src/types/index.ts` — don't create separate types.
 - After evaluation completes, call `useSkillStore.addEvaluation()` to update the fingerprint.
 - Fallback evaluation ensures users ALWAYS get results, even if Claude is down.

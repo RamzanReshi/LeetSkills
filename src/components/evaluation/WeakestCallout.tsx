@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Weakest Dimension Callout
-// Owner: YousefNijim (UI/UX & Dashboard)
+// Owner: Yousef (UI/UX & Dashboard)
 // ============================================================
 // TODO: Implement highlighted callout for weakest dimension
 
