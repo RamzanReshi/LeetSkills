@@ -1,0 +1,122 @@
+[
+  {
+    "id": "fp-001",
+    "track": "first-principles",
+    "prompt_text": "A mid-size e-commerce company notices their checkout conversion rate dropped 15% over the last month. No code changes were deployed. Using first principles, analyze what could be happening and propose a diagnostic plan.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "fp-002",
+    "track": "first-principles",
+    "prompt_text": "A startup wants to build a real-time collaborative document editor. They have 3 engineers and 4 months. From first principles, determine the minimum viable architecture they need and what they should explicitly NOT build.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "fp-003",
+    "track": "first-principles",
+    "prompt_text": "A city's public bus system has declining ridership despite population growth. The transit authority has budget for exactly one intervention. Using first principles thinking, determine what single change would have the highest impact.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "fp-004",
+    "track": "first-principles",
+    "prompt_text": "A hospital emergency department has average wait times of 4.5 hours. Staff levels are adequate by industry standards. Using first principles, identify where the actual bottleneck is likely occurring and why standard staffing metrics might be misleading.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "fp-005",
+    "track": "first-principles",
+    "prompt_text": "A SaaS company's customer support team resolves tickets in 2 hours on average, yet customer satisfaction scores are 3.1/5. Faster resolution isn't improving satisfaction. From first principles, explain why speed and satisfaction are decoupled and what actually drives satisfaction.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "ps-001",
+    "track": "productive-struggle",
+    "prompt_text": "You are given a legacy codebase with no documentation, no tests, and a critical bug in production affecting 10% of users. You have 48 hours. Describe your exact approach \u2014 what you do first, what you resist doing, and how you decide when you've understood enough to act.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "ps-002",
+    "track": "productive-struggle",
+    "prompt_text": "You're leading a team building a feature. Halfway through, you realize the technical approach won't scale for the expected load \u2014 but the deadline is in 2 weeks and management has already announced the feature. Walk through your decision-making process.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "ps-003",
+    "track": "productive-struggle",
+    "prompt_text": "You've been debugging an intermittent failure for 3 days. It happens in production but you cannot reproduce it locally. Your test suite passes. Your logs show nothing obvious. Describe what you try next and how you avoid both giving up too early and persisting unproductively.",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "ps-004",
+    "track": "productive-struggle",
+    "prompt_text": "You join a new team and are asked to review a pull request with 2,000 lines of changes to a system you don't understand yet. The PR author is senior and well-respected. How do you provide a meaningful review without rubber-stamping it or pretending to understand things you don't?",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  },
+  {
+    "id": "ps-005",
+    "track": "productive-struggle",
+    "prompt_text": "You designed a database schema 6 months ago. It's now causing performance issues at scale that you didn't anticipate. Your team is frustrated. How do you approach owning the mistake, diagnosing the root cause, and proposing a migration path \u2014 without being defensive or over-correcting?",
+    "time_limit_seconds": 600,
+    "rubric_dimensions": [
+      { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
+      { "name": "Hypothesis Quality", "description": "Strength and specificity of proposed hypotheses", "max_score": 10 },
+      { "name": "Reasoning Depth", "description": "Depth of logical reasoning and analysis", "max_score": 10 },
+      { "name": "Honesty", "description": "Acknowledging uncertainty and limitations", "max_score": 10 }
+    ]
+  }
+]
