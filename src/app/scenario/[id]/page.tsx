@@ -74,15 +74,20 @@ export default function ScenarioPage() {
         const message = [payload?.error, payload?.action, payload?.details]
           .filter(Boolean)
           .join(" ");
-        throw new Error(message || "Evaluation failed");
+        setError(message || "Evaluation failed");
+        setStep(3);
+        return;
       }
 
       const evaluation: Evaluation = await res.json();
       addEvaluation(evaluation);
       router.push(`/results/${scenarioId}`);
     } catch (err) {
-      console.error("Submit failed:", err);
-      setError(err instanceof Error ? err.message : "Something went wrong submitting your response. Please try again.");
+      const message = err instanceof Error
+        ? err.message
+        : "Something went wrong submitting your response. Please try again.";
+      console.warn("Submit failed:", message);
+      setError(message);
       setStep(3);
     }
   }, [addEvaluation, scenarioId, thinkingTrace, response, router]);

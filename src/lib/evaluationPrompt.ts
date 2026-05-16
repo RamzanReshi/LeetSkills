@@ -47,9 +47,9 @@ SCORING RULES:
 - overall_score must equal the sum of weighted_score values, rounded to the nearest whole number.
 - skill_scores must include exactly one object for every rubric skill, in the same order shown below.
 - Be strict and scenario-specific. Do not reward generic advice that misses the prompt.
-- strengths should name what went well, tied to the strongest skill(s).
-- improvements should name what to improve, tied to the weakest skill(s).
-- improved_example_response should be a concise stronger answer the learner could study.
+- strengths must be a non-empty JSON array of strings naming what went well, tied to the strongest skill(s).
+- improvements must be a non-empty JSON array of strings naming what to improve, tied to the weakest skill(s).
+- improved_example_response must be a concise stronger answer string the learner could study.
 - recommended_next_scenario_id should be ${nextScenarioJson} unless a different listed scenario is clearly better for the learner's weakness.
 
 OUTPUT FORMAT - respond with ONLY a valid JSON object, no markdown, no explanation, no text before or after:

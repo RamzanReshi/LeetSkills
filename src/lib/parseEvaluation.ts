@@ -23,9 +23,30 @@ function requireNumber(value: unknown, message: string): number {
   return value;
 }
 
-function requireStringArray(value: unknown, message: string): string[] {
-  if (!Array.isArray(value) || value.length === 0) throw new Error(message);
-  return value.map((item) => requireString(item, message));
+function collectStrings(value: unknown): string[] {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed ? [trimmed] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectStrings(item));
+  }
+
+  if (typeof value === "object" && value !== null) {
+    return Object.values(value).flatMap((item) => collectStrings(item));
+  }
+
+  return [];
+}
+
+function coerceStringArray(value: unknown, fallback: string[]): string[] {
+  const items = collectStrings(value);
+  return items.length > 0 ? items.slice(0, 4) : fallback;
+}
+
+function coerceString(value: unknown, fallback: string): string {
+  return collectStrings(value)[0] ?? fallback;
 }
 
 function normalizeJsonResponse(raw: string): string {
@@ -132,17 +153,30 @@ export function parseEvaluation(raw: string, scenario: Scenario): Evaluation {
     throw new Error(`parseEvaluation: recommended_next_scenario_id ${recommended} is unknown`);
   }
 
+  const strongestScore = [...skillScores].sort(
+    (a, b) => b.rating_0_to_4 - a.rating_0_to_4 || b.weight - a.weight,
+  )[0];
+  const weakestScore = [...skillScores].sort(
+    (a, b) => a.rating_0_to_4 - b.rating_0_to_4 || b.weight - a.weight,
+  )[0];
+  const fallbackStrength = strongestScore
+    ? strongestScore.skill + ": " + strongestScore.feedback
+    : "Your submission was evaluated against the scenario rubric.";
+  const fallbackImprovement = weakestScore
+    ? weakestScore.skill + ": " + weakestScore.feedback
+    : "Make the response more specific to the scenario prompt and constraints.";
+
   return {
     scenario_id: scenario.id,
     path_id: scenario.path_id,
     difficulty: scenario.difficulty,
     overall_score: overallScore,
     skill_scores: skillScores,
-    strengths: requireStringArray(obj.strengths, "parseEvaluation: strengths must be a non-empty string array"),
-    improvements: requireStringArray(obj.improvements, "parseEvaluation: improvements must be a non-empty string array"),
-    improved_example_response: requireString(
+    strengths: coerceStringArray(obj.strengths, [fallbackStrength]),
+    improvements: coerceStringArray(obj.improvements, [fallbackImprovement]),
+    improved_example_response: coerceString(
       obj.improved_example_response,
-      "parseEvaluation: improved_example_response must be a non-empty string",
+      "A stronger response would directly address the prompt, state assumptions, explain tradeoffs, and provide a concrete next step.",
     ),
     recommended_next_scenario_id: recommended,
     timestamp: Date.now(),
