@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { SCENARIOS_META } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
@@ -48,7 +48,12 @@ export default function Navbar() {
   const fingerprint = useSkillStore((s) => s.fingerprint);
   const history = useSkillStore((s) => s.history);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
+  const hydrateSession = useSkillStore((s) => s.hydrateSession);
   const resetSession = useSkillStore((s) => s.resetSession);
+
+  useEffect(() => {
+    hydrateSession();
+  }, [hydrateSession]);
 
   const completed = SCENARIOS_META.filter((scenario) =>
     completedScenarioIds.includes(scenario.id),

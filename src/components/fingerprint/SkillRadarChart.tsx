@@ -43,9 +43,9 @@ export default function SkillRadarChart({
   }));
 
   return (
-    <div className={`w-full ${chartSize}`}>
+    <div className={`w-full min-w-0 ${chartSize}`}>
       {mounted ? (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <RadarChart data={data} outerRadius="72%">
             <PolarGrid stroke="#D1D5DB" />
             <PolarAngleAxis

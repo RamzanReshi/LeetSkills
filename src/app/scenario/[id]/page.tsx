@@ -66,8 +66,15 @@ export default function ScenarioPage() {
       });
 
       if (!res.ok) {
-        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(payload?.error ?? "Evaluation failed");
+        const payload = (await res.json().catch(() => null)) as {
+          error?: string;
+          action?: string;
+          details?: string;
+        } | null;
+        const message = [payload?.error, payload?.action, payload?.details]
+          .filter(Boolean)
+          .join(" ");
+        throw new Error(message || "Evaluation failed");
       }
 
       const evaluation: Evaluation = await res.json();

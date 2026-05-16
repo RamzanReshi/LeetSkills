@@ -28,12 +28,36 @@ function requireStringArray(value: unknown, message: string): string[] {
   return value.map((item) => requireString(item, message));
 }
 
+function normalizeJsonResponse(raw: string): string {
+  const trimmed = raw.trim();
+  const fence = "```";
+
+  if (trimmed.startsWith(fence)) {
+    const firstLineBreak = trimmed.indexOf("\n");
+    const closingFence = trimmed.lastIndexOf(fence);
+
+    if (firstLineBreak >= 0 && closingFence > firstLineBreak) {
+      return trimmed.slice(firstLineBreak + 1, closingFence).trim();
+    }
+  }
+
+  const firstBrace = trimmed.indexOf("{");
+  const lastBrace = trimmed.lastIndexOf("}");
+
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    return trimmed.slice(firstBrace, lastBrace + 1);
+  }
+
+  return trimmed;
+}
+
 export function parseEvaluation(raw: string, scenario: Scenario): Evaluation {
   let parsed: unknown;
+  const json = normalizeJsonResponse(raw);
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(json);
   } catch {
-    throw new Error(`parseEvaluation: invalid JSON - ${raw.slice(0, 120)}`);
+    throw new Error(`parseEvaluation: invalid JSON - ${raw.slice(0, 500)}`);
   }
 
   const obj = asRecord(parsed, "parseEvaluation: response is not an object");
