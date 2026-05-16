@@ -2,38 +2,86 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { UserIcon } from "@/components/ui/Icons";
+import { usePathname } from "next/navigation";
+import { UserIcon, BellIcon, FlameIcon, SearchIcon } from "@/components/ui/Icons";
+
+const navLinks: { name: string; href: string; color?: string }[] = [
+  { name: "Problems", href: "/library" },
+  { name: "Dashboard", href: "/dashboard" },
+];
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-neutral-300 bg-brand-card/90 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-neutral-100">
-            <Image
-              src="/logo-light.png"
-              alt="LeetSkills Logo"
-              fill
-              className="object-contain"
-              priority
+    <nav className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white">
+      <div className="mx-auto flex h-[50px] max-w-[1200px] items-center justify-between px-4">
+        {/* Left Side: Logo & Links */}
+        <div className="flex items-center gap-6 h-full">
+          <Link href="/" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+            <div className="relative h-6 w-6">
+              <Image
+                src="/logo-v2.png"
+                alt="LeetSkills Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-lg font-bold tracking-tight text-neutral-900">
+              Leet<span className="text-neutral-500 font-medium">Skills</span>
+            </span>
+          </Link>
+
+          <div className="flex items-center h-full gap-5">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`relative flex h-full items-center text-[14px] font-medium transition-colors ${
+                    isActive 
+                      ? "text-neutral-900 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900" 
+                      : link.color || "text-neutral-500 hover:text-neutral-900"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Side: Search, Icons, Profile */}
+        <div className="flex items-center gap-4">
+          {/* Search Box */}
+          <div className="relative hidden md:block">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <SearchIcon className="h-4 w-4 text-neutral-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search"
+              className="h-8 w-40 rounded-md bg-neutral-100 pl-9 pr-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-300 transition-all"
             />
           </div>
-          <span className="text-xl font-bold tracking-tight text-brand-deep group-hover:text-brand-primary transition-colors">
-            Leet<span className="text-brand-primary">Skills</span>
-          </span>
-        </Link>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-neutral-700 hover:text-brand-primary transition-colors"
-          >
-            Dashboard
-          </Link>
-          <div className="h-4 w-[1px] bg-neutral-300" />
-          <button className="rounded-full bg-neutral-100 p-1.5 text-neutral-700 hover:bg-brand-mint hover:text-brand-primary transition-all">
-            <UserIcon className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-3 text-neutral-500">
+            <button className="p-1 hover:text-neutral-900 transition-colors">
+              <BellIcon className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-1 hover:text-neutral-900 transition-colors cursor-pointer">
+              <FlameIcon className="h-5 w-5 text-orange-500" />
+              <span className="text-sm font-semibold">0</span>
+            </div>
+            <div className="h-8 w-8 overflow-hidden rounded-full bg-neutral-100 p-1 hover:ring-2 hover:ring-neutral-200 transition-all cursor-pointer">
+              <UserIcon className="h-full w-full text-neutral-400" />
+            </div>
+            <button className="hidden sm:block rounded-md bg-orange-100 px-3 py-1 text-[13px] font-semibold text-orange-600 hover:bg-orange-200 transition-colors">
+              Premium
+            </button>
+          </div>
         </div>
       </div>
     </nav>
