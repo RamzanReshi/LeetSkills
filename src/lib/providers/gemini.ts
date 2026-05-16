@@ -1,11 +1,30 @@
-// Gemini provider stub — install @google/generative-ai and fill this in when switching.
-// Required env var: GEMINI_API_KEY
+import { GoogleGenAI } from "@google/genai";
 import type { EvaluationProvider } from "./types";
 
 export const geminiProvider: EvaluationProvider = {
-  async complete(_systemPrompt: string, _userMessage: string): Promise<string> {
-    throw new Error(
-      "Gemini provider not configured. Install @google/generative-ai and set GEMINI_API_KEY."
-    );
+  async complete(systemPrompt: string, userMessage: string): Promise<string> {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is required when AI_PROVIDER=gemini.");
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+      contents: userMessage,
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: "application/json",
+        temperature: 0.2,
+        maxOutputTokens: 1024,
+      },
+    });
+
+    const text = response.text;
+    if (!text) {
+      throw new Error("Gemini returned no text content.");
+    }
+
+    return text;
   },
 };
