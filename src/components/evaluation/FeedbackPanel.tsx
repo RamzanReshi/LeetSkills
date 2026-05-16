@@ -13,11 +13,12 @@ interface FeedbackPanelProps {
 }
 
 export default function FeedbackPanel({ feedback }: FeedbackPanelProps) {
-  // TODO: Styled feedback panel with clear typography
   return (
-    <div>
-      <h3>AI Feedback</h3>
-      <p>{feedback}</p>
+    <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 space-y-1">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+        Overall Feedback
+      </h3>
+      <p className="text-sm text-gray-700 leading-relaxed">{feedback}</p>
     </div>
   );
 }
