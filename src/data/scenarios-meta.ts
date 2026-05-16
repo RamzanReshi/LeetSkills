@@ -1,24 +1,8 @@
+import { MVP_PATHS, MVP_SCENARIOS } from "./mvp-content";
+
 export type Difficulty = "Easy" | "Medium" | "Hard";
-
-export type CategoryId =
-  | "all"
-  | "professional-communication"
-  | "teamwork-conflict"
-  | "career-readiness"
-  | "leadership-decision-making"
-  | "presentation-pitching"
-  | "ai-literacy";
-
-export type SkillId =
-  | "all"
-  | "emails"
-  | "conflict"
-  | "interviews"
-  | "leadership"
-  | "presentations"
-  | "feedback"
-  | "teamwork"
-  | "ai-use";
+export type CategoryId = "all" | (string & {});
+export type SkillId = "all" | (string & {});
 
 export interface Category {
   id: CategoryId;
@@ -42,127 +26,41 @@ export interface ScenarioMeta {
   difficulty: Difficulty;
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export const SCENARIO_CATEGORIES: Category[] = [
-  { id: "all", label: "All", count: 100 },
-  { id: "professional-communication", label: "Professional Communication", count: 24 },
-  { id: "teamwork-conflict", label: "Teamwork & Conflict", count: 18 },
-  { id: "career-readiness", label: "Career Readiness", count: 21 },
-  { id: "leadership-decision-making", label: "Leadership & Decision-Making", count: 15 },
-  { id: "presentation-pitching", label: "Presentation & Pitching", count: 12 },
-  { id: "ai-literacy", label: "AI Literacy", count: 10 },
+  { id: "all", label: "All", count: MVP_SCENARIOS.length },
+  ...MVP_PATHS.map((path) => ({
+    id: path.id,
+    label: path.title,
+    count: path.scenario_ids.length,
+  })),
 ];
+
+const primarySkills = new Map<string, string>();
+for (const scenario of MVP_SCENARIOS) {
+  const primary = scenario.skills_graded[0]?.skill;
+  if (primary) primarySkills.set(slugify(primary), primary);
+}
 
 export const SKILL_TOPICS: SkillTopic[] = [
   { id: "all", label: "All Skills" },
-  { id: "emails", label: "Emails" },
-  { id: "conflict", label: "Conflict" },
-  { id: "interviews", label: "Interviews" },
-  { id: "leadership", label: "Leadership" },
-  { id: "presentations", label: "Presentations" },
-  { id: "feedback", label: "Feedback" },
-  { id: "teamwork", label: "Teamwork" },
-  { id: "ai-use", label: "AI Use" },
+  ...Array.from(primarySkills, ([id, label]) => ({ id, label })),
 ];
 
-export const SCENARIOS_META: ScenarioMeta[] = [
-  {
-    id: "ch-001",
-    number: 1,
-    title: "Reply to a Professor About a Missed Deadline",
-    category: "professional-communication",
-    categoryLabel: "Professional Communication",
-    skill: "emails",
-    avgScore: 72,
-    difficulty: "Easy",
-  },
-  {
-    id: "ch-002",
-    number: 2,
-    title: "Handle a Teammate Who Is Not Contributing",
-    category: "teamwork-conflict",
-    categoryLabel: "Teamwork & Conflict",
-    skill: "teamwork",
-    avgScore: 64,
-    difficulty: "Medium",
-  },
-  {
-    id: "ch-003",
-    number: 3,
-    title: "Answer “Tell Me About Yourself”",
-    category: "career-readiness",
-    categoryLabel: "Career Readiness",
-    skill: "interviews",
-    avgScore: 69,
-    difficulty: "Easy",
-  },
-  {
-    id: "ch-004",
-    number: 4,
-    title: "Lead a Team Through a Last-Minute Change",
-    category: "leadership-decision-making",
-    categoryLabel: "Leadership & Decision-Making",
-    skill: "leadership",
-    avgScore: 58,
-    difficulty: "Hard",
-  },
-  {
-    id: "ch-005",
-    number: 5,
-    title: "Improve a Weak Project Pitch",
-    category: "presentation-pitching",
-    categoryLabel: "Presentation & Pitching",
-    skill: "presentations",
-    avgScore: 61,
-    difficulty: "Medium",
-  },
-  {
-    id: "ch-006",
-    number: 6,
-    title: "Respond Professionally to Critical Feedback",
-    category: "professional-communication",
-    categoryLabel: "Professional Communication",
-    skill: "feedback",
-    avgScore: 66,
-    difficulty: "Medium",
-  },
-  {
-    id: "ch-007",
-    number: 7,
-    title: "Decide When to Use AI for an Assignment",
-    category: "ai-literacy",
-    categoryLabel: "AI Literacy",
-    skill: "ai-use",
-    avgScore: 74,
-    difficulty: "Easy",
-  },
-  {
-    id: "ch-008",
-    number: 8,
-    title: "Resolve Conflict Between Two Group Members",
-    category: "teamwork-conflict",
-    categoryLabel: "Teamwork & Conflict",
-    skill: "conflict",
-    avgScore: 55,
-    difficulty: "Hard",
-  },
-  {
-    id: "ch-009",
-    number: 9,
-    title: "Write a Follow-Up Email After an Interview",
-    category: "career-readiness",
-    categoryLabel: "Career Readiness",
-    skill: "emails",
-    avgScore: 71,
-    difficulty: "Easy",
-  },
-  {
-    id: "ch-010",
-    number: 10,
-    title: "Present Bad News to a Project Team",
-    category: "leadership-decision-making",
-    categoryLabel: "Leadership & Decision-Making",
-    skill: "leadership",
-    avgScore: 57,
-    difficulty: "Hard",
-  },
-];
+export const SCENARIOS_META: ScenarioMeta[] = MVP_SCENARIOS.map((scenario) => ({
+  id: scenario.id,
+  number: scenario.number,
+  title: scenario.title,
+  category: scenario.path_id,
+  categoryLabel: scenario.path_title,
+  skill: slugify(scenario.skills_graded[0]?.skill ?? "general"),
+  avgScore: 0,
+  difficulty: scenario.difficulty,
+}));

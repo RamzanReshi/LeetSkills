@@ -1,17 +1,15 @@
 // ============================================================
-// LeetSkills MVP — POST /api/evaluate
-// Owner: Ramzan (Scenarios & AI Evaluation)
+// LeetSkills MVP - POST /api/evaluate
 // ============================================================
-// Handles: POST /api/evaluate
-// Request:  { scenario_id, thinking_trace, response }
-// Response: Evaluation object (or fallback on AI failure)
 
 import { NextRequest, NextResponse } from "next/server";
-import scenarios from "@/data/scenarios.json";
+import { MVP_SCENARIOS } from "@/data/mvp-content";
 import { evaluateSubmission } from "@/lib/claude";
 import { getFallbackEvaluation } from "@/lib/fallbackEvaluation";
 import { validateThinkingTrace, validateResponse } from "@/utils/validation";
-import type { Submission } from "@/types";
+import type { Scenario, Submission } from "@/types";
+
+const scenarios = MVP_SCENARIOS as Scenario[];
 
 export async function POST(request: NextRequest) {
   let body: Record<string, unknown>;
@@ -41,9 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: responseValidation.message }, { status: 400 });
   }
 
-  const scenario = (scenarios as { id: string }[]).find(
-    (s) => s.id === scenario_id
-  );
+  const scenario = scenarios.find((s) => s.id === scenario_id);
   if (!scenario) {
     return NextResponse.json({ error: `Scenario "${scenario_id}" not found` }, { status: 404 });
   }
@@ -55,11 +51,10 @@ export async function POST(request: NextRequest) {
   };
 
   try {
-    // evaluateSubmission already catches provider/parse errors and returns fallback
-    const evaluation = await evaluateSubmission(scenario as never, submission);
+    const evaluation = await evaluateSubmission(scenario, submission);
     return NextResponse.json(evaluation, { status: 200 });
   } catch (err) {
     console.error("Unhandled error in /api/evaluate:", err);
-    return NextResponse.json(getFallbackEvaluation(scenario_id), { status: 200 });
+    return NextResponse.json(getFallbackEvaluation(scenario), { status: 200 });
   }
 }

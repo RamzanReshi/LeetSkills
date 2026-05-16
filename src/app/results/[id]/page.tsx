@@ -1,13 +1,14 @@
 // ============================================================
-// LeetSkills MVP — Results Page
-// Owner: Yousef (UI/UX & Dashboard)
+// LeetSkills MVP - Results Page
 // ============================================================
 
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useSkillStore } from "@/store/useSkillStore";
+import { getScenarioById } from "@/data/mvp-content";
 import ScoreCard from "@/components/evaluation/ScoreCard";
 import FeedbackPanel from "@/components/evaluation/FeedbackPanel";
 import WeakestCallout from "@/components/evaluation/WeakestCallout";
@@ -21,7 +22,6 @@ export default function ResultsPage() {
   const history = useSkillStore((s) => s.history);
   const fingerprint = useSkillStore((s) => s.fingerprint);
 
-  // Most recent evaluation for this scenario
   const evaluation = [...history]
     .reverse()
     .find((e) => e.scenario_id === scenarioId);
@@ -33,49 +33,72 @@ export default function ResultsPage() {
         <p className="mt-2 text-neutral-500">
           Complete scenario <code className="text-sm">{scenarioId}</code> to see your evaluation.
         </p>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="btn-primary mt-6"
-        >
+        <button onClick={() => router.push("/dashboard")} className="btn-primary mt-6">
           Back to Dashboard
         </button>
       </main>
     );
   }
 
-  const weakestScore = evaluation.scores.find(
-    (score) => score.dimension === evaluation.weakest_dimension
-  );
+  const scenario = getScenarioById(evaluation.scenario_id);
+  const weakestScore = [...evaluation.skill_scores].sort(
+    (a, b) => a.rating_0_to_4 - b.rating_0_to_4 || b.weight - a.weight,
+  )[0];
+  const recommended = evaluation.recommended_next_scenario_id
+    ? getScenarioById(evaluation.recommended_next_scenario_id)
+    : null;
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-brand-deep">Your Results</h1>
-        <span className="text-xs text-neutral-500">
-          {new Date(evaluation.timestamp).toLocaleDateString()}
-        </span>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
+            {scenario?.path_title ?? evaluation.path_id}
+          </p>
+          <h1 className="text-xl font-bold text-brand-deep">Your Results</h1>
+        </div>
+        <div className="text-right">
+          <p className="font-mono text-3xl font-black text-brand-primary">
+            {evaluation.overall_score}
+          </p>
+          <p className="text-xs text-neutral-500">
+            {new Date(evaluation.timestamp).toLocaleDateString()}
+          </p>
+        </div>
       </div>
 
-      {/* 4 dimension score cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {evaluation.scores.map((score) => (
-          <ScoreCard key={score.dimension} score={score} />
+        {evaluation.skill_scores.map((score) => (
+          <ScoreCard key={score.skill} score={score} />
         ))}
       </div>
 
-      {/* Overall feedback */}
-      <FeedbackPanel feedback={evaluation.overall_feedback} />
+      <FeedbackPanel
+        strengths={evaluation.strengths}
+        improvements={evaluation.improvements}
+        improvedExample={evaluation.improved_example_response}
+      />
 
-      {/* Weakest dimension callout */}
       {weakestScore ? (
         <WeakestCallout
-          dimension={evaluation.weakest_dimension}
-          score={weakestScore.score}
-          maxScore={weakestScore.max_score}
+          skill={weakestScore.skill}
+          rating={weakestScore.rating_0_to_4}
+          weight={weakestScore.weight}
         />
       ) : null}
 
-      {/* Updated skill fingerprint */}
+      {recommended ? (
+        <Link
+          href={`/scenario/${recommended.id}`}
+          className="block rounded-lg border border-brand-primary/25 bg-brand-mint p-4 text-sm text-brand-deep transition-colors hover:border-brand-primary"
+        >
+          <span className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
+            Recommended next
+          </span>
+          <span className="mt-1 block font-semibold">{recommended.id}: {recommended.title}</span>
+        </Link>
+      ) : null}
+
       <div className="rounded-lg border border-neutral-300 bg-brand-card p-4 space-y-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
           Updated Skill Fingerprint
@@ -83,10 +106,7 @@ export default function ResultsPage() {
         <SkillRadarChart fingerprint={fingerprint} />
       </div>
 
-      <button
-        onClick={() => router.push("/dashboard")}
-        className="btn-primary w-full"
-      >
+      <button onClick={() => router.push("/dashboard")} className="btn-primary w-full">
         Back to Dashboard
       </button>
     </main>

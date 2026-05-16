@@ -2,12 +2,19 @@
 
 import Link from "next/link";
 import type { LearningPath } from "@/data/paths";
+import { MVP_PATHS } from "@/data/mvp-content";
+import { useSkillStore } from "@/store/useSkillStore";
 import { ArrowRightIcon } from "@/components/ui/Icons";
 import PathIcon from "./PathIcon";
 import PathProgress from "./PathProgress";
 
 export default function PathCard({ path }: { path: LearningPath }) {
-  const started = path.completed > 0;
+  const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
+  const mvpPath = MVP_PATHS.find((item) => item.id === path.id);
+  const completed = mvpPath
+    ? mvpPath.scenario_ids.filter((id) => completedScenarioIds.includes(id)).length
+    : path.completed;
+  const started = completed > 0;
   const href = `/scenarios?category=${path.category}`;
   const ctaLabel = started ? "Continue Path" : "Start Path";
 
@@ -34,15 +41,13 @@ export default function PathCard({ path }: { path: LearningPath }) {
         <div className="flex items-center justify-between text-xs text-neutral-500">
           <span className="font-medium text-neutral-700">{path.levels} scenarios</span>
           <span>
-            {path.completed}/{path.levels}
+            {completed}/{path.levels}
           </span>
         </div>
 
-        <PathProgress completed={path.completed} total={path.levels} />
+        <PathProgress completed={completed} total={path.levels} />
 
-        <span
-          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-brand-primary-hover"
-        >
+        <span className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-brand-primary-hover">
           {ctaLabel}
           <ArrowRightIcon className="h-4 w-4" />
         </span>

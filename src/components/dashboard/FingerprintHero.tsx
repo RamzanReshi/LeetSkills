@@ -2,6 +2,7 @@
 
 import React from "react";
 import SkillRadarChart from "@/components/fingerprint/SkillRadarChart";
+import { DASHBOARD_DIMENSIONS } from "@/data/mvp-content";
 import type { DimensionName, SkillFingerprint } from "@/types";
 
 interface FingerprintHeroProps {
@@ -9,31 +10,18 @@ interface FingerprintHeroProps {
   attemptCount?: number;
 }
 
-const DIMENSION_CONFIG: Record<
-  DimensionName,
-  { description: string; color: string; lightBg: string }
-> = {
-  Decomposition: {
-    description: "Breaks problems into useful parts",
-    color: "#3B82F6",
-    lightBg: "#EFF6FF",
-  },
-  "Hypothesis Quality": {
-    description: "Forms specific, testable explanations",
-    color: "#7C3AED",
-    lightBg: "#F5F3FF",
-  },
-  "Reasoning Depth": {
-    description: "Connects evidence to conclusions",
-    color: "#D97706",
-    lightBg: "#FFFBEB",
-  },
-  Honesty: {
-    description: "Names uncertainty and limits clearly",
-    color: "#1F8A5B",
-    lightBg: "#ECFDF3",
-  },
-};
+const COLORS = ["#3B82F6", "#7C3AED", "#D97706", "#1F8A5B", "#DC2626", "#0891B2"];
+const LIGHT_BACKGROUNDS = ["#EFF6FF", "#F5F3FF", "#FFFBEB", "#ECFDF3", "#FEF2F2", "#ECFEFF"];
+
+const DIMENSION_CONFIG: Record<DimensionName, { description: string; color: string; lightBg: string }> =
+  DASHBOARD_DIMENSIONS.reduce((acc, dimension, index) => {
+    acc[dimension.dimension] = {
+      description: dimension.description,
+      color: COLORS[index % COLORS.length],
+      lightBg: LIGHT_BACKGROUNDS[index % LIGHT_BACKGROUNDS.length],
+    };
+    return acc;
+  }, {} as Record<DimensionName, { description: string; color: string; lightBg: string }>);
 
 function getStrengthLabel(score: number) {
   if (score >= 80) return "Strong";
@@ -59,11 +47,10 @@ export default function FingerprintHero({
 
   return (
     <section className="glass-card w-full p-8 animate-fade-in">
-      {/* Header */}
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-brand-primary">
-            Cognitive Profile
+            Skill Profile
           </p>
           <h2 className="mt-1.5 text-3xl font-bold tracking-tight text-brand-deep">
             Your Skill Fingerprint
@@ -87,23 +74,13 @@ export default function FingerprintHero({
         </div>
       </div>
 
-      {/* Chart + Dimension Cards */}
       <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr] lg:items-start">
-        {/* Radar Chart */}
         <div className="relative flex items-center justify-center py-4">
-          <div
-            className="absolute rounded-full blur-3xl opacity-50"
-            style={{
-              inset: "10%",
-              background: "radial-gradient(circle, #ECFDF3 0%, transparent 70%)",
-            }}
-          />
           <div className="relative z-10 w-full aspect-square max-w-[280px] mx-auto">
             <SkillRadarChart fingerprint={fingerprint} size="lg" />
           </div>
         </div>
 
-        {/* Dimension Cards Grid */}
         <div className="grid gap-3 sm:grid-cols-2">
           {dimensions.map(([dimension, score]) => {
             const cfg = DIMENSION_CONFIG[dimension];

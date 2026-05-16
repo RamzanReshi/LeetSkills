@@ -1,4 +1,5 @@
 import type { CategoryId } from "./scenarios-meta";
+import { MVP_PATHS } from "./mvp-content";
 
 export interface LearningPath {
   id: string;
@@ -9,80 +10,17 @@ export interface LearningPath {
   difficulty: string;
   category: Exclude<CategoryId, "all">;
   categoryLabel: string;
-  iconKey: "comm" | "team" | "career" | "leadership" | "presentation" | "ai";
+  iconKey: "engineering" | "quality" | "comm" | "team" | "product" | "ai";
 }
 
-export const LEARNING_PATHS: LearningPath[] = [
-  {
-    id: "path-comm",
-    title: "Professional Communication Path",
-    description:
-      "Practice clear, respectful, and effective written communication for academic and workplace situations.",
-    levels: 12,
-    completed: 0,
-    difficulty: "Easy to Medium",
-    category: "professional-communication",
-    categoryLabel: "Professional Communication",
-    iconKey: "comm",
-  },
-  {
-    id: "path-team",
-    title: "Teamwork & Conflict Path",
-    description:
-      "Build confidence handling group tension, difficult teammates, and collaborative decision-making.",
-    levels: 10,
-    completed: 0,
-    difficulty: "Medium to Hard",
-    category: "teamwork-conflict",
-    categoryLabel: "Teamwork & Conflict",
-    iconKey: "team",
-  },
-  {
-    id: "path-career",
-    title: "Career Readiness Path",
-    description:
-      "Prepare for interviews, networking, follow-up emails, and early-career professional situations.",
-    levels: 11,
-    completed: 0,
-    difficulty: "Easy to Medium",
-    category: "career-readiness",
-    categoryLabel: "Career Readiness",
-    iconKey: "career",
-  },
-  {
-    id: "path-leadership",
-    title: "Leadership Decision Path",
-    description:
-      "Practice leading under pressure, making tradeoffs, and communicating decisions clearly.",
-    levels: 9,
-    completed: 0,
-    difficulty: "Medium to Hard",
-    category: "leadership-decision-making",
-    categoryLabel: "Leadership & Decision-Making",
-    iconKey: "leadership",
-  },
-  {
-    id: "path-pitch",
-    title: "Presentation & Pitch Path",
-    description:
-      "Improve how you structure ideas, pitch projects, and respond to audience feedback.",
-    levels: 8,
-    completed: 0,
-    difficulty: "Easy to Hard",
-    category: "presentation-pitching",
-    categoryLabel: "Presentation & Pitching",
-    iconKey: "presentation",
-  },
-  {
-    id: "path-ai",
-    title: "AI Literacy Path",
-    description:
-      "Learn when and how to use AI responsibly for school, work, and communication.",
-    levels: 7,
-    completed: 0,
-    difficulty: "Easy to Medium",
-    category: "ai-literacy",
-    categoryLabel: "AI Literacy",
-    iconKey: "ai",
-  },
-];
+export const LEARNING_PATHS: LearningPath[] = MVP_PATHS.map((path) => ({
+  id: path.id,
+  title: path.title,
+  description: path.description,
+  levels: path.scenario_ids.length,
+  completed: 0,
+  difficulty: path.difficulty,
+  category: path.id,
+  categoryLabel: path.title,
+  iconKey: path.iconKey,
+}));
