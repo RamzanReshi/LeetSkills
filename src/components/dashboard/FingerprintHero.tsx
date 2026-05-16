@@ -1,3 +1,9 @@
+// ============================================================
+// LeetSkills MVP — Fingerprint Hero Section
+// Owner: YousefNijim (UI/UX & Dashboard)
+// ============================================================
+// TODO: Large radar chart display for the dashboard hero area
+// ============================================================
 "use client";
 
 import React from "react";

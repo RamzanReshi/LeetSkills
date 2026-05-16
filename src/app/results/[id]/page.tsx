@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Results Page
-// Owner: Yousef (UI/UX & Dashboard)
+// Owner: YousefNijim (UI/UX & Dashboard)
 // ============================================================
 // TODO: Implement evaluation results display:
 // - 4 ScoreCards (one per dimension)
