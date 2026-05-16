@@ -19,11 +19,14 @@ export interface ScenarioMeta {
   id: string;
   number: number;
   title: string;
+  promptText: string;
   category: Exclude<CategoryId, "all">;
   categoryLabel: string;
   skill: Exclude<SkillId, "all">;
+  skillLabels: string[];
   avgScore: number;
   difficulty: Difficulty;
+  searchText: string;
 }
 
 function slugify(value: string): string {
@@ -58,9 +61,22 @@ export const SCENARIOS_META: ScenarioMeta[] = MVP_SCENARIOS.map((scenario) => ({
   id: scenario.id,
   number: scenario.number,
   title: scenario.title,
+  promptText: scenario.prompt_text,
   category: scenario.path_id,
   categoryLabel: scenario.path_title,
   skill: slugify(scenario.skills_graded[0]?.skill ?? "general"),
+  skillLabels: scenario.skills_graded.map((skill) => skill.skill),
   avgScore: 0,
   difficulty: scenario.difficulty,
+  searchText: [
+    scenario.id,
+    scenario.number,
+    scenario.title,
+    scenario.prompt_text,
+    scenario.path_title,
+    scenario.difficulty,
+    ...scenario.skills_graded.map((skill) => skill.skill),
+  ]
+    .join(" ")
+    .toLowerCase(),
 }));
