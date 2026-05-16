@@ -1,6 +1,6 @@
 "use client";
 
-import type { Category, CategoryId } from "@/data/challenges";
+import type { Category, CategoryId } from "@/data/scenarios-meta";
 
 interface Props {
   categories: Category[];

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CHALLENGES } from "@/data/challenges";
+import { SCENARIOS_META } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
 import { ArrowRightIcon, CheckIcon, FlameIcon, UserIcon } from "@/components/ui/Icons";
 
@@ -42,10 +42,10 @@ export default function ProfileView() {
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const resetSession = useSkillStore((s) => s.resetSession);
 
-  const completedChallenges = CHALLENGES.filter((challenge) =>
-    completedScenarioIds.includes(challenge.id),
+  const completedScenarios = SCENARIOS_META.filter((scenario) =>
+    completedScenarioIds.includes(scenario.id),
   );
-  const completionPct = Math.round((completedChallenges.length / CHALLENGES.length) * 100);
+  const completionPct = Math.round((completedScenarios.length / SCENARIOS_META.length) * 100);
   const strongest = Object.entries(fingerprint).sort((a, b) => b[1] - a[1])[0];
   const weakest = Object.entries(fingerprint).sort((a, b) => a[1] - b[1])[0];
   const averageScore =
@@ -81,7 +81,7 @@ export default function ProfileView() {
               </div>
             </div>
             <Link
-              href="/library"
+              href="/scenarios"
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover"
             >
               Continue practice
@@ -91,7 +91,7 @@ export default function ProfileView() {
 
           <div className="mt-6">
             <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="font-medium text-neutral-700">Library completion</span>
+              <span className="font-medium text-neutral-700">Scenarios completion</span>
               <span className="font-semibold text-brand-deep">{completionPct}%</span>
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
@@ -134,7 +134,7 @@ export default function ProfileView() {
       <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label="Completed"
-          value={`${completedChallenges.length}/${CHALLENGES.length}`}
+          value={`${completedScenarios.length}/${SCENARIOS_META.length}`}
           detail="Practice scenarios finished"
         />
         <StatCard label="Attempts" value={`${history.length}`} detail="Evaluated responses" />

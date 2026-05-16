@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchIcon, SortIcon, FilterIcon } from "@/components/ui/Icons";
-import type { Difficulty } from "@/data/challenges";
+import type { Difficulty } from "@/data/scenarios-meta";
 
 interface Props {
   search: string;
@@ -12,7 +12,7 @@ interface Props {
   total: number;
 }
 
-export default function ChallengeToolbar({
+export default function ScenarioToolbar({
   search,
   onSearchChange,
   difficulty,
@@ -28,7 +28,7 @@ export default function ChallengeToolbar({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search challenges"
+          placeholder="Search scenarios"
           className="w-full rounded-lg border border-neutral-300 bg-brand-card py-2 pl-9 pr-3 text-sm text-neutral-900 placeholder:text-neutral-500 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
         />
       </div>

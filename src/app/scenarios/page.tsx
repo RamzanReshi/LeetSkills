@@ -1,16 +1,16 @@
 import { Suspense } from "react";
 import AppShell from "@/components/shell/AppShell";
-import LibraryView from "@/components/library/LibraryView";
+import ScenariosView from "@/components/scenarios/ScenariosView";
 
 export const metadata = {
-  title: "Practice Library — LeetSkills",
+  title: "Scenarios — LeetSkills",
 };
 
-export default function LibraryPage() {
+export default function ScenariosPage() {
   return (
     <AppShell>
       <Suspense fallback={null}>
-        <LibraryView />
+        <ScenariosView />
       </Suspense>
     </AppShell>
   );

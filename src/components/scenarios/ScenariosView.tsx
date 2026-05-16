@@ -3,24 +3,24 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
-  CHALLENGES,
-  CHALLENGE_CATEGORIES,
+  SCENARIOS_META,
+  SCENARIO_CATEGORIES,
   SKILL_TOPICS,
   type CategoryId,
   type SkillId,
   type Difficulty,
-} from "@/data/challenges";
+} from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
 import CategoryTabs from "./CategoryTabs";
 import SkillChips from "./SkillChips";
-import ChallengeToolbar from "./ChallengeToolbar";
-import ChallengeTable from "./ChallengeTable";
+import ScenarioToolbar from "./ScenarioToolbar";
+import ScenarioTable from "./ScenarioTable";
 
-export default function LibraryView() {
+export default function ScenariosView() {
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const searchParams = useSearchParams();
   const categoryParam = searchParams?.get("category") ?? null;
-  const initialCategory: CategoryId = CHALLENGE_CATEGORIES.some(
+  const initialCategory: CategoryId = SCENARIO_CATEGORIES.some(
     (c) => c.id === categoryParam,
   )
     ? (categoryParam as CategoryId)
@@ -33,33 +33,35 @@ export default function LibraryView() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return CHALLENGES.filter((c) => activeCategory === "all" || c.category === activeCategory)
-      .filter((c) => activeSkill === "all" || c.skill === activeSkill)
-      .filter((c) => difficulty === "all" || c.difficulty === difficulty)
+    return SCENARIOS_META.filter(
+      (s) => activeCategory === "all" || s.category === activeCategory,
+    )
+      .filter((s) => activeSkill === "all" || s.skill === activeSkill)
+      .filter((s) => difficulty === "all" || s.difficulty === difficulty)
       .filter(
-        (c) =>
+        (s) =>
           !q ||
-          c.title.toLowerCase().includes(q) ||
-          c.categoryLabel.toLowerCase().includes(q),
+          s.title.toLowerCase().includes(q) ||
+          s.categoryLabel.toLowerCase().includes(q),
       );
   }, [activeCategory, activeSkill, difficulty, search]);
 
-  const completedCount = CHALLENGES.filter((c) =>
-    completedScenarioIds.includes(c.id),
+  const completedCount = SCENARIOS_META.filter((s) =>
+    completedScenarioIds.includes(s.id),
   ).length;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-10 animate-fade-in">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-deep">Practice Library</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-brand-deep">Scenarios</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Scenario-based soft skill challenges for university and workplace readiness.
+          Real-world situations for university and workplace readiness — think through them, respond, get evaluated.
         </p>
       </header>
 
       <div className="mb-5">
         <CategoryTabs
-          categories={CHALLENGE_CATEGORIES}
+          categories={SCENARIO_CATEGORIES}
           activeId={activeCategory}
           onSelect={setActiveCategory}
         />
@@ -70,17 +72,17 @@ export default function LibraryView() {
       </div>
 
       <div className="mb-4">
-        <ChallengeToolbar
+        <ScenarioToolbar
           search={search}
           onSearchChange={setSearch}
           difficulty={difficulty}
           onDifficultyChange={setDifficulty}
           completed={completedCount}
-          total={CHALLENGES.length}
+          total={SCENARIOS_META.length}
         />
       </div>
 
-      <ChallengeTable challenges={filtered} completedIds={completedScenarioIds} />
+      <ScenarioTable scenarios={filtered} completedIds={completedScenarioIds} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { UserIcon, SearchIcon } from "@/components/ui/Icons";
 
 const navLinks: { name: string; href: string; color?: string }[] = [
-  { name: "Problems", href: "/library" },
+  { name: "Scenarios", href: "/scenarios" },
   { name: "Dashboard", href: "/dashboard" },
 ];
 
@@ -18,8 +18,8 @@ export default function Navbar() {
       <div className="mx-auto flex h-[50px] max-w-[1200px] items-center justify-between px-4">
         {/* Left Side: Logo & Links */}
         <div className="flex items-center gap-6 h-full">
-          <Link href="/" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-            <div className="relative h-6 w-6">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <div className="relative h-8 w-8">
               <Image
                 src="/logo-v2.png"
                 alt="LeetSkills Logo"
@@ -28,8 +28,8 @@ export default function Navbar() {
                 priority
               />
             </div>
-            <span className="text-lg font-bold tracking-tight text-neutral-900">
-              Leet<span className="text-neutral-500 font-medium">Skills</span>
+            <span className="text-xl font-bold tracking-tight text-brand-deep">
+              Leet<span className="text-brand-primary font-normal">Skills</span>
             </span>
           </Link>
 

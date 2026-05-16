@@ -31,7 +31,7 @@ export interface SkillTopic {
   label: string;
 }
 
-export interface Challenge {
+export interface ScenarioMeta {
   id: string;
   number: number;
   title: string;
@@ -42,7 +42,7 @@ export interface Challenge {
   difficulty: Difficulty;
 }
 
-export const CHALLENGE_CATEGORIES: Category[] = [
+export const SCENARIO_CATEGORIES: Category[] = [
   { id: "all", label: "All", count: 100 },
   { id: "professional-communication", label: "Professional Communication", count: 24 },
   { id: "teamwork-conflict", label: "Teamwork & Conflict", count: 18 },
@@ -64,7 +64,7 @@ export const SKILL_TOPICS: SkillTopic[] = [
   { id: "ai-use", label: "AI Use" },
 ];
 
-export const CHALLENGES: Challenge[] = [
+export const SCENARIOS_META: ScenarioMeta[] = [
   {
     id: "ch-001",
     number: 1,

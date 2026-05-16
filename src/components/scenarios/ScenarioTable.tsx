@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import type { Challenge } from "@/data/challenges";
+import type { ScenarioMeta } from "@/data/scenarios-meta";
 import { CheckIcon } from "@/components/ui/Icons";
 import DifficultyBadge from "./DifficultyBadge";
 
 interface Props {
-  challenges: Challenge[];
+  scenarios: ScenarioMeta[];
   completedIds: string[];
 }
 
 // TODO: /scenario/[id] currently only resolves for engineering scenarios in scenarios.json.
-// Wire mock soft-skill challenges to the solve route once content is seeded.
+// Wire mock soft-skill scenarios to the solve route once content is seeded.
 
 function StatusDot({ done }: { done: boolean }) {
   if (done) {
@@ -24,11 +24,11 @@ function StatusDot({ done }: { done: boolean }) {
   return <span className="inline-block h-5 w-5 rounded-full border border-neutral-300" />;
 }
 
-export default function ChallengeTable({ challenges, completedIds }: Props) {
-  if (challenges.length === 0) {
+export default function ScenarioTable({ scenarios, completedIds }: Props) {
+  if (scenarios.length === 0) {
     return (
       <div className="glass-card p-10 text-center text-sm text-neutral-500">
-        No challenges match your filters.
+        No scenarios match your filters.
       </div>
     );
   }
@@ -48,7 +48,7 @@ export default function ChallengeTable({ challenges, completedIds }: Props) {
           </tr>
         </thead>
         <tbody>
-          {challenges.map((c) => {
+          {scenarios.map((c) => {
             const done = completedIds.includes(c.id);
             return (
               <tr
@@ -80,7 +80,7 @@ export default function ChallengeTable({ challenges, completedIds }: Props) {
 
       {/* Mobile card list */}
       <ul className="divide-y divide-neutral-300/60 md:hidden">
-        {challenges.map((c) => {
+        {scenarios.map((c) => {
           const done = completedIds.includes(c.id);
           return (
             <li key={c.id} className="p-4">

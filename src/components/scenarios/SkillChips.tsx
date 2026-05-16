@@ -1,6 +1,6 @@
 "use client";
 
-import type { SkillTopic, SkillId } from "@/data/challenges";
+import type { SkillTopic, SkillId } from "@/data/scenarios-meta";
 
 interface Props {
   topics: SkillTopic[];

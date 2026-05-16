@@ -8,7 +8,7 @@ import PathProgress from "./PathProgress";
 
 export default function PathCard({ path }: { path: LearningPath }) {
   const started = path.completed > 0;
-  const href = `/library?category=${path.category}`;
+  const href = `/scenarios?category=${path.category}`;
   const ctaLabel = started ? "Continue Path" : "Start Path";
 
   return (
@@ -32,7 +32,7 @@ export default function PathCard({ path }: { path: LearningPath }) {
 
       <div className="mt-auto flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs text-neutral-500">
-          <span className="font-medium text-neutral-700">{path.levels} challenges</span>
+          <span className="font-medium text-neutral-700">{path.levels} scenarios</span>
           <span>
             {path.completed}/{path.levels}
           </span>

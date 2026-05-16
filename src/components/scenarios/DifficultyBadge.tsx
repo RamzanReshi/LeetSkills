@@ -1,4 +1,4 @@
-import type { Difficulty } from "@/data/challenges";
+import type { Difficulty } from "@/data/scenarios-meta";
 
 const STYLES: Record<Difficulty, string> = {
   Easy: "bg-brand-mint text-brand-primary",

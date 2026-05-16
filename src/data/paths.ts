@@ -1,4 +1,4 @@
-import type { CategoryId } from "./challenges";
+import type { CategoryId } from "./scenarios-meta";
 
 export interface LearningPath {
   id: string;

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { BookIcon, CompassIcon, UserIcon } from "@/components/ui/Icons";
 
 const NAV_ITEMS = [
-  { href: "/library", label: "Library", icon: BookIcon },
+  { href: "/scenarios", label: "Scenarios", icon: BookIcon },
   { href: "/path", label: "Path", icon: CompassIcon },
   { href: "/profile", label: "Profile", icon: UserIcon },
 ];
@@ -17,7 +17,7 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
       ? "/path"
       : pathname?.startsWith("/profile")
         ? "/profile"
-      : "/library";
+      : "/scenarios";
 
   return (
     <nav className="flex flex-col gap-1 p-4">
