@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookIcon, CompassIcon } from "@/components/ui/Icons";
+import { BookIcon, CompassIcon, UserIcon } from "@/components/ui/Icons";
 
 const NAV_ITEMS = [
   { href: "/library", label: "Library", icon: BookIcon },
   { href: "/path", label: "Path", icon: CompassIcon },
+  { href: "/profile", label: "Profile", icon: UserIcon },
 ];
 
 export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
@@ -14,6 +15,8 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
   const activeHref =
     pathname?.startsWith("/path") || pathname?.startsWith("/quest")
       ? "/path"
+      : pathname?.startsWith("/profile")
+        ? "/profile"
       : "/library";
 
   return (
