@@ -1,306 +1,239 @@
-# LeetSkills MVP --- Product Requirements Document
+# LeetSkills MVP - Product Requirements Document
 
-  Field          Value
-  -------------- ----------------------
-  Product        LeetSkills MVP
-  Owner          Ramzan
-  Context        Functional MVP Build
-  Status         Ready to build
-  Last Updated   May 16, 2026
+| Field | Value |
+| --- | --- |
+| Product | LeetSkills MVP |
+| Context | Current functional MVP build |
+| Status | Demo-ready, not fully MVP-ready |
+| Last Updated | May 16, 2026 |
 
-------------------------------------------------------------------------
+## 1. Product Summary
 
-## 1. Context
+LeetSkills is a web app where users practice real-world professional and technical scenarios. Users read a scenario, write a required thinking trace, write a final response, receive AI-evaluated feedback, and build an evolving Skill Fingerprint.
 
-LeetSkills is being built as a focused MVP designed to deliver a
-complete, reliable user experience around scenario-based skill
-evaluation. Every requirement in this PRD must directly serve the final
-functional product. Anything that does not strengthen the product loop,
-usability, or reliability is cut.
+The current MVP is an anonymous localStorage product. It does not include authentication, database persistence, payments, social features, or an admin dashboard.
 
-------------------------------------------------------------------------
+## 2. Current Product Loop
 
-## 2. The One-Sentence Product
+The main loop is:
 
-**A web app where users complete real-world scenarios through structured
-reasoning, receive AI-evaluated multidimensional feedback, and
-continuously build an evolving Skill Fingerprint.**
+1. User lands on `/dashboard`.
+2. User opens a scenario from `/dashboard`, `/scenarios`, or `/path`.
+3. User reads the prompt on `/scenario/[id]`.
+4. User writes a mandatory thinking trace of at least 80 characters.
+5. User writes a final response.
+6. App submits to `POST /api/evaluate`.
+7. AI returns structured feedback and weighted skill scores.
+8. App stores the result in Zustand/localStorage.
+9. User sees results on `/results/[id]`.
+10. Dashboard, profile, path progress, and Skill Fingerprint update from local session data.
 
-That single loop is the entire MVP. Everything below serves it.
+## 3. Current Scope
 
-------------------------------------------------------------------------
+### In Scope
 
-## 3. The Product Goal
+- 30 scenarios in `src/data/mvp-content.ts`.
+- 6 learning paths:
+  - Software Engineering Problem Solving
+  - Debugging, Testing & Quality
+  - Professional Communication
+  - Teamwork & Conflict Resolution
+  - Product Thinking
+  - AI Literacy & Responsible Use
+- Scenario browser with category, skill, difficulty, and search filters.
+- Scenario solve page with timer display, thinking trace input, response input, and submit flow.
+- AI feedback route at `POST /api/evaluate`.
+- Claude as the default AI provider.
+- Gemini as an optional AI provider.
+- OpenAI provider stub, not production-ready.
+- Fallback evaluation when AI evaluation fails.
+- Skill Fingerprint radar and progress views.
+- Dashboard, learning paths, profile, and results pages.
+- Anonymous session persistence through Zustand and localStorage.
+- Reset local session.
 
-Users must experience, in one seamless product loop:
+### Out of Scope For Current MVP
 
-1.  A scenario appears with constraints and timer\
-2.  User writes a mandatory thinking trace\
-3.  User writes a response\
-4.  AI returns multi-dimensional scores with specific feedback\
-5.  The Skill Fingerprint visibly updates to reflect growth
+- Authentication
+- Database persistence
+- Admin dashboard
+- Payments
+- Leaderboards
+- Social features
+- Production analytics
+- Full OpenAI provider implementation
 
-If all 5 happen reliably and clearly, the MVP succeeds.
+## 4. Current Routes
 
-------------------------------------------------------------------------
+| Route | Current purpose | File |
+| --- | --- | --- |
+| `/` | Redirects to `/dashboard` | `src/app/page.tsx` |
+| `/dashboard` | Main home view with Skill Fingerprint, next scenario CTA, and weakest dimension banner | `src/app/dashboard/page.tsx` |
+| `/scenarios` | Scenario browser with filters and completion status | `src/app/scenarios/page.tsx` |
+| `/scenario/[id]` | Scenario solve flow | `src/app/scenario/[id]/page.tsx` |
+| `/results/[id]` | Evaluation results and updated fingerprint | `src/app/results/[id]/page.tsx` |
+| `/path` | Learning paths overview | `src/app/path/page.tsx` |
+| `/quest` | Redirects to `/path` | `src/app/quest/page.tsx` |
+| `/profile` | Local profile, stats, fingerprint bars, and reset control | `src/app/profile/page.tsx` |
+| `/api/evaluate` | Server route for scenario evaluation | `src/app/api/evaluate/route.ts` |
 
-## 4. Brand Identity & Color Palette
+## 5. Current Tech Stack
 
-### 4.1 Logo Colors
+| Area | Current implementation |
+| --- | --- |
+| Framework | Next.js 16 App Router |
+| UI runtime | React 19 |
+| Styling | Tailwind CSS v4 using CSS tokens in `src/app/globals.css` |
+| State | Zustand |
+| Persistence | Browser localStorage through `src/utils/localStorage.ts` |
+| Charts | Recharts |
+| Animation | Framer Motion dependency is installed |
+| AI SDKs | Anthropic SDK and Google GenAI SDK |
+| AI providers | Claude default, Gemini optional, OpenAI stub |
+| Hosting target | Vercel-compatible Next.js app |
 
-- Logo Primary Green: `#1F8A5B` — main logo shape / outline
-- Logo Action Green: `#27AE60` — accent highlight, active detail, progress feel
-- Logo Deep Green: `#123D2A` — strong contrast, dark logo version
-- Logo Mint Fill: `#ECFDF3` — soft inner fill or background version
-- Logo Background Gray: `#F3F4F6` — logo presentation background
+## 6. Content Model
 
-### 4.2 Core Product Palette
+The active MVP content is in `src/data/mvp-content.ts`.
 
-- Primary Green: `#1F8A5B` — main CTA, active states, progress
-- Action Green: `#27AE60` — submit buttons, learning actions
-- Deep Green: `#123D2A` — headers, dark sections, brand anchor
-- Mint Surface: `#ECFDF3` — success backgrounds, learning surfaces
-- App Background: `#F7FAF6` — main page background
-- Card Background: `#FFFFFF` — cards, forms, dashboard panels
+Each scenario includes:
 
-### 4.3 Five Gray Shades
+- `id`
+- `path_id`
+- `path_title`
+- `title`
+- `difficulty`
+- `scenario_type`
+- `estimated_time`
+- `time_limit_seconds`
+- `prompt_text`
+- `expected_learner_output`
+- `skills_graded`
+- optional `grading_notes`
+- optional `recommended_next_scenario_id`
 
-- Gray 900: `#111827` — main headings, primary text
-- Gray 700: `#374151` — body text, labels
-- Gray 500: `#6B7280` — muted text, helper copy
-- Gray 300: `#D1D5DB` — borders, dividers, disabled states
-- Gray 100: `#F3F4F6` — light gray surfaces, logo background
+`src/data/paths.ts` builds learning-path cards from the active MVP paths.
 
-### 4.4 Recommended Logo Usage
+`src/data/scenarios-meta.ts` builds scenario-browser metadata from the active MVP scenarios.
 
-**Primary Logo**
-- Logo outline: `#1F8A5B`
-- Inner fill or soft background: `#ECFDF3`
-- Background: `#F3F4F6`
+`src/data/scenarios.json` is older PRD-era data and is not the active source for the current UI.
 
-**Strong Logo Version**
-- Logo mark: `#123D2A`
-- Accent: `#27AE60`
-- Background: `#FFFFFF`
+## 7. Skill Fingerprint
 
-**App Icon Version**
-- Circle background: `#1F8A5B`
-- Logo/cloud mark: `#FFFFFF`
-- Optional accent: `#ECFDF3`
+The current Skill Fingerprint has 6 axes. The axes are defined in `DASHBOARD_DIMENSIONS` inside `src/data/mvp-content.ts`.
 
-### 4.5 UI Mapping
+| Axis | Meaning |
+| --- | --- |
+| Decomposition | Breaks problems into useful parts. |
+| Pattern Recognition | Recognizes useful patterns, solution approaches, or likely causes. |
+| Execution Quality | Turns plans into reliable action through testing, implementation, prevention, and follow-through. |
+| Communication | Explains clearly for the audience. |
+| Judgment | Makes practical tradeoffs under constraints. |
+| Adaptability | Collaborates and adjusts under ambiguity. |
 
-- Primary CTA: `#1F8A5B`
-- Submit Button: `#27AE60`
-- CTA Hover: `#166A45`
-- Dashboard Background: `#F7FAF6`
-- Card Background: `#FFFFFF`
-- Skill Fingerprint Highlight: `#1F8A5B`
-- Success Surface: `#ECFDF3`
-- Main Text: `#111827`
-- Secondary Text: `#374151`
-- Muted Text: `#6B7280`
-- Borders: `#D1D5DB`
-- Neutral Surface: `#F3F4F6`
+Current calculation:
 
-### 4.6 Tailwind Tokens
+- Evaluations are stored in `src/store/useSkillStore.ts`.
+- Each rubric skill score is normalized to a 0-100 value.
+- Rubric skills map into one or more dashboard dimensions.
+- Each dimension is averaged across matching historical skill scores.
+- The result is persisted in localStorage.
 
-```js
-colors: {
-  brand: {
-    primary: "#1F8A5B",
-    action: "#27AE60",
-    deep: "#123D2A",
-    mint: "#ECFDF3",
-    background: "#F7FAF6",
-    card: "#FFFFFF"
-  },
-  neutral: {
-    900: "#111827",
-    700: "#374151",
-    500: "#6B7280",
-    300: "#D1D5DB",
-    100: "#F3F4F6"
-  }
+Current gap:
+
+- Fallback AI scores currently look like normal scored progress.
+- The product should mark fallback evaluations clearly or exclude them from fingerprint updates before production MVP.
+
+## 8. AI Evaluation
+
+Evaluation route: `POST /api/evaluate`
+
+Request body:
+
+```json
+{
+  "scenario_id": "SE-01",
+  "thinking_trace": "user thinking trace",
+  "response": "user final response"
 }
 ```
 
-------------------------------------------------------------------------
+Current behavior:
 
-## 5. In Scope (Build These)
+- Validates `scenario_id`.
+- Validates thinking trace length.
+- Validates non-empty final response.
+- Finds the scenario from `MVP_SCENARIOS`.
+- Calls `evaluateSubmission`.
+- Uses the configured provider from `AI_PROVIDER`.
+- Falls back to a neutral evaluation if live AI evaluation or parsing fails.
 
-### 5.1 Scenarios
+Providers:
 
--   10 hand-written scenarios total
--   5 from Track 1 (First Principles Thinking)
--   5 from Track 4 (Productive Struggle)
--   Stored as static JSON in repo
--   Each scenario includes: `id`, `track`, `prompt_text`,
-    `time_limit_seconds`, `rubric_dimensions[]`
+- `AI_PROVIDER=claude` is the default.
+- `AI_PROVIDER=gemini` is supported when `GEMINI_API_KEY` is set.
+- `AI_PROVIDER=openai` is only a stub and throws until implemented.
 
-### 5.2 Core Product Loop
+## 9. Brand Identity & Color Palette
 
-1.  Scenario screen\
-2.  Thinking trace input (minimum 80 chars)\
-3.  Response input\
-4.  Submit to Claude API\
-5.  Evaluation screen with scores + Skill Fingerprint update
+The current app uses the PRD green/gray palette through CSS variables in `src/app/globals.css`.
 
-### 5.3 AI Evaluation
+Core colors:
 
--   One Claude API call per submission
--   Structured JSON output
--   4 dimensions scored
--   Strict grading prompt
--   Fallback reliability system with cached evaluation if live parsing
-    fails
+- Primary Green: `#1F8A5B`
+- Action Green: `#27AE60`
+- Deep Green: `#123D2A`
+- Mint Surface: `#ECFDF3`
+- App Background: `#F7FAF6`
+- Card Background: `#FFFFFF`
+- Gray 900: `#111827`
+- Gray 700: `#374151`
+- Gray 500: `#6B7280`
+- Gray 300: `#D1D5DB`
+- Gray 100: `#F3F4F6`
 
-### 5.4 Skill Fingerprint
+The dashboard fingerprint also uses secondary accent colors for dimension cards.
 
--   4-axis radar chart
--   Axes: Decomposition, Hypothesis Quality, Reasoning Depth, Honesty
--   Browser state via Zustand
--   Animated updates with Framer Motion
+## 10. MVP Readiness
 
-### 5.5 Dashboard
+Current status:
 
--   Skill Fingerprint hero
--   Today's Scenario CTA
--   Weakest dimension callout
--   No unnecessary social or gamification systems
+- Demo-ready: yes
+- MVP-ready: not fully
 
-### 5.6 Sessions
+Main blockers:
 
--   Anonymous
--   localStorage persistence
--   Reset session
+- Dashboard needs better metrics.
+- Skill Fingerprint needs clearer product meaning.
+- Fallback AI scores must be marked clearly or excluded from real progress.
+- No authentication.
+- No database persistence.
+- No admin dashboard.
+- Missing `.env.local.example`.
+- No automated tests or smoke tests.
+- Some unfinished UI remains: navbar search, timer TODO, and hardcoded profile data.
 
-------------------------------------------------------------------------
+## 11. Next Priority
 
-## 6. Out of Scope
+Recommended next work:
 
--   Authentication
--   Database persistence
--   Leaderboards
--   Social systems
--   Advanced modes
--   Mobile optimization
--   Additional tracks
--   Payments
--   Admin systems
+1. Improve dashboard metrics and recent activity.
+2. Improve Skill Fingerprint explanation, empty state, and fallback handling.
+3. Add `.env.local.example`.
+4. Improve AI fallback and provider error handling.
+5. Add smoke tests for critical routes and `/api/evaluate`.
+6. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
 
-------------------------------------------------------------------------
+## 12. Success Criteria
 
-## 7. Build Roadmap
+The MVP succeeds when:
 
-### Phase 1 --- Foundation
-
--   Next.js setup
--   Tailwind
--   Vercel deployment
--   Core routes
-
-### Phase 2 --- Content + Evaluation
-
--   Scenario writing
--   Rubric design
--   Calibration examples
--   Claude integration
-
-### Phase 3 --- Product Experience
-
--   Skill Fingerprint
--   Dashboard
--   Full flow integration
-
-### Phase 4 --- Reliability + Polish
-
--   UX polish
--   Loading states
--   Error handling
--   Deployment QA
--   Launch readiness
-
-------------------------------------------------------------------------
-
-## 8. Technical Decisions
-
-  Decision    Choice
-  ----------- -------------------
-  Framework   Next.js 14
-  Styling     Tailwind CSS
-  State       Zustand
-  Charts      Recharts
-  Animation   Framer Motion
-  AI          Claude Sonnet 4.6
-  Storage     localStorage
-  Hosting     Vercel
-
-------------------------------------------------------------------------
-
-## 9. Evaluation Prompt Contract
-
-**POST /api/evaluate**
-
-### Request:
-
--   scenario_id
--   thinking_trace
--   response
-
-### Response:
-
--   scores
--   feedback
--   weakest_dimension
-
-### System Priorities:
-
--   Scenario specificity
--   Calibration consistency
--   JSON-only output
--   Reliability fallback
-
-------------------------------------------------------------------------
-
-## 10. Success Criteria
-
-The MVP succeeds if:
-
-1.  Product is live and deployable\
-2.  Full user loop functions without breakage\
-3.  Skill Fingerprint updates clearly\
-4.  AI feedback is scenario-specific\
-5.  Product experience is reliable and repeatable
-
-------------------------------------------------------------------------
-
-## 11. Known Product Risks
-
--   API latency\
--   Parsing failures\
--   User misuse\
--   Visualization clarity\
--   Scoring inconsistency
-
-### Mitigation:
-
--   Cached fallback\
--   Validation\
--   QA\
--   Calibration\
--   Deployment testing
-
-------------------------------------------------------------------------
-
-## 12. Decisions Needed Before Build
-
--   Claude API ownership\
--   Deployment ownership\
--   Scenario content owner\
--   Evaluation prompt owner\
--   Production environment readiness
-
-------------------------------------------------------------------------
+1. The full local student loop works reliably.
+2. AI feedback is specific to the scenario.
+3. Failed AI evaluation is clearly marked and does not mislead users.
+4. Skill Fingerprint changes are understandable.
+5. Dashboard gives useful next actions.
+6. The app is deployable with documented environment variables.
+7. Core routes pass smoke tests.
 
 *End of MVP PRD*

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { SCENARIOS_META } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
 import {
@@ -15,6 +15,11 @@ import {
   SearchIcon,
   UserIcon,
 } from "@/components/ui/Icons";
+import {
+  getAccountDisplayName,
+  getAccountRole,
+  useAuth,
+} from "@/components/auth/AuthProvider";
 
 const dropdownLinks = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
@@ -22,9 +27,6 @@ const dropdownLinks = [
   { name: "Learning Path", href: "/path", icon: CompassIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
 ];
-
-const DISPLAY_NAME = "Ahmed Reshi";
-const ROLE = "AI-era engineering learner";
 
 function getInitials(name: string) {
   return name
@@ -44,11 +46,20 @@ function strengthLabel(score: number) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState("");
+  const profileRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const fingerprint = useSkillStore((s) => s.fingerprint);
   const history = useSkillStore((s) => s.history);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const resetSession = useSkillStore((s) => s.resetSession);
+  const { user, profile, signOut } = useAuth();
+  const isSignedIn = Boolean(user);
+  const displayName = getAccountDisplayName(user, profile);
+  const role = getAccountRole(profile);
 
   const completed = SCENARIOS_META.filter((scenario) =>
     completedScenarioIds.includes(scenario.id),
@@ -61,10 +72,67 @@ export default function Navbar() {
           history.reduce((sum, entry) => sum + entry.overall_score, 0) /
             history.length,
         );
-  const initials = getInitials(DISPLAY_NAME);
+  const initials = getInitials(displayName);
 
   const isActiveLink = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node;
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setProfileOpen(false);
+      }
+
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
+        setMobileMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+        setMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    const query = navSearch.trim();
+
+    if (!query) {
+      if (pathname?.startsWith("/scenarios")) {
+        const timeout = window.setTimeout(() => {
+          router.replace("/scenarios", { scroll: false });
+        }, 200);
+
+        return () => window.clearTimeout(timeout);
+      }
+
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      router.replace(`/scenarios?search=${encodeURIComponent(query)}`, {
+        scroll: false,
+      });
+      setMobileMenuOpen(false);
+      setProfileOpen(false);
+    }, 200);
+
+    return () => window.clearTimeout(timeout);
+  }, [navSearch, pathname, router]);
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white">
@@ -94,33 +162,59 @@ export default function Navbar() {
             </div>
             <input
               type="text"
-              placeholder="Search"
+              value={navSearch}
+              onChange={(event) => setNavSearch(event.target.value)}
+              placeholder="Search scenarios"
               className="h-8 w-40 rounded-md bg-neutral-100 pl-9 pr-3 text-sm transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-300"
             />
           </div>
 
-          <div className="group relative">
-            <Link
-              href="/profile"
-              aria-label="Open profile"
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white shadow-sm ring-1 ring-brand-primary/20 transition-all hover:ring-2 hover:ring-brand-primary/25"
-            >
-              {initials}
-            </Link>
+          <div ref={profileRef} className="relative">
+            {isSignedIn ? (
+              <button
+                type="button"
+                aria-label="Open profile menu"
+                aria-expanded={profileOpen}
+                onClick={() => {
+                  setProfileOpen((open) => !open);
+                  setMobileMenuOpen(false);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white shadow-sm ring-1 ring-brand-primary/20 transition-all hover:ring-2 hover:ring-brand-primary/25"
+              >
+                {initials}
+              </button>
+            ) : (
+              <div className="hidden items-center gap-2 md:flex">
+                <Link
+                  href="/login"
+                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-brand-primary"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover"
+                >
+                  Create account
+                </Link>
+              </div>
+            )}
 
-            <div className="pointer-events-none absolute right-0 top-full z-50 mt-3 w-[320px] translate-y-1 rounded-2xl border border-neutral-200 bg-white p-4 opacity-0 shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-900/5 transition duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+            {isSignedIn && profileOpen && (
+            <div className="absolute right-0 top-full z-50 mt-3 w-[320px] rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-900/5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-bold text-white">
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-brand-deep">{DISPLAY_NAME}</p>
-                    <p className="truncate text-xs text-neutral-500">{ROLE}</p>
+                    <p className="truncate text-sm font-bold text-brand-deep">{displayName}</p>
+                    <p className="truncate text-xs text-neutral-500">{role}</p>
                   </div>
                 </div>
                 <Link
                   href="/profile"
+                  onClick={() => setProfileOpen(false)}
                   className="shrink-0 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
                 >
                   View -&gt;
@@ -185,26 +279,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <div className="mb-4 space-y-1 border-y border-neutral-200 py-3">
-                {dropdownLinks.map(({ href, name, icon: Icon }) => {
-                  const active = isActiveLink(href);
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                        active
-                          ? "bg-brand-mint text-brand-primary"
-                          : "text-neutral-700 hover:bg-neutral-100 hover:text-brand-primary"
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-
               <div className="mb-4 flex items-center justify-between gap-3 rounded-lg bg-neutral-50 px-3 py-2">
                 <div>
                   <p className="text-xs font-semibold text-brand-deep">Text size</p>
@@ -221,21 +295,37 @@ export default function Navbar() {
                 <span className="text-[11px] text-neutral-500">
                   {strengthLabel(Math.max(...Object.values(fingerprint)))} profile
                 </span>
-                <button
-                  type="button"
-                  onClick={resetSession}
-                  className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
-                >
-                  Reset progress
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={resetSession}
+                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileOpen(false);
+                      void signOut();
+                    }}
+                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
+                  >
+                    Sign out
+                  </button>
+                </div>
               </div>
             </div>
+            )}
           </div>
 
-          <div className="relative md:hidden">
+          <div ref={mobileMenuRef} className="relative md:hidden">
             <button
               type="button"
-              onClick={() => setMobileMenuOpen((open) => !open)}
+              onClick={() => {
+                setMobileMenuOpen((open) => !open);
+                setProfileOpen(false);
+              }}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100"
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={mobileMenuOpen}
@@ -249,7 +339,13 @@ export default function Navbar() {
 
             {mobileMenuOpen && (
               <div className="absolute right-0 top-full z-50 mt-3 w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/5">
-                {dropdownLinks.map(({ href, name, icon: Icon }) => {
+                {(isSignedIn
+                  ? dropdownLinks
+                  : [
+                      { name: "Sign in", href: "/login", icon: UserIcon },
+                      { name: "Create account", href: "/signup", icon: UserIcon },
+                    ]
+                ).map(({ href, name, icon: Icon }) => {
                   const active = isActiveLink(href);
                   return (
                     <Link
