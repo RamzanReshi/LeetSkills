@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AppShell from "@/components/shell/AppShell";
 import FingerprintHero from "@/components/dashboard/FingerprintHero";
 import TodayScenarioCTA from "@/components/dashboard/TodayScenarioCTA";
 import WeakDimensionBanner from "@/components/dashboard/WeakDimensionBanner";
@@ -22,10 +23,12 @@ const nextScenario = (scenarios as Scenario[]).find(
 
 export default function DashboardPage() {
   return (
-    <main className="container mx-auto flex flex-col items-center gap-8 py-12 px-4 sm:px-6">
-      <FingerprintHero fingerprint={MOCK_FINGERPRINT} attemptCount={3} />
-      <TodayScenarioCTA scenario={nextScenario} allCompleted={false} />
-      <WeakDimensionBanner fingerprint={MOCK_FINGERPRINT} />
-    </main>
+    <AppShell>
+      <main className="flex flex-col gap-6 p-6">
+        <FingerprintHero fingerprint={MOCK_FINGERPRINT} attemptCount={3} />
+        <TodayScenarioCTA scenario={nextScenario} allCompleted={false} />
+        <WeakDimensionBanner fingerprint={MOCK_FINGERPRINT} />
+      </main>
+    </AppShell>
   );
 }

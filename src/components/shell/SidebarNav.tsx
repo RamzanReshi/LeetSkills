@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookIcon, CompassIcon, UserIcon } from "@/components/ui/Icons";
+import { BookIcon, CompassIcon, UserIcon, DashboardIcon } from "@/components/ui/Icons";
 
 const NAV_ITEMS = [
+  { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
   { href: "/scenarios", label: "Scenarios", icon: BookIcon },
   { href: "/path", label: "Path", icon: CompassIcon },
   { href: "/profile", label: "Profile", icon: UserIcon },
@@ -13,16 +14,18 @@ const NAV_ITEMS = [
 export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const activeHref =
-    pathname?.startsWith("/path") || pathname?.startsWith("/quest")
+    pathname?.startsWith("/dashboard")
+      ? "/dashboard"
+      : pathname?.startsWith("/path") || pathname?.startsWith("/quest")
       ? "/path"
       : pathname?.startsWith("/profile")
-        ? "/profile"
+      ? "/profile"
       : "/scenarios";
 
   return (
     <nav className="flex flex-col gap-1 p-4">
       <p className="px-3 pb-2 pt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
-        Practice
+        Navigation
       </p>
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
         const active = href === activeHref;
