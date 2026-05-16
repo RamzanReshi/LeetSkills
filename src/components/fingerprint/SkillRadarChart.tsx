@@ -1,13 +1,6 @@
 // ============================================================
-// LeetSkills MVP — Skill Radar Chart
-// Owner: Yousef (UI/UX & Dashboard)
+// LeetSkills MVP - Skill Radar Chart
 // ============================================================
-// TODO: Implement 4-axis radar chart with Recharts + Framer Motion
-//
-// Axes: Decomposition, Hypothesis Quality, Reasoning Depth, Honesty
-// - Animated transitions on score updates (Framer Motion)
-// - Scale: 0–100
-// - Responsive sizing
 
 "use client";
 
@@ -35,7 +28,6 @@ export default function SkillRadarChart({
 
   React.useEffect(() => {
     const frame = requestAnimationFrame(() => setMounted(true));
-
     return () => cancelAnimationFrame(frame);
   }, []);
 

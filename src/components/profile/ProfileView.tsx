@@ -52,15 +52,8 @@ export default function ProfileView() {
     history.length === 0
       ? 0
       : Math.round(
-          history.reduce((sum, entry) => {
-            const total = entry.scores.reduce(
-              (scoreSum, score) => scoreSum + score.score / score.max_score,
-              0,
-            );
-            return sum + total / entry.scores.length;
-          }, 0) /
-            history.length *
-            100,
+          history.reduce((sum, entry) => sum + entry.overall_score, 0) /
+            history.length,
         );
 
   return (

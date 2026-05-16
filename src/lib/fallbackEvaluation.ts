@@ -1,34 +1,32 @@
 // ============================================================
-// LeetSkills MVP — Fallback Evaluation
-// Owner: Ramzan (Scenarios & AI Evaluation)
+// LeetSkills MVP - Fallback Evaluation
 // ============================================================
-// TODO: Implement cached/default fallback evaluation
-//
-// This module provides a reliable fallback when the Claude API
-// call fails or response parsing fails, ensuring the product
-// loop never breaks for the user.
 
-import type { Evaluation } from "@/types";
+import type { Evaluation, Scenario } from "@/types";
 
-/**
- * Returns a neutral mid-range evaluation when live AI evaluation fails.
- * The user always gets a result — the pipeline never breaks.
- */
-export function getFallbackEvaluation(scenarioId: string): Evaluation {
+export function getFallbackEvaluation(scenario: Scenario): Evaluation {
   const placeholder =
-    "AI evaluation was temporarily unavailable. This is a placeholder score — resubmit to get a real evaluation.";
+    "AI evaluation was temporarily unavailable. This neutral placeholder preserves the attempt; resubmit later for a calibrated score.";
+
+  const skill_scores = scenario.skills_graded.map((skill) => ({
+    skill: skill.skill,
+    rating_0_to_4: 2,
+    weight: skill.weight,
+    weighted_score: Number(((2 / 4) * skill.weight).toFixed(2)),
+    feedback: placeholder,
+  }));
 
   return {
-    scenario_id: scenarioId,
-    scores: [
-      { dimension: "Decomposition", score: 5, max_score: 10, feedback: placeholder },
-      { dimension: "Hypothesis Quality", score: 5, max_score: 10, feedback: placeholder },
-      { dimension: "Reasoning Depth", score: 5, max_score: 10, feedback: placeholder },
-      { dimension: "Honesty", score: 5, max_score: 10, feedback: placeholder },
-    ],
-    overall_feedback:
-      "Live AI evaluation was unavailable when you submitted. Scores are neutral placeholders (5/10 across all dimensions). Your submission was recorded — try again to receive real feedback.",
-    weakest_dimension: "Honesty",
+    scenario_id: scenario.id,
+    path_id: scenario.path_id,
+    difficulty: scenario.difficulty,
+    overall_score: Math.round(skill_scores.reduce((total, score) => total + score.weighted_score, 0)),
+    skill_scores,
+    strengths: ["Your submission was recorded, but live AI feedback was unavailable."],
+    improvements: ["Resubmit this scenario later to receive specific skill-level feedback."],
+    improved_example_response:
+      "A stronger response would directly address the prompt, make assumptions explicit, explain tradeoffs, and provide a concrete next step.",
+    recommended_next_scenario_id: scenario.recommended_next_scenario_id,
     timestamp: Date.now(),
   };
 }

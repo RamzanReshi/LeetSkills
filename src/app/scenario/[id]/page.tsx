@@ -1,23 +1,19 @@
 // ============================================================
-// LeetSkills MVP — Scenario Flow Page
-// Owner: Ramzan (Scenarios & AI Evaluation)
+// LeetSkills MVP - Scenario Flow Page
 // ============================================================
-// Steps: 1 = Read prompt  2 = Thinking trace  3 = Response  4 = Submitting
 
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import scenariosData from "@/data/scenarios.json";
+import { MVP_SCENARIOS } from "@/data/mvp-content";
 import type { Scenario, Evaluation } from "@/types";
 import ScenarioPrompt from "@/components/scenario/ScenarioPrompt";
 import ThinkingTraceInput from "@/components/scenario/ThinkingTraceInput";
 import ResponseInput from "@/components/scenario/ResponseInput";
 import { useSkillStore } from "@/store/useSkillStore";
 
-const scenarios = scenariosData as Scenario[];
-
-const STEP_LABELS = ["Read", "Think", "Respond"] as const;
+const scenarios = MVP_SCENARIOS as Scenario[];
 
 export default function ScenarioPage() {
   const params = useParams();
@@ -25,7 +21,6 @@ export default function ScenarioPage() {
   const scenarioId = params.id as string;
 
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? null;
-
   const addEvaluation = useSkillStore((s) => s.addEvaluation);
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -37,7 +32,6 @@ export default function ScenarioPage() {
   const [responseValid, setResponseValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Countdown timer — only ticks while step 1 or 2 or 3 is active
   useEffect(() => {
     if (!timerRunning || timeRemaining <= 0) return;
     const id = setInterval(() => {
@@ -71,15 +65,20 @@ export default function ScenarioPage() {
         }),
       });
 
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Evaluation failed");
+      }
+
       const evaluation: Evaluation = await res.json();
       addEvaluation(evaluation);
       router.push(`/results/${scenarioId}`);
     } catch (err) {
       console.error("Submit failed:", err);
-      setError("Something went wrong submitting your response. Please try again.");
+      setError(err instanceof Error ? err.message : "Something went wrong submitting your response. Please try again.");
       setStep(3);
     }
-  }, [scenarioId, thinkingTrace, response, router, addEvaluation]);
+  }, [addEvaluation, scenarioId, thinkingTrace, response, router]);
 
   if (!scenario) {
     return (
@@ -91,62 +90,29 @@ export default function ScenarioPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:py-10">
-      {/* Visual Step Progress */}
-      <nav aria-label="Scenario progress" className="flex items-start justify-center">
-        {STEP_LABELS.map((label, i) => {
-          const stepNum = (i + 1) as 1 | 2 | 3;
-          const isDone = step > stepNum || step === 4;
-          const isActive = step === stepNum;
-          return (
-            <React.Fragment key={label}>
-              <div className="flex flex-col items-center gap-1.5">
-                <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
-                    isDone
-                      ? "bg-brand-primary border-brand-primary text-white"
-                      : isActive
-                      ? "bg-brand-mint border-brand-primary text-brand-primary"
-                      : "bg-white border-neutral-200 text-neutral-400"
-                  }`}
-                >
-                  {isDone ? "✓" : stepNum}
-                </div>
-                <span
-                  className={`text-[11px] font-semibold tracking-wide ${
-                    isActive
-                      ? "text-brand-primary"
-                      : isDone
-                      ? "text-neutral-600"
-                      : "text-neutral-400"
-                  }`}
-                >
-                  {label}
-                </span>
-              </div>
-              {i < 2 && (
-                <div
-                  className={`h-0.5 w-12 sm:w-20 mx-2 mt-[18px] rounded-full transition-all duration-300 ${
-                    step > i + 1 ? "bg-brand-primary" : "bg-neutral-200"
-                  }`}
-                />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </nav>
+    <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
+      <div className="flex gap-2 text-xs font-medium text-neutral-500">
+        {(["Read", "Think", "Respond", "Submitting"] as const).map((label, i) => (
+          <span
+            key={label}
+            className={`rounded-full px-2 py-0.5 ${
+              step === i + 1 ? "bg-brand-mint text-brand-primary" : ""
+            }`}
+          >
+            {i + 1}. {label}
+          </span>
+        ))}
+      </div>
 
-      {/* Step 1 — Read scenario */}
       {step === 1 && (
         <div className="space-y-6">
           <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
           <button onClick={handleStart} className="btn-primary w-full">
-            Start — timer begins now
+            Start - timer begins now
           </button>
         </div>
       )}
 
-      {/* Step 2 — Thinking trace */}
       {step === 2 && (
         <div className="space-y-6">
           <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
@@ -160,12 +126,11 @@ export default function ScenarioPage() {
             disabled={!traceValid}
             className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Next — write your response
+            Next - write your response
           </button>
         </div>
       )}
 
-      {/* Step 3 — Response */}
       {step === 3 && (
         <div className="space-y-6">
           <div className="rounded-lg border border-neutral-300 bg-neutral-100 p-3 text-xs text-neutral-500">
@@ -187,14 +152,13 @@ export default function ScenarioPage() {
         </div>
       )}
 
-      {/* Step 4 — Loading */}
       {step === 4 && (
         <div className="flex flex-col items-center gap-4 py-16 text-neutral-700">
           <svg className="h-8 w-8 animate-spin text-brand-primary" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
-          <p className="text-sm font-medium">Evaluating your submission…</p>
+          <p className="text-sm font-medium">Evaluating your submission...</p>
         </div>
       )}
     </main>

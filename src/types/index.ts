@@ -1,30 +1,32 @@
 // ============================================================
-// LeetSkills MVP — Shared TypeScript Types
-// Owner: Reshi (Foundation & Infrastructure)
+// LeetSkills MVP - Shared TypeScript Types
 // ============================================================
 
-/** A single scenario stored in scenarios.json */
+import type { DashboardDimension, MvpScenario } from "@/data/mvp-content";
+
+/** A single canonical MVP scenario. */
 export interface Scenario {
   id: string;
-  track: "first-principles" | "productive-struggle";
+  path_id: MvpScenario["path_id"];
+  path_title: string;
+  title: string;
+  difficulty: MvpScenario["difficulty"];
+  scenario_type: string;
+  estimated_time: string;
   prompt_text: string;
   time_limit_seconds: number;
-  rubric_dimensions: RubricDimension[];
+  expected_learner_output: string;
+  skills_graded: SkillRubric[];
+  grading_notes?: string;
+  recommended_next_scenario_id?: string;
 }
 
-/** Rubric dimension metadata */
-export interface RubricDimension {
-  name: DimensionName;
-  description: string;
-  max_score: number;
+/** Scenario-level weighted skill rubric. */
+export interface SkillRubric {
+  skill: string;
+  weight: number;
+  excellent: string;
 }
-
-/** The 4 evaluation axes */
-export type DimensionName =
-  | "Decomposition"
-  | "Hypothesis Quality"
-  | "Reasoning Depth"
-  | "Honesty";
 
 /** What the user submits */
 export interface Submission {
@@ -33,30 +35,33 @@ export interface Submission {
   response: string;
 }
 
-/** Score for a single dimension */
-export interface DimensionScore {
-  dimension: DimensionName;
-  score: number;
-  max_score: number;
+/** Score for a single weighted scenario skill. */
+export interface SkillScore {
+  skill: string;
+  rating_0_to_4: number;
+  weight: number;
+  weighted_score: number;
   feedback: string;
 }
 
 /** Full evaluation returned by /api/evaluate */
 export interface Evaluation {
   scenario_id: string;
-  scores: DimensionScore[];
-  overall_feedback: string;
-  weakest_dimension: DimensionName;
+  path_id: Scenario["path_id"];
+  difficulty: Scenario["difficulty"];
+  overall_score: number;
+  skill_scores: SkillScore[];
+  strengths: string[];
+  improvements: string[];
+  improved_example_response: string;
+  recommended_next_scenario_id?: string;
   timestamp: number;
 }
 
-/** Skill Fingerprint — aggregated scores across all attempts */
-export interface SkillFingerprint {
-  Decomposition: number;
-  "Hypothesis Quality": number;
-  "Reasoning Depth": number;
-  Honesty: number;
-}
+/** Skill Fingerprint - aggregated scores across all attempts */
+export type DimensionName = DashboardDimension;
+
+export type SkillFingerprint = Record<DashboardDimension, number>;
 
 /** Session data persisted in localStorage */
 export interface SessionData {

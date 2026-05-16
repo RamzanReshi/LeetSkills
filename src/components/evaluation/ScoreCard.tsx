@@ -1,58 +1,40 @@
 "use client";
 
 import React from "react";
-import type { DimensionScore, DimensionName } from "@/types";
+import type { SkillScore } from "@/types";
 
 interface ScoreCardProps {
-  score: DimensionScore;
+  score: SkillScore;
 }
 
-const DIMENSION_COLORS: Record<DimensionName, { color: string; lightBg: string }> = {
-  Decomposition: { color: "#3B82F6", lightBg: "#EFF6FF" },
-  "Hypothesis Quality": { color: "#7C3AED", lightBg: "#F5F3FF" },
-  "Reasoning Depth": { color: "#D97706", lightBg: "#FFFBEB" },
-  Honesty: { color: "#1F8A5B", lightBg: "#ECFDF3" },
-};
-
 export default function ScoreCard({ score }: ScoreCardProps) {
-  const pct = Math.round((score.score / score.max_score) * 100);
-  const cfg = DIMENSION_COLORS[score.dimension as DimensionName] ?? {
-    color: "#1F8A5B",
-    lightBg: "#ECFDF3",
-  };
+  const pct = Math.round((score.rating_0_to_4 / 4) * 100);
 
   return (
-    <div
-      className="rounded-xl px-5 py-4 transition-shadow hover:shadow-md"
-      style={{
-        backgroundColor: cfg.lightBg,
-        outline: `1px solid ${cfg.color}33`,
-      }}
-    >
-      <div className="flex justify-between items-start mb-3 gap-2">
-        <div className="min-w-0">
-          <div
-            className="inline-block w-2 h-2 rounded-full mb-1.5"
-            style={{ backgroundColor: cfg.color }}
-          />
-          <p className="font-bold text-[15px] text-neutral-900 leading-tight">{score.dimension}</p>
-        </div>
-        <span
-          className="font-mono font-black text-xl leading-none shrink-0"
-          style={{ color: cfg.color }}
-        >
-          {score.score}/{score.max_score}
+    <div className="bg-ls-surface border border-ls-border rounded-[10px] px-5 py-4 hover:border-ls-green/40 transition-colors shadow-sm">
+      <div className="flex justify-between items-start gap-4 mb-4">
+        <span className="text-ls-text font-bold text-[16px] leading-tight">{score.skill}</span>
+        <span className="text-ls-green font-bold text-[16px] font-mono whitespace-nowrap">
+          {score.rating_0_to_4}/4
         </span>
       </div>
 
-      <div className="w-full h-[5px] bg-white/70 rounded-full overflow-hidden mb-3">
+      <div className="w-full h-[6px] bg-neutral-100 rounded-full overflow-hidden mb-3">
         <div
           className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${pct}%`, backgroundColor: cfg.color }}
+          style={{
+            width: `${pct}%`,
+            background: "linear-gradient(90deg, #123D2A 0%, #27AE60 100%)",
+          }}
         />
       </div>
 
-      <p className="text-neutral-600 text-[13px] leading-[1.5]">{score.feedback}</p>
+      <div className="mb-3 flex justify-between text-[11px] font-mono text-ls-text-muted">
+        <span>Weight {score.weight}</span>
+        <span>{score.weighted_score.toFixed(1)} pts</span>
+      </div>
+
+      <p className="text-ls-text-muted text-[13px] leading-[1.5]">{score.feedback}</p>
     </div>
   );
 }
