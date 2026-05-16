@@ -145,9 +145,12 @@ export default function ScenarioPage() {
 
       {step === 3 && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-neutral-300 bg-neutral-100 p-3 text-xs text-neutral-500">
-            Thinking trace saved ({thinkingTrace.length} chars). Now write your final response.
-          </div>
+          <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
+          <ThinkingTraceInput
+            value={thinkingTrace}
+            onChange={setThinkingTrace}
+            onValidChange={setTraceValid}
+          />
           <ResponseInput
             value={response}
             onChange={setResponse}
@@ -156,7 +159,7 @@ export default function ScenarioPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             onClick={handleSubmit}
-            disabled={!responseValid}
+            disabled={!traceValid || !responseValid}
             className="btn-action w-full disabled:cursor-not-allowed disabled:opacity-40"
           >
             Submit for evaluation
