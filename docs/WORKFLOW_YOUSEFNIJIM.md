@@ -1,4 +1,4 @@
-# 🎨 Yousef — UI/UX & Dashboard Workflow
+# 🎨 YousefNijim — UI/UX & Dashboard Workflow
 
 > **Role:** UI/UX & Dashboard Lead
 > **Branch:** `feat/ui-dashboard`
@@ -69,7 +69,7 @@ git clone https://github.com/CadPosting/LeetSkills.git
 cd LeetSkills
 npm install
 
-# Create your branch (after Reshi's foundation merges)
+# Create your branch (after reshiahmed's foundation merges)
 git checkout main
 git pull origin main
 git checkout -b feat/ui-dashboard
@@ -113,8 +113,8 @@ const data = [
 
 ## Integration Notes
 
-- **Wait for Reshi's `feat/foundation` to merge** before starting your branch.
+- **Wait for reshiahmed's `feat/foundation` to merge** before starting your branch.
 - You can prototype the radar chart independently using mock data.
-- Use Reshi's UI primitives (`Button`, `Card`, `LoadingSpinner`) — don't rebuild them.
+- Use reshiahmed's UI primitives (`Button`, `Card`, `LoadingSpinner`) — don't rebuild them.
 - Use types from `src/types/index.ts` — especially `SkillFingerprint`, `DimensionScore`, `Evaluation`.
 - The dashboard reads from `useSkillStore` — Ramzan's evaluation flow writes to it.

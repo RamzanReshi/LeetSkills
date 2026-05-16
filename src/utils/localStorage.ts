@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — localStorage Helpers
-// Owner: Reshi (Foundation & Infrastructure)
+// Owner: reshiahmed (Foundation & Infrastructure)
 // ============================================================
 
 import type { SessionData } from "@/types";

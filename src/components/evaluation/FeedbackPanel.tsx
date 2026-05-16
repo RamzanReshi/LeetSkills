@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Feedback Panel Component
-// Owner: Yousef (UI/UX & Dashboard)
+// Owner: YousefNijim (UI/UX & Dashboard)
 // ============================================================
 // TODO: Implement AI feedback display panel
 

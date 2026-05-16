@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Results Page
-// Owner: Yousef (UI/UX & Dashboard) — wired by Ramzan
+// Owner: YousefNijim (UI/UX & Dashboard)
 // ============================================================
 
 "use client";

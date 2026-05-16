@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — TextArea Component
-// Owner: Reshi (Foundation & Infrastructure)
+// Owner: reshiahmed (Foundation & Infrastructure)
 // ============================================================
 // TODO: Implement reusable TextArea with character count
 

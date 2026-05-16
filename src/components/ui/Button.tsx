@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Button Component
-// Owner: Reshi (Foundation & Infrastructure)
+// Owner: reshiahmed (Foundation & Infrastructure)
 // ============================================================
 // TODO: Implement reusable Button with variants (primary, secondary, ghost)
 
