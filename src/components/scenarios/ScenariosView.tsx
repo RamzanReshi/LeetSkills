@@ -12,7 +12,6 @@ import {
 } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
 import CategoryTabs from "./CategoryTabs";
-import SkillChips from "./SkillChips";
 import ScenarioToolbar from "./ScenarioToolbar";
 import ScenarioTable from "./ScenarioTable";
 
@@ -67,16 +66,15 @@ export default function ScenariosView() {
         />
       </div>
 
-      <div className="mb-5">
-        <SkillChips topics={SKILL_TOPICS} activeId={activeSkill} onSelect={setActiveSkill} />
-      </div>
-
       <div className="mb-4">
         <ScenarioToolbar
           search={search}
           onSearchChange={setSearch}
           difficulty={difficulty}
           onDifficultyChange={setDifficulty}
+          skillTopics={SKILL_TOPICS}
+          activeSkill={activeSkill}
+          onSkillChange={setActiveSkill}
           completed={completedCount}
           total={SCENARIOS_META.length}
         />

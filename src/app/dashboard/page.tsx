@@ -21,7 +21,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <main className="flex flex-col gap-6 p-6">
+      <main className="flex max-w-full flex-col gap-4 overflow-x-hidden p-4 sm:gap-6 sm:p-6">
         <FingerprintHero fingerprint={fingerprint} attemptCount={attemptCount} />
         <TodayScenarioCTA scenario={nextScenario} allCompleted={!nextScenario} />
         <WeakDimensionBanner fingerprint={fingerprint} />

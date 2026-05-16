@@ -2,21 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { SCENARIOS_META } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
 import {
   BookIcon,
+  CloseIcon,
   CompassIcon,
   DashboardIcon,
+  MenuIcon,
   SearchIcon,
   UserIcon,
 } from "@/components/ui/Icons";
-
-const navLinks: { name: string; href: string; color?: string }[] = [
-  { name: "Scenarios", href: "/scenarios" },
-  { name: "Dashboard", href: "/dashboard" },
-];
 
 const dropdownLinks = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
@@ -46,6 +44,7 @@ function strengthLabel(score: number) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fingerprint = useSkillStore((s) => s.fingerprint);
   const history = useSkillStore((s) => s.history);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
@@ -64,10 +63,13 @@ export default function Navbar() {
         );
   const initials = getInitials(DISPLAY_NAME);
 
+  const isActiveLink = (href: string) =>
+    pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex h-[50px] max-w-[1200px] items-center justify-between px-4">
-        <div className="flex h-full items-center gap-6">
+      <div className="flex h-[50px] w-screen max-w-[100vw] items-center justify-between px-4">
+        <div className="flex h-full items-center">
           <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
             <div className="relative h-8 w-8">
               <Image
@@ -83,25 +85,6 @@ export default function Navbar() {
               Leet<span className="font-normal text-brand-primary">Skills</span>
             </span>
           </Link>
-
-          <div className="flex h-full items-center gap-5">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`relative flex h-full items-center text-[14px] font-medium transition-colors ${
-                    isActive
-                      ? "text-neutral-900 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900"
-                      : link.color || "text-neutral-500 hover:text-neutral-900"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
-          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -204,7 +187,7 @@ export default function Navbar() {
 
               <div className="mb-4 space-y-1 border-y border-neutral-200 py-3">
                 {dropdownLinks.map(({ href, name, icon: Icon }) => {
-                  const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+                  const active = isActiveLink(href);
                   return (
                     <Link
                       key={href}
@@ -247,6 +230,45 @@ export default function Navbar() {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="relative md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100"
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <CloseIcon className="h-5 w-5" />
+              ) : (
+                <MenuIcon className="h-5 w-5" />
+              )}
+            </button>
+
+            {mobileMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-3 w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/5">
+                {dropdownLinks.map(({ href, name, icon: Icon }) => {
+                  const active = isActiveLink(href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-brand-mint text-brand-primary"
+                          : "text-neutral-700 hover:bg-neutral-100 hover:text-brand-primary"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

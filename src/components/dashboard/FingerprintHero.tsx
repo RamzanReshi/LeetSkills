@@ -46,27 +46,30 @@ export default function FingerprintHero({
     Math.max(dimensions.length, 1);
 
   return (
-    <section className="glass-card w-full p-8 animate-fade-in">
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <section
+      className="glass-card w-full min-w-0 overflow-hidden p-4 animate-fade-in sm:max-w-full sm:p-8"
+      style={{ maxWidth: "calc(100vw - 2rem)" }}
+    >
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:mb-8 sm:gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-brand-primary">
             Skill Profile
           </p>
-          <h2 className="mt-1.5 text-3xl font-bold tracking-tight text-brand-deep">
+          <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-brand-deep sm:text-3xl">
             Your Skill Fingerprint
           </h2>
         </div>
         <div className="flex gap-3">
-          <div className="rounded-2xl bg-brand-mint px-5 py-3 ring-1 ring-neutral-200 text-center min-w-[80px]">
-            <p className="text-3xl font-black text-brand-deep leading-none">
+          <div className="min-w-[72px] rounded-xl bg-brand-mint px-4 py-2.5 text-center ring-1 ring-neutral-200 sm:min-w-[80px] sm:rounded-2xl sm:px-5 sm:py-3">
+            <p className="text-2xl font-black leading-none text-brand-deep sm:text-3xl">
               {Math.round(average)}
             </p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
               {getOverallLabel(average)}
             </p>
           </div>
-          <div className="rounded-2xl bg-neutral-50 px-5 py-3 ring-1 ring-neutral-200 text-center min-w-[80px]">
-            <p className="text-3xl font-black text-brand-deep leading-none">{attemptCount}</p>
+          <div className="min-w-[72px] rounded-xl bg-neutral-50 px-4 py-2.5 text-center ring-1 ring-neutral-200 sm:min-w-[80px] sm:rounded-2xl sm:px-5 sm:py-3">
+            <p className="text-2xl font-black leading-none text-brand-deep sm:text-3xl">{attemptCount}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
               Scenarios
             </p>
@@ -74,40 +77,43 @@ export default function FingerprintHero({
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr] lg:items-start">
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[1fr_1.5fr] lg:items-start">
         <div className="relative flex items-center justify-center py-4">
           <div className="relative z-10 w-full aspect-square max-w-[280px] mx-auto">
             <SkillRadarChart fingerprint={fingerprint} size="lg" />
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div
+          className="grid w-full max-w-full min-w-0 gap-3"
+          style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}
+        >
           {dimensions.map(([dimension, score]) => {
             const cfg = DIMENSION_CONFIG[dimension];
             return (
               <div
                 key={dimension}
-                className="rounded-xl p-4 transition-shadow hover:shadow-md"
+                className="min-w-0 rounded-xl p-3 transition-shadow hover:shadow-md sm:p-4"
                 style={{
                   backgroundColor: cfg.lightBg,
                   outline: `1px solid ${cfg.color}33`,
                 }}
               >
-                <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="mb-3 flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div
                       className="inline-block w-2 h-2 rounded-full mb-1.5"
                       style={{ backgroundColor: cfg.color }}
                     />
-                    <h3 className="font-bold text-sm leading-tight" style={{ color: cfg.color }}>
+                    <h3 className="break-words text-sm font-bold leading-tight" style={{ color: cfg.color }}>
                       {dimension}
                     </h3>
-                    <p className="mt-0.5 text-xs text-neutral-500 leading-snug">
+                    <p className="mt-0.5 hidden text-xs leading-snug text-neutral-500 min-[420px]:block">
                       {cfg.description}
                     </p>
                   </div>
                   <span
-                    className="font-mono text-2xl font-black shrink-0 leading-none"
+                    className="shrink-0 font-mono text-xl font-black leading-none sm:text-2xl"
                     style={{ color: cfg.color }}
                   >
                     {score}
