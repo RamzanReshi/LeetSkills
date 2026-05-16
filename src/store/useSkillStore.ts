@@ -8,6 +8,8 @@ import { DASHBOARD_DIMENSIONS, getDashboardDimensionsForSkill } from "@/data/mvp
 import { loadSession, saveSession, clearSession } from "@/utils/localStorage";
 
 interface SkillStore extends SessionData {
+  hydrated: boolean;
+  hydrateSession: () => void;
   addEvaluation: (evaluation: Evaluation) => void;
   resetSession: () => void;
 }
@@ -69,26 +71,39 @@ function calculateFingerprint(history: Evaluation[]): SkillFingerprint {
   return totals;
 }
 
-const initialSession = normalizeSession(loadSession());
-
 export const useSkillStore = create<SkillStore>((set) => ({
-  fingerprint: initialSession?.fingerprint ?? DEFAULT_FINGERPRINT,
-  history: initialSession?.history ?? [],
-  completedScenarioIds: initialSession?.completedScenarioIds ?? [],
+  fingerprint: DEFAULT_FINGERPRINT,
+  history: [],
+  completedScenarioIds: [],
+  hydrated: false,
+
+  hydrateSession: () => {
+    const session = normalizeSession(loadSession());
+    set({
+      fingerprint: session?.fingerprint ?? DEFAULT_FINGERPRINT,
+      history: session?.history ?? [],
+      completedScenarioIds: session?.completedScenarioIds ?? [],
+      hydrated: true,
+    });
+  },
 
   addEvaluation: (evaluation: Evaluation) =>
     set((state) => {
-      const newHistory = [...state.history, evaluation];
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const baseHistory = savedSession?.history ?? state.history;
+      const baseCompletedScenarioIds =
+        savedSession?.completedScenarioIds ?? state.completedScenarioIds;
+      const newHistory = [...baseHistory, evaluation];
       const newState: SessionData = {
         fingerprint: calculateFingerprint(newHistory),
         history: newHistory,
         completedScenarioIds: [
-          ...new Set([...state.completedScenarioIds, evaluation.scenario_id]),
+          ...new Set([...baseCompletedScenarioIds, evaluation.scenario_id]),
         ],
       };
 
       saveSession(newState);
-      return newState;
+      return { ...newState, hydrated: true };
     }),
 
   resetSession: () => {
@@ -97,6 +112,7 @@ export const useSkillStore = create<SkillStore>((set) => ({
       fingerprint: DEFAULT_FINGERPRINT,
       history: [],
       completedScenarioIds: [],
+      hydrated: true,
     });
   },
 }));

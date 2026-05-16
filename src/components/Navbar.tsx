@@ -55,11 +55,16 @@ export default function Navbar() {
   const fingerprint = useSkillStore((s) => s.fingerprint);
   const history = useSkillStore((s) => s.history);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
+  const hydrateSession = useSkillStore((s) => s.hydrateSession);
   const resetSession = useSkillStore((s) => s.resetSession);
   const { user, profile, signOut } = useAuth();
   const isSignedIn = Boolean(user);
   const displayName = getAccountDisplayName(user, profile);
   const role = getAccountRole(profile);
+
+  useEffect(() => {
+    hydrateSession();
+  }, [hydrateSession]);
 
   const completed = SCENARIOS_META.filter((scenario) =>
     completedScenarioIds.includes(scenario.id),

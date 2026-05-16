@@ -21,6 +21,15 @@ export default function ResultsPage() {
 
   const history = useSkillStore((s) => s.history);
   const fingerprint = useSkillStore((s) => s.fingerprint);
+  const hydrated = useSkillStore((s) => s.hydrated);
+
+  if (!hydrated) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-brand-deep">Loading results...</h1>
+      </main>
+    );
+  }
 
   const evaluation = [...history]
     .reverse()

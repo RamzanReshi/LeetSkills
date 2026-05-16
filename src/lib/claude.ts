@@ -5,7 +5,6 @@
 import type { Scenario, Submission, Evaluation } from "@/types";
 import { buildEvaluationPrompt } from "@/lib/evaluationPrompt";
 import { parseEvaluation } from "@/lib/parseEvaluation";
-import { getFallbackEvaluation } from "@/lib/fallbackEvaluation";
 import { getProvider } from "@/lib/providers";
 
 export async function evaluateSubmission(
@@ -19,11 +18,6 @@ export async function evaluateSubmission(
     `CANDIDATE RESPONSE:\n${submission.response}`,
   ].join("\n\n");
 
-  try {
-    const raw = await getProvider().complete(systemPrompt, userMessage);
-    return parseEvaluation(raw, scenario);
-  } catch (err) {
-    console.error("evaluateSubmission failed, using fallback:", err);
-    return getFallbackEvaluation(scenario);
-  }
+  const raw = await getProvider().complete(systemPrompt, userMessage);
+  return parseEvaluation(raw, scenario);
 }
