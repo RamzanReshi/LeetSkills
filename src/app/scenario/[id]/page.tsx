@@ -17,6 +17,8 @@ import { useSkillStore } from "@/store/useSkillStore";
 
 const scenarios = scenariosData as Scenario[];
 
+const STEP_LABELS = ["Read", "Think", "Respond"] as const;
+
 export default function ScenarioPage() {
   const params = useParams();
   const router = useRouter();
@@ -77,7 +79,7 @@ export default function ScenarioPage() {
       setError("Something went wrong submitting your response. Please try again.");
       setStep(3);
     }
-  }, [scenarioId, thinkingTrace, response, router]);
+  }, [scenarioId, thinkingTrace, response, router, addEvaluation]);
 
   if (!scenario) {
     return (
@@ -89,29 +91,56 @@ export default function ScenarioPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
-      {/* Step indicator */}
-      <div className="flex gap-2 text-xs font-medium text-neutral-500">
-        {(["Read", "Think", "Respond", "Submitting"] as const).map((label, i) => (
-          <span
-            key={label}
-            className={`rounded-full px-2 py-0.5 ${
-              step === i + 1 ? "bg-brand-mint text-brand-primary" : ""
-            }`}
-          >
-            {i + 1}. {label}
-          </span>
-        ))}
-      </div>
+    <main className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:py-10">
+      {/* Visual Step Progress */}
+      <nav aria-label="Scenario progress" className="flex items-start justify-center">
+        {STEP_LABELS.map((label, i) => {
+          const stepNum = (i + 1) as 1 | 2 | 3;
+          const isDone = step > stepNum || step === 4;
+          const isActive = step === stepNum;
+          return (
+            <React.Fragment key={label}>
+              <div className="flex flex-col items-center gap-1.5">
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
+                    isDone
+                      ? "bg-brand-primary border-brand-primary text-white"
+                      : isActive
+                      ? "bg-brand-mint border-brand-primary text-brand-primary"
+                      : "bg-white border-neutral-200 text-neutral-400"
+                  }`}
+                >
+                  {isDone ? "✓" : stepNum}
+                </div>
+                <span
+                  className={`text-[11px] font-semibold tracking-wide ${
+                    isActive
+                      ? "text-brand-primary"
+                      : isDone
+                      ? "text-neutral-600"
+                      : "text-neutral-400"
+                  }`}
+                >
+                  {label}
+                </span>
+              </div>
+              {i < 2 && (
+                <div
+                  className={`h-0.5 w-12 sm:w-20 mx-2 mt-[18px] rounded-full transition-all duration-300 ${
+                    step > i + 1 ? "bg-brand-primary" : "bg-neutral-200"
+                  }`}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </nav>
 
       {/* Step 1 — Read scenario */}
       {step === 1 && (
         <div className="space-y-6">
           <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
-          <button
-            onClick={handleStart}
-            className="btn-primary w-full"
-          >
+          <button onClick={handleStart} className="btn-primary w-full">
             Start — timer begins now
           </button>
         </div>
