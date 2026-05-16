@@ -33,30 +33,30 @@ export default function ThinkingTraceInput({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-neutral-700">
         Thinking Trace
-        <span className="ml-1 text-xs text-gray-400">(minimum {MIN_CHARS} characters)</span>
+        <span className="ml-1 text-xs text-neutral-500">(minimum {MIN_CHARS} characters)</span>
       </label>
       <textarea
         value={value}
         onChange={handleChange}
         placeholder="Show your reasoning process — what assumptions are you making, what are you ruling out, what's your approach?"
         rows={8}
-        className={`w-full rounded-lg border px-3 py-2 text-sm leading-relaxed outline-none transition-colors focus:ring-2 ${
+        className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
-            ? "border-red-400 focus:ring-red-300"
-            : "border-gray-300 focus:ring-blue-300"
+            ? "border-red-400 focus:ring-red-200"
+            : "border-neutral-300 focus:ring-brand-primary/30 focus:border-brand-primary"
         }`}
       />
       <div className="flex justify-between text-xs">
         {value.length > 0 && !valid ? (
-          <span className="text-red-500">{remaining} more characters needed</span>
+          <span className="text-red-600">{remaining} more characters needed</span>
         ) : valid ? (
-          <span className="text-green-600">Looks good</span>
+          <span className="text-brand-primary">Looks good</span>
         ) : (
-          <span className="text-gray-400">Start typing your thinking trace…</span>
+          <span className="text-neutral-500">Start typing your thinking trace…</span>
         )}
-        <span className="text-gray-400">{charCount} chars</span>
+        <span className="text-neutral-500">{charCount} chars</span>
       </div>
     </div>
   );

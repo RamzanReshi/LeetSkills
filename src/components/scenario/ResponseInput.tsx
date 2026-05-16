@@ -30,7 +30,7 @@ export default function ResponseInput({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-neutral-700">
         Your Response
       </label>
       <textarea
@@ -38,14 +38,14 @@ export default function ResponseInput({
         onChange={handleChange}
         placeholder="Write your final, structured response to the scenario."
         rows={10}
-        className={`w-full rounded-lg border px-3 py-2 text-sm leading-relaxed outline-none transition-colors focus:ring-2 ${
+        className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
-            ? "border-red-400 focus:ring-red-300"
-            : "border-gray-300 focus:ring-blue-300"
+            ? "border-red-400 focus:ring-red-200"
+            : "border-neutral-300 focus:ring-brand-primary/30 focus:border-brand-primary"
         }`}
       />
       {value.length > 0 && !valid && (
-        <p className="text-xs text-red-500">Response cannot be empty.</p>
+        <p className="text-xs text-red-600">Response cannot be empty.</p>
       )}
     </div>
   );

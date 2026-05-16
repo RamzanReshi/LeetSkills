@@ -44,9 +44,92 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 4. In Scope (Build These)
+## 4. Brand Identity & Color Palette
 
-### 4.1 Scenarios
+### 4.1 Logo Colors
+
+- Logo Primary Green: `#1F8A5B` — main logo shape / outline
+- Logo Action Green: `#27AE60` — accent highlight, active detail, progress feel
+- Logo Deep Green: `#123D2A` — strong contrast, dark logo version
+- Logo Mint Fill: `#ECFDF3` — soft inner fill or background version
+- Logo Background Gray: `#F3F4F6` — logo presentation background
+
+### 4.2 Core Product Palette
+
+- Primary Green: `#1F8A5B` — main CTA, active states, progress
+- Action Green: `#27AE60` — submit buttons, learning actions
+- Deep Green: `#123D2A` — headers, dark sections, brand anchor
+- Mint Surface: `#ECFDF3` — success backgrounds, learning surfaces
+- App Background: `#F7FAF6` — main page background
+- Card Background: `#FFFFFF` — cards, forms, dashboard panels
+
+### 4.3 Five Gray Shades
+
+- Gray 900: `#111827` — main headings, primary text
+- Gray 700: `#374151` — body text, labels
+- Gray 500: `#6B7280` — muted text, helper copy
+- Gray 300: `#D1D5DB` — borders, dividers, disabled states
+- Gray 100: `#F3F4F6` — light gray surfaces, logo background
+
+### 4.4 Recommended Logo Usage
+
+**Primary Logo**
+- Logo outline: `#1F8A5B`
+- Inner fill or soft background: `#ECFDF3`
+- Background: `#F3F4F6`
+
+**Strong Logo Version**
+- Logo mark: `#123D2A`
+- Accent: `#27AE60`
+- Background: `#FFFFFF`
+
+**App Icon Version**
+- Circle background: `#1F8A5B`
+- Logo/cloud mark: `#FFFFFF`
+- Optional accent: `#ECFDF3`
+
+### 4.5 UI Mapping
+
+- Primary CTA: `#1F8A5B`
+- Submit Button: `#27AE60`
+- CTA Hover: `#166A45`
+- Dashboard Background: `#F7FAF6`
+- Card Background: `#FFFFFF`
+- Skill Fingerprint Highlight: `#1F8A5B`
+- Success Surface: `#ECFDF3`
+- Main Text: `#111827`
+- Secondary Text: `#374151`
+- Muted Text: `#6B7280`
+- Borders: `#D1D5DB`
+- Neutral Surface: `#F3F4F6`
+
+### 4.6 Tailwind Tokens
+
+```js
+colors: {
+  brand: {
+    primary: "#1F8A5B",
+    action: "#27AE60",
+    deep: "#123D2A",
+    mint: "#ECFDF3",
+    background: "#F7FAF6",
+    card: "#FFFFFF"
+  },
+  neutral: {
+    900: "#111827",
+    700: "#374151",
+    500: "#6B7280",
+    300: "#D1D5DB",
+    100: "#F3F4F6"
+  }
+}
+```
+
+------------------------------------------------------------------------
+
+## 5. In Scope (Build These)
+
+### 5.1 Scenarios
 
 -   10 hand-written scenarios total
 -   5 from Track 1 (First Principles Thinking)
@@ -55,7 +138,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 -   Each scenario includes: `id`, `track`, `prompt_text`,
     `time_limit_seconds`, `rubric_dimensions[]`
 
-### 4.2 Core Product Loop
+### 5.2 Core Product Loop
 
 1.  Scenario screen\
 2.  Thinking trace input (minimum 80 chars)\
@@ -63,7 +146,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 4.  Submit to Claude API\
 5.  Evaluation screen with scores + Skill Fingerprint update
 
-### 4.3 AI Evaluation
+### 5.3 AI Evaluation
 
 -   One Claude API call per submission
 -   Structured JSON output
@@ -72,21 +155,21 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 -   Fallback reliability system with cached evaluation if live parsing
     fails
 
-### 4.4 Skill Fingerprint
+### 5.4 Skill Fingerprint
 
 -   4-axis radar chart
 -   Axes: Decomposition, Hypothesis Quality, Reasoning Depth, Honesty
 -   Browser state via Zustand
 -   Animated updates with Framer Motion
 
-### 4.5 Dashboard
+### 5.5 Dashboard
 
 -   Skill Fingerprint hero
 -   Today's Scenario CTA
 -   Weakest dimension callout
 -   No unnecessary social or gamification systems
 
-### 4.6 Sessions
+### 5.6 Sessions
 
 -   Anonymous
 -   localStorage persistence
@@ -94,7 +177,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 5. Out of Scope
+## 6. Out of Scope
 
 -   Authentication
 -   Database persistence
@@ -108,7 +191,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 6. Build Roadmap
+## 7. Build Roadmap
 
 ### Phase 1 --- Foundation
 
@@ -140,7 +223,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 7. Technical Decisions
+## 8. Technical Decisions
 
   Decision    Choice
   ----------- -------------------
@@ -155,7 +238,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 8. Evaluation Prompt Contract
+## 9. Evaluation Prompt Contract
 
 **POST /api/evaluate**
 
@@ -180,7 +263,7 @@ If all 5 happen reliably and clearly, the MVP succeeds.
 
 ------------------------------------------------------------------------
 
-## 9. Success Criteria
+## 10. Success Criteria
 
 The MVP succeeds if:
 
@@ -192,7 +275,7 @@ The MVP succeeds if:
 
 ------------------------------------------------------------------------
 
-## 10. Known Product Risks
+## 11. Known Product Risks
 
 -   API latency\
 -   Parsing failures\
@@ -210,7 +293,7 @@ The MVP succeeds if:
 
 ------------------------------------------------------------------------
 
-## 11. Decisions Needed Before Build
+## 12. Decisions Needed Before Build
 
 -   Claude API ownership\
 -   Deployment ownership\

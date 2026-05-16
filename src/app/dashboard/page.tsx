@@ -22,7 +22,7 @@ const nextScenario = (scenarios as Scenario[]).find(
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-ls-bg flex flex-col items-center justify-center gap-6 p-8">
+    <main className="container mx-auto flex flex-col items-center gap-8 py-12 px-4 sm:px-6">
       <FingerprintHero fingerprint={MOCK_FINGERPRINT} attemptCount={3} />
       <TodayScenarioCTA scenario={nextScenario} allCompleted={false} />
       <WeakDimensionBanner fingerprint={MOCK_FINGERPRINT} />

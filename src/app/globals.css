@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* PRD palette */
+  --brand-primary: #1F8A5B;
+  --brand-primary-hover: #166A45;
+  --brand-action: #27AE60;
+  --brand-deep: #123D2A;
+  --brand-mint: #ECFDF3;
+  --brand-bg: #F7FAF6;
+  --brand-card: #FFFFFF;
+
+  --neutral-900: #111827;
+  --neutral-700: #374151;
+  --neutral-500: #6B7280;
+  --neutral-300: #D1D5DB;
+  --neutral-100: #F3F4F6;
+
+  --background: var(--brand-bg);
+  --foreground: var(--neutral-900);
+
+  --card-bg: var(--brand-card);
+  --card-border: var(--neutral-300);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-action: var(--brand-action);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-card: var(--brand-card);
+
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-100: var(--neutral-100);
+
+  /* Aliases used by evaluation components */
+  --color-ls-surface: var(--brand-card);
+  --color-ls-border: var(--neutral-300);
+  --color-ls-green: var(--brand-primary);
+  --color-ls-text: var(--neutral-900);
+  --color-ls-text-muted: var(--neutral-500);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px rgba(17, 24, 39, 0.04);
+  transition: all 0.25s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--brand-primary);
+  box-shadow: 0 8px 28px rgba(31, 138, 91, 0.12);
+}
+
+.btn-primary {
+  background: var(--brand-primary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(31, 138, 91, 0.18);
+}
+
+.btn-primary:hover {
+  background: var(--brand-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(31, 138, 91, 0.25);
+}
+
+.btn-action {
+  background: var(--brand-action);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  background: var(--brand-primary);
+}
+
+.logo-text {
+  color: var(--brand-deep);
+  font-weight: 800;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
 }
