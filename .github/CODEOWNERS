@@ -1,0 +1,30 @@
+# This file defines code ownership for pull request reviews.
+# Each contributor is responsible for reviewing changes to their owned files.
+
+# Foundation & Infrastructure — Reshi
+/src/app/layout.tsx                        @reshi
+/src/app/page.tsx                          @reshi
+/src/app/globals.css                       @reshi
+/src/components/ui/                        @reshi
+/src/store/                                @reshi
+/src/types/                                @reshi
+/src/utils/localStorage.ts                 @reshi
+/next.config.ts                            @reshi
+/tailwind.config.ts                        @reshi
+/tsconfig.json                             @reshi
+/package.json                              @reshi
+
+# Scenarios & AI Evaluation — Ramzan
+/src/data/                                 @CadPosting
+/src/lib/                                  @CadPosting
+/src/app/api/                              @CadPosting
+/src/app/scenario/                         @CadPosting
+/src/components/scenario/                  @CadPosting
+/src/utils/validation.ts                   @CadPosting
+
+# UI/UX & Dashboard — Yousef
+/src/components/fingerprint/               @yousef
+/src/components/evaluation/                @yousef
+/src/components/dashboard/                 @yousef
+/src/app/dashboard/                        @yousef
+/src/app/results/                          @yousef
