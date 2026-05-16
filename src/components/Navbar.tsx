@@ -2,13 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { UserIcon, SearchIcon } from "@/components/ui/Icons";
+import { SearchIcon } from "@/components/ui/Icons";
+import ProfileDropdown from "@/components/navbar/ProfileDropdown";
 
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white">
       <div className="mx-auto flex h-[50px] max-w-[1200px] items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0"
+        >
           <div className="relative h-8 w-8">
             <Image
               src="/logo-v2.png"
@@ -34,13 +38,7 @@ export default function Navbar() {
               className="h-8 w-40 rounded-md bg-neutral-100 pl-9 pr-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-300 transition-all"
             />
           </div>
-          <Link
-            href="/profile"
-            aria-label="Open profile"
-            className="h-8 w-8 overflow-hidden rounded-full bg-neutral-100 p-1 hover:ring-2 hover:ring-neutral-200 transition-all shrink-0"
-          >
-            <UserIcon className="h-full w-full text-neutral-400" />
-          </Link>
+          <ProfileDropdown />
         </div>
       </div>
     </nav>
