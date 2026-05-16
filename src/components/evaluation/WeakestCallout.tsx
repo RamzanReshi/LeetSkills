@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import type { DimensionName } from "@/types";
 
 interface WeakestCalloutProps {
@@ -36,11 +37,20 @@ export default function WeakestCallout({ dimension, score, maxScore }: WeakestCa
         </div>
       </div>
 
-      <div className="flex-shrink-0">
-        <span className="text-ls-green text-[13px] font-medium flex items-center gap-1 hover:underline cursor-pointer">
-          See tips →
+      <motion.div
+        className="flex-shrink-0 cursor-pointer"
+        whileHover="hover"
+      >
+        <span className="text-ls-green text-[13px] font-medium flex items-center gap-1">
+          See tips
+          <motion.span
+            variants={{ hover: { x: 4 } }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            →
+          </motion.span>
         </span>
-      </div>
+      </motion.div>
     </div>
   );
 }

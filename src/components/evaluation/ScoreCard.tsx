@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import type { DimensionScore } from "@/types";
 
 interface ScoreCardProps {
@@ -11,7 +12,11 @@ export default function ScoreCard({ score }: ScoreCardProps) {
   const pct = Math.round((score.score / score.max_score) * 100);
 
   return (
-    <div className="bg-ls-surface border border-ls-border rounded-[10px] px-5 py-4 hover:border-ls-green/40 transition-colors shadow-sm">
+    <motion.div
+      whileHover={{ y: -2, scale: 1.01 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="bg-ls-surface border border-ls-border rounded-[10px] px-5 py-4 hover:border-ls-green/40 transition-colors shadow-sm cursor-default"
+    >
       <div className="flex justify-between items-center mb-4">
         <span className="text-ls-text font-bold text-[16px]">{score.dimension}</span>
         <span className="text-ls-green font-bold text-[16px] font-mono">
@@ -30,6 +35,6 @@ export default function ScoreCard({ score }: ScoreCardProps) {
       </div>
 
       <p className="text-ls-text-muted text-[13px] leading-[1.5]">{score.feedback}</p>
-    </div>
+    </motion.div>
   );
 }

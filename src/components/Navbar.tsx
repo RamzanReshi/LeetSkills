@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserIcon, BellIcon, FlameIcon, SearchIcon } from "@/components/ui/Icons";
+import { UserIcon, SearchIcon } from "@/components/ui/Icons";
 
 const navLinks: { name: string; href: string; color?: string }[] = [
   { name: "Problems", href: "/library" },
@@ -67,21 +67,13 @@ export default function Navbar() {
             />
           </div>
 
-          <div className="flex items-center gap-3 text-neutral-500">
-            <button className="p-1 hover:text-neutral-900 transition-colors">
-              <BellIcon className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-1 hover:text-neutral-900 transition-colors cursor-pointer">
-              <FlameIcon className="h-5 w-5 text-orange-500" />
-              <span className="text-sm font-semibold">0</span>
-            </div>
-            <div className="h-8 w-8 overflow-hidden rounded-full bg-neutral-100 p-1 hover:ring-2 hover:ring-neutral-200 transition-all cursor-pointer">
-              <UserIcon className="h-full w-full text-neutral-400" />
-            </div>
-            <button className="hidden sm:block rounded-md bg-orange-100 px-3 py-1 text-[13px] font-semibold text-orange-600 hover:bg-orange-200 transition-colors">
-              Premium
-            </button>
-          </div>
+          <Link
+            href="/profile"
+            aria-label="Open profile"
+            className="h-8 w-8 overflow-hidden rounded-full bg-neutral-100 p-1 hover:ring-2 hover:ring-neutral-200 transition-all"
+          >
+            <UserIcon className="h-full w-full text-neutral-400" />
+          </Link>
         </div>
       </div>
     </nav>

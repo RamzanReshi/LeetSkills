@@ -4,28 +4,25 @@ import React from "react";
 import FingerprintHero from "@/components/dashboard/FingerprintHero";
 import TodayScenarioCTA from "@/components/dashboard/TodayScenarioCTA";
 import WeakDimensionBanner from "@/components/dashboard/WeakDimensionBanner";
+import { useSkillStore } from "@/store/useSkillStore";
 import scenarios from "@/data/scenarios.json";
 import type { Scenario } from "@/types";
 
-const MOCK_FINGERPRINT = {
-  Decomposition: 75,
-  "Hypothesis Quality": 60,
-  "Reasoning Depth": 80,
-  Honesty: 90,
-};
-
-const MOCK_COMPLETED = ["fp-001"];
-
-const nextScenario = (scenarios as Scenario[]).find(
-  (s) => !MOCK_COMPLETED.includes(s.id)
-) ?? null;
+const allScenarios = scenarios as Scenario[];
 
 export default function DashboardPage() {
+  const fingerprint = useSkillStore((s) => s.fingerprint);
+  const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
+  const attemptCount = useSkillStore((s) => s.history.length);
+
+  const nextScenario = allScenarios.find((s) => !completedScenarioIds.includes(s.id)) ?? null;
+  const allCompleted = allScenarios.length > 0 && completedScenarioIds.length >= allScenarios.length;
+
   return (
     <main className="container mx-auto flex flex-col items-center gap-8 py-12 px-4 sm:px-6">
-      <FingerprintHero fingerprint={MOCK_FINGERPRINT} attemptCount={3} />
-      <TodayScenarioCTA scenario={nextScenario} allCompleted={false} />
-      <WeakDimensionBanner fingerprint={MOCK_FINGERPRINT} />
+      <FingerprintHero fingerprint={fingerprint} attemptCount={attemptCount} />
+      <TodayScenarioCTA scenario={nextScenario} allCompleted={allCompleted} />
+      <WeakDimensionBanner fingerprint={fingerprint} />
     </main>
   );
 }

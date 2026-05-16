@@ -34,7 +34,7 @@ export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBanner
         </p>
       </div>
 
-      <div className="relative flex-shrink-0 w-20 h-20">
+      <div className="relative hidden sm:flex flex-shrink-0 w-20 h-20">
         <svg className="w-full h-full transform -rotate-90">
           <circle
             cx="40"
