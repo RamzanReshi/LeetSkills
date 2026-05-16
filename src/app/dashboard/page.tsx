@@ -3,6 +3,7 @@
 import React from "react";
 import FingerprintHero from "@/components/dashboard/FingerprintHero";
 import TodayScenarioCTA from "@/components/dashboard/TodayScenarioCTA";
+import WeakDimensionBanner from "@/components/dashboard/WeakDimensionBanner";
 import scenarios from "@/data/scenarios.json";
 import type { Scenario } from "@/types";
 
@@ -24,7 +25,7 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-ls-bg flex flex-col items-center justify-center gap-6 p-8">
       <FingerprintHero fingerprint={MOCK_FINGERPRINT} attemptCount={3} />
       <TodayScenarioCTA scenario={nextScenario} allCompleted={false} />
-      {/* <WeakDimensionBanner /> */}
+      <WeakDimensionBanner fingerprint={MOCK_FINGERPRINT} />
     </main>
   );
 }
