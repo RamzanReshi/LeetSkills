@@ -22,12 +22,10 @@ export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBanner
 
   return (
     <div className="w-full max-w-[400px] bg-ls-surface border border-ls-border border-l-[4px] border-l-[#F59E0B] rounded-[12px] px-6 py-5 flex items-center gap-5">
-      {/* Warning icon */}
       <div className="flex-shrink-0 text-[#F59E0B] text-[22px] leading-none">
         ⚠
       </div>
 
-      {/* Text */}
       <div className="flex-1 min-w-0">
         <p className="text-ls-green font-mono uppercase tracking-widest text-[11px] mb-1">
           Focus Area
@@ -40,7 +38,6 @@ export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBanner
         </p>
       </div>
 
-      {/* Circular score ring */}
       <div
         className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center"
         style={ringStyle}

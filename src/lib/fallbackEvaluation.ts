@@ -8,21 +8,27 @@
 // call fails or response parsing fails, ensuring the product
 // loop never breaks for the user.
 
-import type { Evaluation, DimensionName } from "@/types";
+import type { Evaluation } from "@/types";
 
 /**
- * Generate a fallback evaluation when live evaluation fails.
- * Returns a conservative, generic evaluation with a message
- * explaining that AI evaluation was unavailable.
- *
- * @param scenarioId - The scenario that was attempted
- * @returns A safe fallback Evaluation object
+ * Returns a neutral mid-range evaluation when live AI evaluation fails.
+ * The user always gets a result — the pipeline never breaks.
  */
 export function getFallbackEvaluation(scenarioId: string): Evaluation {
-  // TODO: Implement in Phase 2
-  // Return a neutral evaluation with:
-  // - Mid-range scores
-  // - Generic but honest feedback
-  // - Clear indication this is a fallback
-  throw new Error("Not implemented — Phase 2");
+  const placeholder =
+    "AI evaluation was temporarily unavailable. This is a placeholder score — resubmit to get a real evaluation.";
+
+  return {
+    scenario_id: scenarioId,
+    scores: [
+      { dimension: "Decomposition", score: 5, max_score: 10, feedback: placeholder },
+      { dimension: "Hypothesis Quality", score: 5, max_score: 10, feedback: placeholder },
+      { dimension: "Reasoning Depth", score: 5, max_score: 10, feedback: placeholder },
+      { dimension: "Honesty", score: 5, max_score: 10, feedback: placeholder },
+    ],
+    overall_feedback:
+      "Live AI evaluation was unavailable when you submitted. Scores are neutral placeholders (5/10 across all dimensions). Your submission was recorded — try again to receive real feedback.",
+    weakest_dimension: "Honesty",
+    timestamp: Date.now(),
+  };
 }

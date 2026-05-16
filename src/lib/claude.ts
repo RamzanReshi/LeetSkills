@@ -1,34 +1,38 @@
 // ============================================================
-// LeetSkills MVP — Claude API Client
+// LeetSkills MVP — Evaluation Orchestrator
 // Owner: Ramzan (Scenarios & AI Evaluation)
 // ============================================================
-// TODO: Implement Claude API call using @anthropic-ai/sdk
-//
-// This module wraps the Anthropic SDK to send a structured
-// evaluation request and return parsed results.
-//
 // Usage:
 //   import { evaluateSubmission } from "@/lib/claude";
 //   const result = await evaluateSubmission(scenario, submission);
 
 import type { Scenario, Submission, Evaluation } from "@/types";
+import { buildEvaluationPrompt } from "@/lib/evaluationPrompt";
+import { parseEvaluation } from "@/lib/parseEvaluation";
+import { getFallbackEvaluation } from "@/lib/fallbackEvaluation";
+import { getProvider } from "@/lib/providers";
 
 /**
- * Send a submission to Claude for evaluation.
- * Returns a structured Evaluation object.
- *
- * @param scenario - The scenario being answered
- * @param submission - User's thinking trace + response
- * @returns Parsed evaluation with scores and feedback
+ * Send a submission to the active AI provider for evaluation.
+ * Falls back to a neutral evaluation if the provider or parser fails.
+ * Switch providers by setting AI_PROVIDER in .env.local.
  */
 export async function evaluateSubmission(
   scenario: Scenario,
   submission: Submission
 ): Promise<Evaluation> {
-  // TODO: Implement in Phase 2
-  // 1. Build the system prompt using evaluationPrompt.ts
-  // 2. Call Claude API with structured JSON output
-  // 3. Parse response using parseEvaluation.ts
-  // 4. Fall back to fallbackEvaluation.ts if parsing fails
-  throw new Error("Not implemented — Phase 2");
+  const systemPrompt = buildEvaluationPrompt(scenario);
+  const userMessage = [
+    `SCENARIO PROMPT:\n${scenario.prompt_text}`,
+    `CANDIDATE THINKING TRACE:\n${submission.thinking_trace}`,
+    `CANDIDATE RESPONSE:\n${submission.response}`,
+  ].join("\n\n");
+
+  try {
+    const raw = await getProvider().complete(systemPrompt, userMessage);
+    return parseEvaluation(raw, scenario.id);
+  } catch (err) {
+    console.error("evaluateSubmission failed, using fallback:", err);
+    return getFallbackEvaluation(scenario.id);
+  }
 }

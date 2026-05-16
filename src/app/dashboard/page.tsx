@@ -1,13 +1,3 @@
-// ============================================================
-// LeetSkills MVP — Dashboard Page
-// Owner: YousefNijim (UI/UX & Dashboard)
-// ============================================================
-// TODO: Implement the main dashboard with:
-// - Skill Fingerprint hero (radar chart)
-// - Today's Scenario CTA
-// - Weakest dimension callout
-// - Session reset option
-// ============================================================
 "use client";
 
 import React from "react";

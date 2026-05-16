@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Timer Component
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 // TODO: Implement countdown timer with visual urgency states
 

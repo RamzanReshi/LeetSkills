@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Loading Spinner Component
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 // TODO: Implement animated loading spinner
 

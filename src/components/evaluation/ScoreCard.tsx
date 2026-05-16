@@ -12,7 +12,6 @@ export default function ScoreCard({ score }: ScoreCardProps) {
 
   return (
     <div className="bg-ls-surface border border-ls-border rounded-[10px] px-5 py-4 hover:border-ls-green/30 transition-colors">
-      {/* Dimension name + score */}
       <div className="flex justify-between items-center mb-4">
         <span className="text-ls-text font-bold text-[16px]">{score.dimension}</span>
         <span className="text-ls-green font-bold text-[16px] font-mono">
@@ -20,7 +19,6 @@ export default function ScoreCard({ score }: ScoreCardProps) {
         </span>
       </div>
 
-      {/* Progress bar */}
       <div className="w-full h-[6px] bg-ls-border rounded-full overflow-hidden mb-4">
         <div
           className="h-full rounded-full transition-all duration-700"
@@ -31,7 +29,6 @@ export default function ScoreCard({ score }: ScoreCardProps) {
         />
       </div>
 
-      {/* Feedback text */}
       <p className="text-ls-text-muted text-[13px] leading-[1.5]">{score.feedback}</p>
     </div>
   );

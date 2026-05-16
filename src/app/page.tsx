@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Root Page
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 // Redirects to /dashboard
 

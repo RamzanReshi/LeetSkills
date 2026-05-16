@@ -9,7 +9,6 @@ interface FeedbackPanelProps {
 export default function FeedbackPanel({ feedback }: FeedbackPanelProps) {
   return (
     <div className="bg-ls-surface border border-ls-border border-l-[4px] border-l-ls-green rounded-[10px] px-6 py-5 shadow-lg">
-      {/* Header */}
       <div className="flex justify-between items-center mb-5 pb-5 border-b border-ls-border">
         <div className="flex items-center gap-2">
           <span className="text-ls-green text-[18px] leading-none">✦</span>
@@ -22,7 +21,6 @@ export default function FeedbackPanel({ feedback }: FeedbackPanelProps) {
         </div>
       </div>
 
-      {/* Feedback body */}
       <p className="text-ls-text text-[15px] leading-[1.7] opacity-90">
         {feedback}
       </p>

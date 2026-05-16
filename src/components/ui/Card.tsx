@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Card Component
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 // TODO: Implement reusable Card container with optional title
 

@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Zustand Store
-// Owner: reshiahmed (Foundation & Infrastructure)
+// Owner: Reshi (Foundation & Infrastructure)
 // ============================================================
 
 import { create } from "zustand";

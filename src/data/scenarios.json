@@ -62,7 +62,7 @@
   {
     "id": "ps-001",
     "track": "productive-struggle",
-    "prompt_text": "You are given a legacy codebase with no documentation, no tests, and a critical bug in production affecting 10% of users. You have 48 hours. Describe your exact approach \u2014 what you do first, what you resist doing, and how you decide when you've understood enough to act.",
+    "prompt_text": "You are given a legacy codebase with no documentation, no tests, and a critical bug in production affecting 10% of users. You have 48 hours. Describe your exact approach — what you do first, what you resist doing, and how you decide when you've understood enough to act.",
     "time_limit_seconds": 600,
     "rubric_dimensions": [
       { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
@@ -74,7 +74,7 @@
   {
     "id": "ps-002",
     "track": "productive-struggle",
-    "prompt_text": "You're leading a team building a feature. Halfway through, you realize the technical approach won't scale for the expected load \u2014 but the deadline is in 2 weeks and management has already announced the feature. Walk through your decision-making process.",
+    "prompt_text": "You're leading a team building a feature. Halfway through, you realize the technical approach won't scale for the expected load — but the deadline is in 2 weeks and management has already announced the feature. Walk through your decision-making process.",
     "time_limit_seconds": 600,
     "rubric_dimensions": [
       { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
@@ -110,7 +110,7 @@
   {
     "id": "ps-005",
     "track": "productive-struggle",
-    "prompt_text": "You designed a database schema 6 months ago. It's now causing performance issues at scale that you didn't anticipate. Your team is frustrated. How do you approach owning the mistake, diagnosing the root cause, and proposing a migration path \u2014 without being defensive or over-correcting?",
+    "prompt_text": "You designed a database schema 6 months ago. It's now causing performance issues at scale that you didn't anticipate. Your team is frustrated. How do you approach owning the mistake, diagnosing the root cause, and proposing a migration path — without being defensive or over-correcting?",
     "time_limit_seconds": 600,
     "rubric_dimensions": [
       { "name": "Decomposition", "description": "Ability to break the problem into fundamental components", "max_score": 10 },
