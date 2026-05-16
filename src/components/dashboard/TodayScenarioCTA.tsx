@@ -33,7 +33,7 @@ export default function TodayScenarioCTA({
             All scenarios mastered
           </h3>
           <p className="mt-3 text-neutral-500 max-w-md mx-auto">
-            Excellent work. You&apos;ve cleared all currently available cognitive challenges.
+            Excellent work. You&apos;ve cleared all currently available cognitive scenarios.
             New scenarios will arrive soon.
           </p>
         </div>

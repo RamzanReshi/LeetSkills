@@ -48,29 +48,29 @@ export default function ScenarioTable({ scenarios, completedIds }: Props) {
           </tr>
         </thead>
         <tbody>
-          {scenarios.map((c) => {
-            const done = completedIds.includes(c.id);
+          {scenarios.map((s) => {
+            const done = completedIds.includes(s.id);
             return (
               <tr
-                key={c.id}
+                key={s.id}
                 className="border-b border-neutral-300/60 last:border-b-0 transition-colors even:bg-neutral-50/60 hover:bg-brand-mint/40"
               >
                 <td className="px-4 py-3">
                   <StatusDot done={done} />
                 </td>
-                <td className="px-2 py-3 font-mono text-xs text-neutral-500">{c.number}</td>
+                <td className="px-2 py-3 font-mono text-xs text-neutral-500">{s.number}</td>
                 <td className="px-2 py-3">
                   <Link
-                    href={`/scenario/${c.id}`}
+                    href={`/scenario/${s.id}`}
                     className="font-medium text-neutral-900 hover:text-brand-primary"
                   >
-                    {c.title}
+                    {s.title}
                   </Link>
                 </td>
-                <td className="px-2 py-3 text-neutral-700">{c.categoryLabel}</td>
-                <td className="px-2 py-3 font-semibold text-neutral-900">{c.avgScore}%</td>
+                <td className="px-2 py-3 text-neutral-700">{s.categoryLabel}</td>
+                <td className="px-2 py-3 font-semibold text-neutral-900">{s.avgScore}%</td>
                 <td className="px-4 py-3">
-                  <DifficultyBadge difficulty={c.difficulty} />
+                  <DifficultyBadge difficulty={s.difficulty} />
                 </td>
               </tr>
             );
@@ -80,22 +80,22 @@ export default function ScenarioTable({ scenarios, completedIds }: Props) {
 
       {/* Mobile card list */}
       <ul className="divide-y divide-neutral-300/60 md:hidden">
-        {scenarios.map((c) => {
-          const done = completedIds.includes(c.id);
+        {scenarios.map((s) => {
+          const done = completedIds.includes(s.id);
           return (
-            <li key={c.id} className="p-4">
-              <Link href={`/scenario/${c.id}`} className="flex items-start gap-3">
+            <li key={s.id} className="p-4">
+              <Link href={`/scenario/${s.id}`} className="flex items-start gap-3">
                 <StatusDot done={done} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[11px] text-neutral-500">#{c.number}</span>
-                    <span className="font-medium text-neutral-900">{c.title}</span>
+                    <span className="font-mono text-[11px] text-neutral-500">#{s.number}</span>
+                    <span className="font-medium text-neutral-900">{s.title}</span>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
-                    <span>{c.categoryLabel}</span>
+                    <span>{s.categoryLabel}</span>
                     <span>·</span>
-                    <span className="font-semibold text-neutral-700">{c.avgScore}%</span>
-                    <DifficultyBadge difficulty={c.difficulty} />
+                    <span className="font-semibold text-neutral-700">{s.avgScore}%</span>
+                    <DifficultyBadge difficulty={s.difficulty} />
                   </div>
                 </div>
               </Link>
