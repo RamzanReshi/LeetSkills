@@ -1,6 +1,6 @@
 // ============================================================
 // LeetSkills MVP — Score Card Component
-// Owner: Yousef (UI/UX & Dashboard)
+// Owner: YousefNijim (UI/UX & Dashboard)
 // ============================================================
 // TODO: Implement individual dimension score display
 

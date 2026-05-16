@@ -35,9 +35,9 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 | Contributor | Role | Branch | Workflow Doc |
 |-------------|------|--------|--------------|
-| **Reshi** | Foundation & Infrastructure | `feat/foundation` | [WORKFLOW_RESHI.md](docs/WORKFLOW_RESHI.md) |
+| **reshiahmed** | Foundation & Infrastructure | `feat/foundation` | [WORKFLOW_RESHIAHMED.md](docs/WORKFLOW_RESHIAHMED.md) |
 | **Ramzan** | Scenarios & AI Evaluation | `feat/evaluation` | [WORKFLOW_RAMZAN.md](docs/WORKFLOW_RAMZAN.md) |
-| **Yousef** | UI/UX & Dashboard | `feat/ui-dashboard` | [WORKFLOW_YOUSEF.md](docs/WORKFLOW_YOUSEF.md) |
+| **YousefNijim** | UI/UX & Dashboard | `feat/ui-dashboard` | [WORKFLOW_YOUSEFNIJIM.md](docs/WORKFLOW_YOUSEFNIJIM.md) |
 
 ## Project Structure
 
@@ -49,23 +49,23 @@ src/
 │   ├── scenario/[id]/      # Scenario flow page
 │   └── results/[id]/       # Evaluation results page
 ├── components/
-│   ├── ui/                 # Shared primitives (Reshi)
+│   ├── ui/                 # Shared primitives (reshiahmed)
 │   ├── scenario/           # Scenario flow components (Ramzan)
-│   ├── evaluation/         # Score display components (Yousef)
-│   ├── fingerprint/        # Radar chart (Yousef)
-│   └── dashboard/          # Dashboard sections (Yousef)
+│   ├── evaluation/         # Score display components (YousefNijim)
+│   ├── fingerprint/        # Radar chart (YousefNijim)
+│   └── dashboard/          # Dashboard sections (YousefNijim)
 ├── data/                   # Static scenario JSON (Ramzan)
 ├── lib/                    # Claude API + evaluation pipeline (Ramzan)
-├── store/                  # Zustand state management (Reshi)
-├── types/                  # Shared TypeScript types (Reshi)
-└── utils/                  # Helpers (Reshi + Ramzan)
+├── store/                  # Zustand state management (reshiahmed)
+├── types/                  # Shared TypeScript types (reshiahmed)
+└── utils/                  # Helpers (reshiahmed + Ramzan)
 ```
 
 ## Build Phases
 
-1. **Phase 1 — Foundation** (Reshi): Project setup, routing, UI primitives, state management
+1. **Phase 1 — Foundation** (reshiahmed): Project setup, routing, UI primitives, state management
 2. **Phase 2 — Content + Evaluation** (Ramzan): Scenarios, Claude integration, API route
-3. **Phase 3 — Product Experience** (Yousef + Ramzan): Dashboard, radar chart, scenario flow
+3. **Phase 3 — Product Experience** (YousefNijim + Ramzan): Dashboard, radar chart, scenario flow
 4. **Phase 4 — Reliability + Polish** (All): Error handling, loading states, deployment QA
 
 ## Product Loop

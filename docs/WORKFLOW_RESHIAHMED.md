@@ -1,4 +1,4 @@
-# 🔧 Reshi — Foundation & Infrastructure Workflow
+# 🔧 reshiahmed — Foundation & Infrastructure Workflow
 
 > **Role:** Foundation & Backend Lead
 > **Branch:** `feat/foundation`
@@ -86,6 +86,6 @@ git push origin feat/foundation
 
 ## Integration Notes
 
-- **Your branch merges first.** Ramzan and Yousef depend on your types, store, and UI components.
+- **Your branch merges first.** Ramzan and YousefNijim depend on your types, store, and UI components.
 - Keep `src/types/index.ts` stable — any changes require notifying the team.
 - The `useSkillStore` is the single source of truth for session state.

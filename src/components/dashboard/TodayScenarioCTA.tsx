@@ -1,3 +1,9 @@
+// ============================================================
+// LeetSkills MVP — Today's Scenario CTA
+// Owner: YousefNijim (UI/UX & Dashboard)
+// ============================================================
+// TODO: Call-to-action card linking to the next available scenario
+// ============================================================
 "use client";
 
 import React from "react";
