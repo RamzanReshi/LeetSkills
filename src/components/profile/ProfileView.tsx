@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { SCENARIOS_META } from "@/data/scenarios-meta";
 import { useSkillStore } from "@/store/useSkillStore";
-import { ArrowRightIcon, CheckIcon, FlameIcon, UserIcon } from "@/components/ui/Icons";
+import { ArrowRightIcon, CheckIcon, FlameIcon, SettingsIcon, UserIcon } from "@/components/ui/Icons";
 import {
   getAccountDisplayName,
   getAccountRole,
@@ -126,13 +126,22 @@ export default function ProfileView() {
                 <p className="mt-1 text-sm text-neutral-500">{role}</p>
               </div>
             </div>
-            <Link
-              href="/scenarios"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover"
-            >
-              Continue practice
-              <ArrowRightIcon className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Link
+                href="/settings"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-semibold text-brand-deep transition-colors hover:border-brand-primary hover:text-brand-primary"
+              >
+                <SettingsIcon className="h-4 w-4" />
+                Settings
+              </Link>
+              <Link
+                href="/scenarios"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover"
+              >
+                Continue practice
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
 
           <div className="mt-6">

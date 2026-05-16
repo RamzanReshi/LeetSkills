@@ -11,7 +11,7 @@
 
 LeetSkills is a web app where users practice real-world professional and technical scenarios. Users read a scenario, write a required thinking trace, write a final response, receive AI-evaluated feedback, and build an evolving Skill Fingerprint.
 
-The current MVP is an anonymous localStorage product. It does not include authentication, database persistence, payments, social features, or an admin dashboard.
+The current MVP stores scenario progress in browser localStorage. It includes optional Supabase Auth and profile data when Supabase env vars are configured, but it does not include database persistence for scenario progress, payments, social features, or an admin dashboard.
 
 ## 2. Current Product Loop
 
@@ -23,8 +23,8 @@ The main loop is:
 4. User writes a mandatory thinking trace of at least 80 characters.
 5. User writes a final response.
 6. App submits to `POST /api/evaluate`.
-7. AI returns structured feedback and weighted skill scores.
-8. App stores the result in Zustand/localStorage.
+7. AI returns structured feedback and weighted skill scores, or the route returns a classified provider error.
+8. If evaluation succeeds, the app stores the result in Zustand/localStorage.
 9. User sees results on `/results/[id]`.
 10. Dashboard, profile, path progress, and Skill Fingerprint update from local session data.
 
@@ -46,16 +46,16 @@ The main loop is:
 - Claude as the default AI provider.
 - Gemini as an optional AI provider.
 - OpenAI provider stub, not production-ready.
-- Fallback evaluation when AI evaluation fails.
+- Classified provider errors when AI evaluation fails.
+- Optional Supabase Auth with a `leetskill.profiles` table.
 - Skill Fingerprint radar and progress views.
 - Dashboard, learning paths, profile, and results pages.
-- Anonymous session persistence through Zustand and localStorage.
+- Scenario progress persistence through Zustand and localStorage.
 - Reset local session.
 
 ### Out of Scope For Current MVP
 
-- Authentication
-- Database persistence
+- Database persistence for scenario progress and evaluations
 - Admin dashboard
 - Payments
 - Leaderboards
@@ -75,7 +75,14 @@ The main loop is:
 | `/path` | Learning paths overview | `src/app/path/page.tsx` |
 | `/quest` | Redirects to `/path` | `src/app/quest/page.tsx` |
 | `/profile` | Local profile, stats, fingerprint bars, and reset control | `src/app/profile/page.tsx` |
+| `/login` | Supabase sign-in page | `src/app/login/page.tsx` |
+| `/signup` | Supabase account creation page | `src/app/signup/page.tsx` |
+| `/forgot-password` | Password reset request page | `src/app/forgot-password/page.tsx` |
+| `/reset-password` | Password update page | `src/app/reset-password/page.tsx` |
+| `/auth/callback` | Supabase auth callback route | `src/app/auth/callback/route.ts` |
 | `/api/evaluate` | Server route for scenario evaluation | `src/app/api/evaluate/route.ts` |
+
+When Supabase env vars are present, `/dashboard`, `/scenarios`, `/path`, `/quest`, `/profile`, `/scenario/*`, and `/results/*` are protected routes. Without Supabase env vars, the app runs in anonymous local demo mode.
 
 ## 5. Current Tech Stack
 
@@ -85,11 +92,12 @@ The main loop is:
 | UI runtime | React 19 |
 | Styling | Tailwind CSS v4 using CSS tokens in `src/app/globals.css` |
 | State | Zustand |
-| Persistence | Browser localStorage through `src/utils/localStorage.ts` |
+| Persistence | Browser localStorage through `src/utils/localStorage.ts` for scenario progress |
 | Charts | Recharts |
 | Animation | Framer Motion dependency is installed |
 | AI SDKs | Anthropic SDK and Google GenAI SDK |
 | AI providers | Claude default, Gemini optional, OpenAI stub |
+| Auth | Optional Supabase Auth and `leetskill.profiles` profile data |
 | Hosting target | Vercel-compatible Next.js app |
 
 ## 6. Content Model
@@ -141,8 +149,7 @@ Current calculation:
 
 Current gap:
 
-- Fallback AI scores currently look like normal scored progress.
-- The product should mark fallback evaluations clearly or exclude them from fingerprint updates before production MVP.
+- AI provider failures are returned as structured errors, but the product still needs a learner-facing retry or fallback decision before production MVP.
 
 ## 8. AI Evaluation
 
@@ -166,13 +173,14 @@ Current behavior:
 - Finds the scenario from `MVP_SCENARIOS`.
 - Calls `evaluateSubmission`.
 - Uses the configured provider from `AI_PROVIDER`.
-- Falls back to a neutral evaluation if live AI evaluation or parsing fails.
+- Returns a classified JSON error if live AI evaluation or parsing fails.
 
 Providers:
 
 - `AI_PROVIDER=claude` is the default.
 - `AI_PROVIDER=gemini` is supported when `GEMINI_API_KEY` is set.
 - `AI_PROVIDER=openai` is only a stub and throws until implemented.
+- `src/lib/fallbackEvaluation.ts` contains a neutral placeholder helper, but it is not currently wired into `POST /api/evaluate`.
 
 ## 9. Brand Identity & Color Palette
 
@@ -205,11 +213,9 @@ Main blockers:
 
 - Dashboard needs better metrics.
 - Skill Fingerprint needs clearer product meaning.
-- Fallback AI scores must be marked clearly or excluded from real progress.
-- No authentication.
-- No database persistence.
+- AI provider failures need a product-level retry or fallback decision.
+- Scenario progress and evaluations are not persisted to a database.
 - No admin dashboard.
-- Missing `.env.local.example`.
 - No automated tests or smoke tests.
 - Some unfinished UI remains: navbar search, timer TODO, and hardcoded profile data.
 
@@ -218,11 +224,10 @@ Main blockers:
 Recommended next work:
 
 1. Improve dashboard metrics and recent activity.
-2. Improve Skill Fingerprint explanation, empty state, and fallback handling.
-3. Add `.env.local.example`.
-4. Improve AI fallback and provider error handling.
-5. Add smoke tests for critical routes and `/api/evaluate`.
-6. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
+2. Improve Skill Fingerprint explanation and empty state.
+3. Improve AI fallback/error handling UX.
+4. Add smoke tests for critical routes and `/api/evaluate`.
+5. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
 
 ## 12. Success Criteria
 

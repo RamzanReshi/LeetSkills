@@ -2,19 +2,39 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 type Mode = "login" | "signup";
+const LAST_AUTH_EMAIL_KEY = "leetskills_last_auth_email";
+
+function getSavedAuthEmail() {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(LAST_AUTH_EMAIL_KEY) ?? "";
+}
 
 export default function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [message, setMessage] = useState<string | null>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [message, setMessage] = useState<string | null>(() =>
+    searchParams.get("message") === "check-email"
+      ? "Check your email to confirm your account, then enter your password."
+      : null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const isSignup = mode === "signup";
+  const initialEmail = isSignup
+    ? ""
+    : searchParams.get("email") ?? getSavedAuthEmail();
+
+  useEffect(() => {
+    if (!isSignup && initialEmail) {
+      passwordRef.current?.focus();
+    }
+  }, [initialEmail, isSignup]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,10 +47,11 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     }
 
     const formData = new FormData(event.currentTarget);
-    const email = String(formData.get("email") ?? "");
+    const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
     const fullName = String(formData.get("fullName") ?? "");
     const supabase = createClient();
+    window.localStorage.setItem(LAST_AUTH_EMAIL_KEY, email);
     setLoading(true);
 
     try {
@@ -48,7 +69,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         });
 
         if (signUpError) throw signUpError;
-        setMessage("Check your email to confirm your account.");
+        router.push(
+          `/login?email=${encodeURIComponent(email)}&message=check-email`,
+        );
         return;
       }
 
@@ -89,6 +112,8 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           name="email"
           type="email"
           autoComplete="email"
+          defaultValue={initialEmail}
+          autoFocus={!initialEmail}
           required
           className="mt-1 h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
         />
@@ -99,6 +124,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         <input
           name="password"
           type="password"
+          ref={passwordRef}
           autoComplete={isSignup ? "new-password" : "current-password"}
           minLength={6}
           required

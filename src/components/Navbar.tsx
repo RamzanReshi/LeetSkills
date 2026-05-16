@@ -13,6 +13,7 @@ import {
   DashboardIcon,
   MenuIcon,
   SearchIcon,
+  SettingsIcon,
   UserIcon,
 } from "@/components/ui/Icons";
 import {
@@ -26,6 +27,7 @@ const dropdownLinks = [
   { name: "Scenarios", href: "/scenarios", icon: BookIcon },
   { name: "Learning Path", href: "/path", icon: CompassIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
+  { name: "Settings", href: "/settings", icon: SettingsIcon },
 ];
 
 function getInitials(name: string) {
@@ -80,7 +82,9 @@ export default function Navbar() {
   const initials = getInitials(displayName);
 
   const isActiveLink = (href: string) =>
-    pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+    pathname === href ||
+    (href !== "/dashboard" && href !== "/profile" && pathname?.startsWith(href)) ||
+    (href === "/settings" && pathname?.startsWith("/profile/settings"));
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent | TouchEvent) {
@@ -217,13 +221,23 @@ export default function Navbar() {
                     <p className="truncate text-xs text-neutral-500">{role}</p>
                   </div>
                 </div>
-                <Link
-                  href="/profile"
-                  onClick={() => setProfileOpen(false)}
-                  className="shrink-0 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
-                >
-                  View -&gt;
-                </Link>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Link
+                    href="/settings"
+                    onClick={() => setProfileOpen(false)}
+                    className="rounded-lg border border-neutral-300 p-1.5 text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
+                    aria-label="Open settings"
+                  >
+                    <SettingsIcon className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setProfileOpen(false)}
+                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
+                  >
+                    View -&gt;
+                  </Link>
+                </div>
               </div>
 
               <div className="mb-4 border-y border-neutral-200 py-3">

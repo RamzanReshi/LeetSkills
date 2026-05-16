@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookIcon, CompassIcon, UserIcon, DashboardIcon } from "@/components/ui/Icons";
+import { BookIcon, CompassIcon, DashboardIcon, SettingsIcon, UserIcon } from "@/components/ui/Icons";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
   { href: "/scenarios", label: "Scenarios", icon: BookIcon },
   { href: "/path", label: "Path", icon: CompassIcon },
   { href: "/profile", label: "Profile", icon: UserIcon },
+  { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
@@ -18,6 +19,8 @@ export default function SidebarNav({ onNavigate }: { onNavigate?: () => void }) 
       ? "/dashboard"
       : pathname?.startsWith("/path") || pathname?.startsWith("/quest")
       ? "/path"
+      : pathname?.startsWith("/settings") || pathname?.startsWith("/profile/settings")
+      ? "/settings"
       : pathname?.startsWith("/profile")
       ? "/profile"
       : "/scenarios";

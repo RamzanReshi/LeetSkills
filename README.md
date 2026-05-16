@@ -6,7 +6,8 @@ Current status:
 
 - Demo-ready: yes
 - MVP-ready: not fully
-- Persistence: anonymous browser localStorage
+- Persistence: browser localStorage for scenario progress
+- Auth: optional Supabase Auth and profile data when configured
 - Active content: 30 scenarios across 6 learning paths
 
 ## Tech Stack
@@ -17,11 +18,12 @@ Current status:
 | React 19 | UI runtime |
 | Tailwind CSS v4 | Styling and design tokens |
 | Zustand | Client state management |
-| localStorage | Anonymous session persistence |
+| localStorage | Browser scenario progress persistence |
 | Recharts | Skill Fingerprint radar chart |
 | Framer Motion | Animation dependency |
 | Anthropic SDK | Claude evaluation provider |
 | Google GenAI SDK | Optional Gemini evaluation provider |
+| Supabase | Optional auth and profile storage |
 
 ## Product Scope
 
@@ -35,14 +37,15 @@ The current app includes:
 - Dashboard at `/dashboard`
 - Learning paths page at `/path`
 - Profile page at `/profile`
+- Optional login, signup, password reset, and auth callback routes
 - AI evaluation API route at `/api/evaluate`
 - Zustand/localStorage progress tracking
+- Optional Supabase Auth with a `leetskill.profiles` table
 - 6-axis Skill Fingerprint
 
 The current app does not include:
 
-- Authentication
-- Database persistence
+- Database persistence for scenario progress and evaluations
 - Admin dashboard
 - Payments
 - Leaderboards
@@ -76,7 +79,14 @@ The fingerprint is calculated in `src/store/useSkillStore.ts` from saved evaluat
 | `/path` | Learning paths overview |
 | `/quest` | Redirects to `/path` |
 | `/profile` | Local profile, stats, fingerprint bars, and reset progress |
+| `/login` | Supabase sign-in page |
+| `/signup` | Supabase account creation page |
+| `/forgot-password` | Password reset request page |
+| `/reset-password` | Password update page |
+| `/auth/callback` | Supabase auth callback route |
 | `/api/evaluate` | Server route for AI evaluation |
+
+When Supabase env vars are present, `/dashboard`, `/scenarios`, `/path`, `/quest`, `/profile`, `/scenario/*`, and `/results/*` are protected routes. Without Supabase env vars, the app runs in anonymous local demo mode.
 
 ## AI Evaluation
 
@@ -95,18 +105,22 @@ Provider behavior:
 - Claude is the default provider.
 - Gemini is optional with `AI_PROVIDER=gemini`.
 - OpenAI exists as a stub and is not ready for production use.
-- If live AI evaluation or parsing fails, the app returns a neutral fallback evaluation.
+- If live AI evaluation or parsing fails, the route returns a classified JSON error with a suggested action.
+- `src/lib/fallbackEvaluation.ts` contains a neutral placeholder helper, but it is not currently wired into `POST /api/evaluate`.
 
 Environment variables currently expected by the code:
 
 ```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 AI_PROVIDER=claude
-ANTHROPIC_API_KEY=...
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-2.0-flash
+ANTHROPIC_API_KEY=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+OPENAI_API_KEY=
 ```
 
-Note: `.env.local.example` is currently missing and should be added next.
+See `.env.local.example` for the full template.
 
 ## Getting Started
 
@@ -117,7 +131,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). The root route redirects to `/dashboard`.
 
-For live Claude evaluation, set `ANTHROPIC_API_KEY` in `.env.local`. Without a working provider key, `/api/evaluate` can fall back to a neutral placeholder evaluation.
+For live Claude evaluation, set `ANTHROPIC_API_KEY` in `.env.local`. To enable Supabase Auth, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`, then apply `supabase/migrations/leetskilldb_schema.sql`. See `docs/SUPABASE_AUTH.md` for setup details.
 
 ## Project Structure
 
@@ -125,13 +139,18 @@ For live Claude evaluation, set `ANTHROPIC_API_KEY` in `.env.local`. Without a w
 src/
 ├── app/
 │   ├── api/evaluate/       # POST /api/evaluate
+│   ├── auth/callback/      # Supabase auth callback
 │   ├── dashboard/          # Dashboard page
+│   ├── forgot-password/    # Password reset request
+│   ├── login/              # Login page
 │   ├── path/               # Learning paths page
 │   ├── profile/            # Profile page
 │   ├── quest/              # Redirects to /path
+│   ├── reset-password/     # Password update
 │   ├── scenario/[id]/      # Scenario solve flow
 │   ├── results/[id]/       # Evaluation results
-│   └── scenarios/          # Scenario browser
+│   ├── scenarios/          # Scenario browser
+│   └── signup/             # Signup page
 ├── components/
 │   ├── dashboard/          # Dashboard sections
 │   ├── evaluation/         # Feedback and score display
@@ -144,6 +163,7 @@ src/
 │   └── ui/                 # Shared primitives/icons
 ├── data/                   # Active MVP content and metadata
 ├── lib/                    # Evaluation prompt, parser, fallback, providers
+│   └── supabase/           # Supabase browser/server/middleware clients
 ├── store/                  # Zustand session store
 ├── types/                  # Shared TypeScript types
 └── utils/                  # Validation and localStorage helpers
@@ -159,10 +179,9 @@ Main blockers:
 
 - Dashboard needs better metrics.
 - Skill Fingerprint needs clearer meaning and empty/fallback states.
-- Fallback AI scores must be marked clearly or excluded from real progress.
-- No auth or database.
+- AI provider failures need a product-level retry or fallback decision.
+- Scenario progress and evaluations are not persisted to a database.
 - No admin dashboard.
-- Missing `.env.local.example`.
 - No automated tests or smoke tests.
 - Some unfinished UI remains: navbar search, timer TODO, hardcoded profile data.
 
@@ -170,9 +189,8 @@ Main blockers:
 
 1. Improve dashboard.
 2. Improve Skill Fingerprint.
-3. Add `.env.local.example`.
-4. Improve AI fallback/error handling.
-5. Add smoke tests.
-6. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
+3. Improve AI fallback/error handling UX.
+4. Add smoke tests.
+5. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
 
 See [LeetSkills_MVP_PRD.md](LeetSkills_MVP_PRD.md) for the current product requirements document.

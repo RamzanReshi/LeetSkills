@@ -9,6 +9,7 @@ const protectedRoutes = [
   "/path",
   "/quest",
   "/profile",
+  "/settings",
   "/scenario",
   "/results",
 ];
