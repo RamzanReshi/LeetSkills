@@ -10,7 +10,7 @@ interface Props {
 
 export default function CategoryTabs({ categories, activeId, onSelect }: Props) {
   return (
-    <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 pt-1 px-1 scrollbar-thin">
+    <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto pb-1 pt-1 px-1">
       {categories.map((cat) => {
         const active = cat.id === activeId;
         return (

@@ -16,7 +16,7 @@ export default function AuthCard({
       <div className="mx-auto grid min-h-[calc(100vh-7rem)] w-full max-w-5xl items-center gap-8 lg:grid-cols-[1fr_420px]">
         <section className="hidden lg:block">
           <Link href="/" className="inline-flex items-center gap-3">
-            <Image src="/logo-v2.png" alt="LeetSkills Logo" width={44} height={44} priority />
+            <Image src="/leetskills_logo_no_background.png" alt="LeetSkills Logo" width={44} height={44} priority />
             <span className="text-3xl font-bold tracking-tight text-brand-deep">
               Leet<span className="font-normal text-brand-primary">Skills</span>
             </span>

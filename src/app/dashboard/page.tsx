@@ -14,7 +14,11 @@ const scenarios = MVP_SCENARIOS as Scenario[];
 export default function DashboardPage() {
   const fingerprint = useSkillStore((s) => s.fingerprint);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
-  const attemptCount = useSkillStore((s) => s.history.length);
+  const attemptCount = useSkillStore((s) => s.completedAttempts.length);
+
+  React.useEffect(() => {
+    document.title = "Dashboard - LeetSkills";
+  }, []);
 
   const nextScenario =
     scenarios.find((scenario) => !completedScenarioIds.includes(scenario.id)) ?? null;

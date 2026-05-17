@@ -55,9 +55,10 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const fingerprint = useSkillStore((s) => s.fingerprint);
-  const history = useSkillStore((s) => s.history);
+  const completedAttempts = useSkillStore((s) => s.completedAttempts);
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const hydrateSession = useSkillStore((s) => s.hydrateSession);
+  const syncWithUser = useSkillStore((s) => s.syncWithUser);
   const resetSession = useSkillStore((s) => s.resetSession);
   const { user, profile, signOut } = useAuth();
   const isSignedIn = Boolean(user);
@@ -68,16 +69,20 @@ export default function Navbar() {
     hydrateSession();
   }, [hydrateSession]);
 
+  useEffect(() => {
+    void syncWithUser(user?.id ?? null);
+  }, [syncWithUser, user?.id]);
+
   const completed = SCENARIOS_META.filter((scenario) =>
     completedScenarioIds.includes(scenario.id),
   ).length;
   const progress = Math.round((completed / SCENARIOS_META.length) * 100);
   const averageScore =
-    history.length === 0
+    completedAttempts.length === 0
       ? null
       : Math.round(
-          history.reduce((sum, entry) => sum + entry.overall_score, 0) /
-            history.length,
+          completedAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
+            completedAttempts.length,
         );
   const initials = getInitials(displayName);
 
@@ -150,7 +155,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
             <div className="relative h-8 w-8">
               <Image
-                src="/logo-v2.png"
+                src="/leetskills_logo_no_background.png"
                 alt="LeetSkills Logo"
                 fill
                 sizes="32px"
@@ -270,7 +275,7 @@ export default function Navbar() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-lg font-black text-brand-deep">{history.length}</p>
+                    <p className="text-lg font-black text-brand-deep">{completedAttempts.length}</p>
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
                       Attempts
                     </p>

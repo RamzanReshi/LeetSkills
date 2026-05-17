@@ -104,9 +104,7 @@ Provider behavior:
 
 - Claude is the default provider.
 - Gemini is optional with `AI_PROVIDER=gemini`.
-- OpenAI exists as a stub and is not ready for production use.
 - If live AI evaluation or parsing fails, the route returns a classified JSON error with a suggested action.
-- `src/lib/fallbackEvaluation.ts` contains a neutral placeholder helper, but it is not currently wired into `POST /api/evaluate`.
 
 Environment variables currently expected by the code:
 
@@ -117,7 +115,6 @@ AI_PROVIDER=claude
 ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.5-flash
-OPENAI_API_KEY=
 ```
 
 See `.env.local.example` for the full template.

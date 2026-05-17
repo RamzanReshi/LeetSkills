@@ -58,6 +58,82 @@ export interface Evaluation {
   timestamp: number;
 }
 
+export type LearningEventType =
+  | "scenario_started"
+  | "draft_updated"
+  | "scenario_submitted"
+  | "ai_evaluation_completed"
+  | "ai_evaluation_failed"
+  | "retry_started"
+  | "scenario_completed"
+  | "session_reset";
+
+export interface UserInputSnapshot {
+  thinking_trace: string;
+  response: string;
+}
+
+export interface AttemptErrorState {
+  message: string;
+  code?: string;
+  action?: string;
+  provider?: string;
+  provider_status?: number;
+  model?: string;
+  retryable?: boolean;
+  failure_count?: number;
+  fallback_used: boolean;
+}
+
+export interface LearningEvent {
+  id: string;
+  type: LearningEventType;
+  scenario_id?: string;
+  timestamp: number;
+  payload?: Record<string, unknown>;
+}
+
+export interface ScenarioDraft {
+  scenario_id: string;
+  user_input: UserInputSnapshot;
+  started_at: number;
+  updated_at: number;
+  submitted_at?: number;
+  last_failure?: AttemptErrorState;
+}
+
+export type AttemptSyncStatus =
+  | "local_only"
+  | "syncing"
+  | "synced"
+  | "sync_failed";
+
+export interface CompletedAttempt {
+  id: string;
+  scenario_id: string;
+  path_id: Scenario["path_id"];
+  difficulty: Scenario["difficulty"];
+  user_input: UserInputSnapshot;
+  thinking_trace: string;
+  final_response: string;
+  ai_feedback: Evaluation;
+  score: number;
+  skill_scores: SkillScore[];
+  fingerprint_before: SkillFingerprint;
+  fingerprint_after: SkillFingerprint;
+  fallback_used: boolean;
+  error_state?: AttemptErrorState;
+  timestamps: {
+    started_at: number;
+    submitted_at: number;
+    evaluated_at: number;
+    completed_at: number;
+  };
+  completion_status: "completed";
+  /** Local-only field. Never sent to Supabase. */
+  syncStatus?: AttemptSyncStatus;
+}
+
 /** Skill Fingerprint - aggregated scores across all attempts */
 export type DimensionName = DashboardDimension;
 
@@ -67,5 +143,8 @@ export type SkillFingerprint = Record<DashboardDimension, number>;
 export interface SessionData {
   fingerprint: SkillFingerprint;
   history: Evaluation[];
+  completedAttempts?: CompletedAttempt[];
+  events?: LearningEvent[];
+  activeDrafts?: Record<string, ScenarioDraft>;
   completedScenarioIds: string[];
 }

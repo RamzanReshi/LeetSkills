@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { SCENARIOS_META } from "@/data/scenarios-meta";
-import { useSkillStore } from "@/store/useSkillStore";
-import { ArrowRightIcon, CheckIcon, FlameIcon, SettingsIcon, UserIcon } from "@/components/ui/Icons";
+import { ArrowRightIcon, FlameIcon, SettingsIcon, UserIcon } from "@/components/ui/Icons";
 import {
   getAccountDisplayName,
   getAccountRole,
@@ -12,14 +10,19 @@ import {
 } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/supabase/browser";
 
-const WEEKLY_ACTIVITY = [
-  { day: "Mon", done: true },
-  { day: "Tue", done: true },
-  { day: "Wed", done: false },
-  { day: "Thu", done: true },
-  { day: "Fri", done: true },
-  { day: "Sat", done: false },
-  { day: "Sun", done: false },
+const PREVIEW_STATS = [
+  { label: "Completed", value: "0/24", detail: "Practice scenarios finished" },
+  { label: "Attempts", value: "0", detail: "Evaluated responses" },
+  { label: "Average", value: "--", detail: "Across scored dimensions" },
+];
+
+const WEEKLY_PREVIEW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const FINGERPRINT_PREVIEW = [
+  ["Prompt Clarity", 74],
+  ["Problem Framing", 62],
+  ["Debugging Judgment", 48],
+  ["Communication", 69],
 ];
 
 function StatCard({
@@ -41,10 +44,6 @@ function StatCard({
 }
 
 export default function ProfileView() {
-  const fingerprint = useSkillStore((s) => s.fingerprint);
-  const history = useSkillStore((s) => s.history);
-  const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
-  const resetSession = useSkillStore((s) => s.resetSession);
   const { user, profile, refreshProfile, signOut } = useAuth();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -52,20 +51,6 @@ export default function ProfileView() {
 
   const displayName = getAccountDisplayName(user, profile);
   const role = getAccountRole(profile);
-
-  const completedScenarios = SCENARIOS_META.filter((scenario) =>
-    completedScenarioIds.includes(scenario.id),
-  );
-  const completionPct = Math.round((completedScenarios.length / SCENARIOS_META.length) * 100);
-  const strongest = Object.entries(fingerprint).sort((a, b) => b[1] - a[1])[0];
-  const weakest = Object.entries(fingerprint).sort((a, b) => a[1] - b[1])[0];
-  const averageScore =
-    history.length === 0
-      ? 0
-      : Math.round(
-          history.reduce((sum, entry) => sum + entry.overall_score, 0) /
-            history.length,
-        );
 
   async function handleProfileSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -144,15 +129,18 @@ export default function ProfileView() {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 rounded-lg border border-dashed border-brand-primary/30 bg-white/70 p-4">
+            <p className="text-xs font-semibold uppercase text-brand-primary">
+              Coming soon: progress tracking
+            </p>
             <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="font-medium text-neutral-700">Scenarios completion</span>
-              <span className="font-semibold text-brand-deep">{completionPct}%</span>
+              <span className="mt-3 font-medium text-neutral-700">Scenarios completion</span>
+              <span className="font-semibold text-brand-deep">Preview</span>
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
               <div
-                className="h-full rounded-full bg-brand-primary transition-all duration-700"
-                style={{ width: `${completionPct}%` }}
+                className="h-full rounded-full bg-brand-primary/45"
+                style={{ width: "42%" }}
               />
             </div>
           </div>
@@ -164,36 +152,32 @@ export default function ProfileView() {
             <h2 className="text-base font-semibold text-brand-deep">Weekly rhythm</h2>
           </div>
           <div className="mt-5 grid grid-cols-7 gap-2">
-            {WEEKLY_ACTIVITY.map((item) => (
-              <div key={item.day} className="text-center">
+            {WEEKLY_PREVIEW.map((day, index) => (
+              <div key={day} className="text-center">
                 <div
                   className={[
                     "mx-auto flex h-9 w-9 items-center justify-center rounded-lg border text-xs font-semibold",
-                    item.done
-                      ? "border-brand-primary bg-brand-mint text-brand-primary"
+                    index < 4
+                      ? "border-brand-primary/30 bg-brand-mint/60 text-brand-primary"
                       : "border-neutral-300 bg-neutral-100 text-neutral-500",
                   ].join(" ")}
                 >
-                  {item.done ? <CheckIcon className="h-4 w-4" /> : item.day.slice(0, 1)}
+                  {day.slice(0, 1)}
                 </div>
-                <p className="mt-2 text-[11px] text-neutral-500">{item.day}</p>
+                <p className="mt-2 text-[11px] text-neutral-500">{day}</p>
               </div>
             ))}
           </div>
           <p className="mt-4 text-sm text-neutral-500">
-            Four active days this week. Keep sessions short and consistent.
+            Coming soon: progress tracking
           </p>
         </section>
       </header>
 
       <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Completed"
-          value={`${completedScenarios.length}/${SCENARIOS_META.length}`}
-          detail="Practice scenarios finished"
-        />
-        <StatCard label="Attempts" value={`${history.length}`} detail="Evaluated responses" />
-        <StatCard label="Average" value={`${averageScore}%`} detail="Across scored dimensions" />
+        {PREVIEW_STATS.map((stat) => (
+          <StatCard key={stat.label} {...stat} />
+        ))}
       </section>
 
       <section className="mt-5 grid gap-5 lg:grid-cols-[1fr_0.9fr]">
@@ -208,15 +192,15 @@ export default function ProfileView() {
           </div>
 
           <div className="mt-5 space-y-4">
-            {Object.entries(fingerprint).map(([name, score]) => (
+            {FINGERPRINT_PREVIEW.map(([name, score]) => (
               <div key={name}>
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="font-medium text-neutral-700">{name}</span>
-                  <span className="font-semibold text-brand-deep">{score}%</span>
+                  <span className="font-semibold text-brand-deep">Preview</span>
                 </div>
                 <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
                   <div
-                    className="h-full rounded-full bg-brand-primary transition-all duration-700"
+                    className="h-full rounded-full bg-brand-primary/45"
                     style={{ width: `${score}%` }}
                   />
                 </div>
@@ -231,13 +215,13 @@ export default function ProfileView() {
             <div className="rounded-lg bg-brand-mint p-4">
               <p className="text-xs font-medium uppercase text-brand-primary">Strongest area</p>
               <p className="mt-1 font-semibold text-brand-deep">
-                {strongest[0]} · {strongest[1]}%
+                Coming soon: progress tracking
               </p>
             </div>
             <div className="rounded-lg bg-neutral-100 p-4">
               <p className="text-xs font-medium uppercase text-neutral-500">Next focus</p>
               <p className="mt-1 font-semibold text-brand-deep">
-                {weakest[0]} · {weakest[1]}%
+                Preview recommendation
               </p>
             </div>
             <Link
@@ -256,17 +240,10 @@ export default function ProfileView() {
           <div>
             <h2 className="text-lg font-semibold text-brand-deep">Account controls</h2>
             <p className="mt-1 text-sm text-neutral-500">
-              Reset local progress or end this authenticated session.
+              End this authenticated session.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <button
-              type="button"
-              onClick={resetSession}
-              className="rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:border-brand-primary hover:text-brand-primary"
-            >
-              Reset progress
-            </button>
             <button
               type="button"
               onClick={() => void signOut()}

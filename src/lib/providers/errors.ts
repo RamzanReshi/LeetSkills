@@ -1,12 +1,22 @@
 type ClassifiedAiError = {
   status: number;
   code: string;
+  userMessage: string;
+  userAction: string;
+  retryable: boolean;
   message: string;
   action: string;
   provider: string;
   model?: string;
   rawMessage: string;
 };
+
+const USER_MESSAGE_RETRY =
+  "AI feedback is currently unavailable. Your answer is saved locally on this page. Please try again in a moment.";
+const USER_MESSAGE_TERMINAL =
+  "AI feedback is temporarily unavailable. Please try again later.";
+const USER_ACTION_RETRY = "Retry the submission in a moment. Your thinking trace and final response remain on this page.";
+const USER_ACTION_TERMINAL = "Try again later. Your thinking trace and final response remain on this page.";
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -32,6 +42,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 500,
       code: "GEMINI_API_KEY_MISSING",
+      userMessage: USER_MESSAGE_TERMINAL,
+      userAction: USER_ACTION_TERMINAL,
+      retryable: false,
       message: "Gemini is selected, but GEMINI_API_KEY is not set on the backend.",
       action: "Add GEMINI_API_KEY to .env.local and restart the Next.js dev server.",
       provider,
@@ -47,6 +60,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 402,
       code: "GEMINI_BILLING_OR_REGION_REQUIRED",
+      userMessage: USER_MESSAGE_TERMINAL,
+      userAction: USER_ACTION_TERMINAL,
+      retryable: false,
       message:
         "Gemini rejected the request because the free tier is unavailable for this project or region, or billing is not enabled.",
       action:
@@ -66,6 +82,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 401,
       code: "AI_API_KEY_INVALID",
+      userMessage: USER_MESSAGE_TERMINAL,
+      userAction: USER_ACTION_TERMINAL,
+      retryable: false,
       message: "The selected AI provider rejected the API key or denied access.",
       action: "Verify the backend API key, provider selection, and project permissions.",
       provider,
@@ -78,6 +97,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 429,
       code: "AI_RATE_LIMITED",
+      userMessage: USER_MESSAGE_RETRY,
+      userAction: USER_ACTION_RETRY,
+      retryable: true,
       message: "The selected AI provider rate limit or quota was reached.",
       action:
         "Wait and retry, reduce request frequency, or use a provider/project with available quota.",
@@ -95,6 +117,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 400,
       code: "AI_MODEL_NOT_FOUND",
+      userMessage: USER_MESSAGE_TERMINAL,
+      userAction: USER_ACTION_TERMINAL,
+      retryable: false,
       message: "The selected AI model was not found or is not available to this API key.",
       action: "Check the model name and confirm the key has access to that model.",
       provider,
@@ -107,6 +132,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
     return {
       status: 502,
       code: "AI_RESPONSE_PARSE_FAILED",
+      userMessage: USER_MESSAGE_RETRY,
+      userAction: USER_ACTION_RETRY,
+      retryable: true,
       message:
         "The AI provider responded, but the response did not match the expected evaluation format.",
       action: "Check the backend logs for the parser error and adjust the prompt or model response.",
@@ -119,6 +147,9 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
   return {
     status: 502,
     code: "AI_PROVIDER_FAILED",
+    userMessage: USER_MESSAGE_RETRY,
+    userAction: USER_ACTION_RETRY,
+    retryable: true,
     message: "The selected AI provider failed while generating the evaluation.",
     action: "Check the backend logs for the provider error and verify the configured API key.",
     provider,

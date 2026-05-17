@@ -57,14 +57,36 @@ export async function POST(request: NextRequest) {
     const issue = classifyAiProviderError(err);
     console.error("AI evaluation failed:", issue);
 
+    const isDev = process.env.NODE_ENV === "development";
+    const providerStatus = {
+      provider: issue.provider,
+      status: issue.status,
+    };
+    const errorPayload = {
+      code: issue.code,
+      message: issue.userMessage,
+      action: issue.userAction,
+      retryable: issue.retryable,
+      provider_status: providerStatus,
+    };
+
     return NextResponse.json(
       {
-        error: issue.message,
+        error: errorPayload,
         code: issue.code,
-        provider: issue.provider,
-        model: issue.model,
-        action: issue.action,
-        details: process.env.NODE_ENV === "development" ? issue.rawMessage : undefined,
+        message: issue.userMessage,
+        action: issue.userAction,
+        retryable: issue.retryable,
+        provider_status: providerStatus,
+        details: isDev
+          ? {
+              provider: issue.provider,
+              model: issue.model,
+              message: issue.message,
+              action: issue.action,
+              raw: issue.rawMessage,
+            }
+          : undefined,
       },
       { status: issue.status },
     );

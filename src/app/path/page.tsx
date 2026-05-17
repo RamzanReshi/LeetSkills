@@ -4,7 +4,7 @@ import PathCard from "@/components/path/PathCard";
 import { LEARNING_PATHS } from "@/data/paths";
 
 export const metadata = {
-  title: "Learning Paths — LeetSkills",
+  title: "Paths - LeetSkills",
 };
 
 export default function PathPage() {

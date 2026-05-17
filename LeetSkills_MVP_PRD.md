@@ -124,8 +124,6 @@ Each scenario includes:
 
 `src/data/scenarios-meta.ts` builds scenario-browser metadata from the active MVP scenarios.
 
-`src/data/scenarios.json` is older PRD-era data and is not the active source for the current UI.
-
 ## 7. Skill Fingerprint
 
 The current Skill Fingerprint has 6 axes. The axes are defined in `DASHBOARD_DIMENSIONS` inside `src/data/mvp-content.ts`.
@@ -179,8 +177,6 @@ Providers:
 
 - `AI_PROVIDER=claude` is the default.
 - `AI_PROVIDER=gemini` is supported when `GEMINI_API_KEY` is set.
-- `AI_PROVIDER=openai` is only a stub and throws until implemented.
-- `src/lib/fallbackEvaluation.ts` contains a neutral placeholder helper, but it is not currently wired into `POST /api/evaluate`.
 
 ## 9. Brand Identity & Color Palette
 
