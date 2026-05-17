@@ -7,8 +7,10 @@ import { useSkillStore } from "@/store/useSkillStore";
 import { ArrowRightIcon } from "@/components/ui/Icons";
 import PathIcon from "./PathIcon";
 import PathProgress from "./PathProgress";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function PathCard({ path }: { path: LearningPath }) {
+  const { t } = useLanguage();
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const mvpPath = MVP_PATHS.find((item) => item.id === path.id);
   const completed = mvpPath
@@ -16,7 +18,7 @@ export default function PathCard({ path }: { path: LearningPath }) {
     : path.completed;
   const started = completed > 0;
   const href = `/scenarios?category=${path.category}`;
-  const ctaLabel = started ? "Continue Path" : "Start Path";
+  const ctaLabel = started ? t("path.continue") : t("path.start");
 
   return (
     <Link
@@ -39,7 +41,7 @@ export default function PathCard({ path }: { path: LearningPath }) {
 
       <div className="mt-auto flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs text-neutral-500">
-          <span className="font-medium text-neutral-700">{path.levels} scenarios</span>
+          <span className="font-medium text-neutral-700">{t("path.scenarios", { n: path.levels })}</span>
           <span>
             {completed}/{path.levels}
           </span>

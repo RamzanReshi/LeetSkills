@@ -16,6 +16,7 @@ import {
   getAccountRole,
   useAuth,
 } from "@/components/auth/AuthProvider";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 type ToggleRowProps = {
   title: string;
@@ -338,6 +339,14 @@ export default function ProfileSettingsView() {
             </div>
           </SettingsSection>
         </div>
+
+        <SettingsSection
+          icon={SettingsIcon}
+          title="Appearance"
+          detail="Choose how LeetSkills should look on this device."
+        >
+          <ThemeToggle detail="Saved locally for this browser." />
+        </SettingsSection>
 
         <SettingsSection
           icon={ShieldIcon}

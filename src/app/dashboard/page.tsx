@@ -9,6 +9,7 @@ import { MVP_PATHS, MVP_SCENARIOS } from "@/data/mvp-content";
 import type { CompletedAttempt, Scenario, ScenarioDraft } from "@/types";
 import { useSkillStore } from "@/store/useSkillStore";
 import { ArrowRightIcon, CheckIcon } from "@/components/ui/Icons";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 const scenarios = MVP_SCENARIOS as Scenario[];
 const paths = MVP_PATHS;
@@ -22,18 +23,18 @@ function isSameLocalDay(timestamp: number, date = new Date()) {
   );
 }
 
-function formatLastWorked(timestamp?: number) {
-  if (!timestamp) return "No saved draft";
+function formatLastWorked(t: (k: string, v?: Record<string, string | number>) => string, timestamp?: number) {
+  if (!timestamp) return t("dashboard.noSavedDraft");
 
   const diffMs = Date.now() - timestamp;
   const minutes = Math.max(1, Math.floor(diffMs / 60000));
-  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 60) return t("dashboard.minAgo", { n: minutes });
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hr ago`;
+  if (hours < 24) return t("dashboard.hrAgo", { n: hours });
 
   const days = Math.floor(hours / 24);
-  return `${days} day${days === 1 ? "" : "s"} ago`;
+  return days === 1 ? t("dashboard.dayAgo", { n: days }) : t("dashboard.daysAgo", { n: days });
 }
 
 function getScenario(id: string) {
@@ -54,10 +55,11 @@ export default function DashboardPage() {
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const completedAttempts = useSkillStore((s) => s.completedAttempts);
   const activeDrafts = useSkillStore((s) => s.activeDrafts);
+  const { t } = useLanguage();
 
   React.useEffect(() => {
-    document.title = "Dashboard - LeetSkills";
-  }, []);
+    document.title = t("dashboard.title");
+  }, [t]);
 
   const attemptCount = completedAttempts.length;
   const recentDraft = getMostRecentDraft(activeDrafts);
@@ -87,7 +89,7 @@ export default function DashboardPage() {
           weeklyAttempts.reduce((total, attempt) => total + attempt.score, 0) /
             weeklyAttempts.length,
         );
-  const actionLabel = draftScenario ? "Resume Draft" : "Continue";
+  const actionLabel = draftScenario ? t("dashboard.resumeDraft") : t("dashboard.continue");
 
   return (
     <AppShell>
@@ -97,15 +99,15 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <p className="font-mono text-xs uppercase tracking-[0.24em] text-brand-primary">
-                  Dashboard
+                  {t("dashboard.eyebrow")}
                 </p>
                 <h1 className="mt-2 text-2xl font-black tracking-tight text-brand-deep sm:text-3xl">
-                  {nextScenario ? nextScenario.title : "All scenarios complete"}
+                  {nextScenario ? nextScenario.title : t("dashboard.allComplete")}
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">
                   {nextScenario
                     ? `${nextScenario.path_title} - ${nextScenario.estimated_time} - ${nextScenario.difficulty}`
-                    : "You have finished every available scenario. Review your fingerprint and keep an eye on new paths."}
+                    : t("dashboard.allCompleteDetail")}
                 </p>
               </div>
 
@@ -123,53 +125,53 @@ export default function DashboardPage() {
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                  Worked Today
+                  {t("dashboard.workedToday")}
                 </p>
                 <p className="mt-2 text-2xl font-black text-brand-deep">{todayAttempts.length}</p>
                 <p className="mt-1 text-xs text-neutral-500">
-                  {todayAttempts.length === 1 ? "scenario completed" : "scenarios completed"}
+                  {todayAttempts.length === 1 ? t("dashboard.scenarioCompleted") : t("dashboard.scenariosCompleted")}
                 </p>
               </div>
 
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                  Left Off
+                  {t("dashboard.leftOff")}
                 </p>
                 <p className="mt-2 truncate text-sm font-bold text-brand-deep">
-                  {draftScenario?.title ?? lastAttempt?.scenario_id ?? "Start your first scenario"}
+                  {draftScenario?.title ?? lastAttempt?.scenario_id ?? t("dashboard.startFirst")}
                 </p>
                 <p className="mt-1 text-xs text-neutral-500">
                   {draftScenario
-                    ? formatLastWorked(recentDraft?.updated_at)
+                    ? formatLastWorked(t, recentDraft?.updated_at)
                     : lastAttempt
-                      ? `Finished ${formatLastWorked(lastAttempt.timestamps.completed_at)}`
-                      : "No activity yet"}
+                      ? t("dashboard.finished", { when: formatLastWorked(t, lastAttempt.timestamps.completed_at) })
+                      : t("dashboard.noActivity")}
                 </p>
               </div>
 
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                  Continue
+                  {t("dashboard.continueCard")}
                 </p>
                 <p className="mt-2 truncate text-sm font-bold text-brand-deep">
-                  {nextScenario?.id ?? "Done"}
+                  {nextScenario?.id ?? t("dashboard.done")}
                 </p>
                 <p className="mt-1 text-xs text-neutral-500">
-                  {nextScenario ? nextScenario.scenario_type : "Review results"}
+                  {nextScenario ? nextScenario.scenario_type : t("dashboard.reviewResults")}
                 </p>
               </div>
 
               <div className="rounded-lg border border-brand-primary/20 bg-brand-mint p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
-                  Do Next
+                  {t("dashboard.doNext")}
                 </p>
                 <p className="mt-2 text-sm font-bold text-brand-deep">
-                  {draftScenario ? "Finish the open draft" : nextScenario ? "Complete one scenario" : "Review weak skill"}
+                  {draftScenario ? t("dashboard.finishOpenDraft") : nextScenario ? t("dashboard.completeOne") : t("dashboard.reviewWeak")}
                 </p>
                 <p className="mt-1 text-xs text-neutral-600">
                   {nextScenario?.time_limit_seconds
-                    ? `${Math.floor(nextScenario.time_limit_seconds / 60)} min focus block`
-                    : "Use the fingerprint below"}
+                    ? t("dashboard.focusBlock", { m: Math.floor(nextScenario.time_limit_seconds / 60) })
+                    : t("dashboard.useFingerprint")}
                 </p>
               </div>
             </div>
@@ -179,7 +181,7 @@ export default function DashboardPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-mono text-xs uppercase tracking-[0.24em] text-brand-primary">
-                  Focus Path
+                  {t("dashboard.focusPath")}
                 </p>
                 <h2 className="mt-2 text-xl font-black tracking-tight text-brand-deep">
                   {focusPath.title}
@@ -192,7 +194,7 @@ export default function DashboardPage() {
 
             <div className="mt-5">
               <div className="flex items-center justify-between text-xs font-semibold text-neutral-500">
-                <span>Path progress</span>
+                <span>{t("dashboard.pathProgress")}</span>
                 <span>{focusPathProgress}%</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
@@ -206,26 +208,26 @@ export default function DashboardPage() {
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-neutral-200 p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                  This Week
+                  {t("dashboard.thisWeek")}
                 </p>
                 <p className="mt-2 text-2xl font-black text-brand-deep">{weeklyAttempts.length}</p>
-                <p className="mt-1 text-xs text-neutral-500">completed</p>
+                <p className="mt-1 text-xs text-neutral-500">{t("dashboard.weekCompleted")}</p>
               </div>
               <div className="rounded-lg border border-neutral-200 p-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                  Avg Score
+                  {t("dashboard.avgScore")}
                 </p>
                 <p className="mt-2 text-2xl font-black text-brand-deep">
                   {weeklyAverage ?? "--"}
                 </p>
-                <p className="mt-1 text-xs text-neutral-500">last 7 days</p>
+                <p className="mt-1 text-xs text-neutral-500">{t("dashboard.last7Days")}</p>
               </div>
             </div>
 
             {allCompleted && (
               <div className="mt-5 flex items-center gap-2 rounded-lg bg-brand-mint px-3 py-2 text-sm font-semibold text-brand-primary">
                 <CheckIcon className="h-4 w-4" />
-                All current scenarios are complete.
+                {t("dashboard.allCurrentComplete")}
               </div>
             )}
           </aside>

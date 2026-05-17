@@ -1,6 +1,7 @@
 "use client";
 
 import type { Category, CategoryId } from "@/data/scenarios-meta";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface Props {
   categories: Category[];
@@ -9,10 +10,12 @@ interface Props {
 }
 
 export default function CategoryTabs({ categories, activeId, onSelect }: Props) {
+  const { t } = useLanguage();
   return (
     <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto pb-1 pt-1 px-1">
       {categories.map((cat) => {
         const active = cat.id === activeId;
+        const label = cat.id === "all" ? t("scenarios.all") : cat.label;
         return (
           <button
             key={cat.id}
@@ -24,7 +27,7 @@ export default function CategoryTabs({ categories, activeId, onSelect }: Props) 
                 : "bg-neutral-100 text-neutral-700 hover:bg-neutral-100/70",
             ].join(" ")}
           >
-            <span>{cat.label}</span>
+            <span>{label}</span>
             <span
               className={[
                 "rounded-full px-2 py-0.5 text-[11px] font-semibold",

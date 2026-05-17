@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function ForgotPasswordForm() {
+  const { t } = useLanguage();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ export default function ForgotPasswordForm() {
     setMessage(null);
 
     if (!isSupabaseConfigured) {
-      setError("Supabase is not configured. Add the public project URL and anon key.");
+      setError(t("auth.notConfigured"));
       return;
     }
 
@@ -31,9 +33,9 @@ export default function ForgotPasswordForm() {
       });
 
       if (resetError) throw resetError;
-      setMessage("Password reset instructions have been sent.");
+      setMessage(t("auth.resetSent"));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Unable to send reset email.");
+      setError(caughtError instanceof Error ? caughtError.message : t("auth.resetSendFailed"));
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ export default function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-neutral-700">Email</span>
+        <span className="text-sm font-semibold text-neutral-700">{t("auth.email")}</span>
         <input
           name="email"
           type="email"
@@ -68,11 +70,11 @@ export default function ForgotPasswordForm() {
         disabled={loading}
         className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Sending..." : "Send reset link"}
+        {loading ? t("auth.sending") : t("auth.sendReset")}
       </button>
 
       <Link href="/login" className="block text-center text-sm font-semibold text-brand-primary hover:underline">
-        Back to sign in
+        {t("auth.backToSignIn")}
       </Link>
     </form>
   );

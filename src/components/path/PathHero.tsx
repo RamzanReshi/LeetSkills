@@ -1,4 +1,9 @@
+"use client";
+
+import { useLanguage } from "@/i18n/LanguageProvider";
+
 export default function PathHero() {
+  const { t } = useLanguage();
   return (
     <section className="relative overflow-hidden rounded-2xl border border-neutral-300 bg-brand-mint/60 px-6 py-10 sm:px-10">
       <div
@@ -28,13 +33,13 @@ export default function PathHero() {
       </svg>
       <div className="relative max-w-xl">
         <span className="inline-flex items-center rounded-full bg-brand-card px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.3em] text-brand-primary ring-1 ring-brand-primary/20">
-          Guided Practice
+          {t("path.eyebrow")}
         </span>
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-brand-deep sm:text-4xl">
-          Learning Paths
+          {t("path.title")}
         </h1>
         <p className="mt-2 text-sm text-neutral-700 sm:text-base">
-          Structured practice routes that turn soft-skill scenarios into measurable growth.
+          {t("path.subtitle")}
         </p>
       </div>
     </section>

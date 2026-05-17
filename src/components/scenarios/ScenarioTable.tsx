@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ScenarioMeta } from "@/data/scenarios-meta";
 import { CheckIcon } from "@/components/ui/Icons";
 import DifficultyBadge from "./DifficultyBadge";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface Props {
   scenarios: ScenarioMeta[];
@@ -22,10 +23,11 @@ function StatusDot({ done }: { done: boolean }) {
 }
 
 export default function ScenarioTable({ scenarios, completedIds }: Props) {
+  const { t } = useLanguage();
   if (scenarios.length === 0) {
     return (
       <div className="glass-card p-10 text-center text-sm text-neutral-500">
-        No scenarios match your filters.
+        {t("scenarios.none")}
       </div>
     );
   }
@@ -35,12 +37,12 @@ export default function ScenarioTable({ scenarios, completedIds }: Props) {
       <table className="hidden w-full text-left text-sm md:table">
         <thead className="border-b border-neutral-300 bg-neutral-100/60 text-xs uppercase tracking-wider text-neutral-500">
           <tr>
-            <th className="w-12 px-4 py-3">Status</th>
-            <th className="w-14 px-2 py-3">#</th>
-            <th className="px-2 py-3">Title</th>
-            <th className="px-2 py-3">Path</th>
-            <th className="w-28 px-2 py-3">Baseline</th>
-            <th className="w-28 px-4 py-3">Difficulty</th>
+            <th className="w-12 px-4 py-3">{t("scenarios.colStatus")}</th>
+            <th className="w-14 px-2 py-3">{t("scenarios.colNumber")}</th>
+            <th className="px-2 py-3">{t("scenarios.colTitle")}</th>
+            <th className="px-2 py-3">{t("scenarios.colPath")}</th>
+            <th className="w-28 px-2 py-3">{t("scenarios.colBaseline")}</th>
+            <th className="w-28 px-4 py-3">{t("scenarios.colDifficulty")}</th>
           </tr>
         </thead>
         <tbody>
@@ -64,7 +66,7 @@ export default function ScenarioTable({ scenarios, completedIds }: Props) {
                   </Link>
                 </td>
                 <td className="px-2 py-3 text-neutral-700">{s.categoryLabel}</td>
-                <td className="px-2 py-3 font-semibold text-neutral-900">New</td>
+                <td className="px-2 py-3 font-semibold text-neutral-900">{t("scenarios.new")}</td>
                 <td className="px-4 py-3">
                   <DifficultyBadge difficulty={s.difficulty} />
                 </td>
@@ -89,7 +91,7 @@ export default function ScenarioTable({ scenarios, completedIds }: Props) {
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
                     <span>{s.categoryLabel}</span>
                     <span>.</span>
-                    <span className="font-semibold text-neutral-700">New</span>
+                    <span className="font-semibold text-neutral-700">{t("scenarios.new")}</span>
                     <DifficultyBadge difficulty={s.difficulty} />
                   </div>
                 </div>

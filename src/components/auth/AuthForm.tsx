@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 type Mode = "login" | "signup";
 const LAST_AUTH_EMAIL_KEY = "leetskills_last_auth_email";
@@ -17,10 +18,11 @@ function getSavedAuthEmail() {
 export default function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const passwordRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(() =>
     searchParams.get("message") === "check-email"
-      ? "Check your email to confirm your account, then enter your password."
+      ? t("auth.checkEmail")
       : null,
   );
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     setMessage(null);
 
     if (!isSupabaseConfigured) {
-      setError("Supabase is not configured. Add the public project URL and anon key.");
+      setError(t("auth.notConfigured"));
       return;
     }
 
@@ -85,7 +87,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       router.push(searchParams.get("next") || "/dashboard");
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Authentication failed.");
+      setError(caughtError instanceof Error ? caughtError.message : t("auth.failed"));
     } finally {
       setLoading(false);
     }
@@ -95,7 +97,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {isSignup && (
         <label className="block">
-          <span className="text-sm font-semibold text-neutral-700">Full name</span>
+          <span className="text-sm font-semibold text-neutral-700">{t("auth.fullName")}</span>
           <input
             name="fullName"
             type="text"
@@ -107,7 +109,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       )}
 
       <label className="block">
-        <span className="text-sm font-semibold text-neutral-700">Email</span>
+        <span className="text-sm font-semibold text-neutral-700">{t("auth.email")}</span>
         <input
           name="email"
           type="email"
@@ -120,7 +122,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       </label>
 
       <label className="block">
-        <span className="text-sm font-semibold text-neutral-700">Password</span>
+        <span className="text-sm font-semibold text-neutral-700">{t("auth.password")}</span>
         <input
           name="password"
           type="password"
@@ -135,7 +137,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       {!isSignup && (
         <div className="text-right">
           <Link href="/forgot-password" className="text-sm font-semibold text-brand-primary hover:underline">
-            Forgot password?
+            {t("auth.forgot")}
           </Link>
         </div>
       )}
@@ -156,13 +158,13 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         disabled={loading}
         className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Working..." : isSignup ? "Create account" : "Sign in"}
+        {loading ? t("auth.working") : isSignup ? t("auth.signUp") : t("auth.signIn")}
       </button>
 
       <p className="text-center text-sm text-neutral-500">
-        {isSignup ? "Already have an account?" : "New to LeetSkills?"}{" "}
+        {isSignup ? t("auth.haveAccount") : t("auth.newToApp")}{" "}
         <Link href={isSignup ? "/login" : "/signup"} className="font-semibold text-brand-primary hover:underline">
-          {isSignup ? "Sign in" : "Create an account"}
+          {isSignup ? t("auth.signInLink") : t("auth.signUpLink")}
         </Link>
       </p>
     </form>

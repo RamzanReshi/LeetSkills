@@ -1,19 +1,14 @@
-// ============================================================
-// LeetSkills MVP — Thinking Trace Input
-// Owner: Ramzan (Scenarios & AI Evaluation)
-// ============================================================
-
 "use client";
 
 import React from "react";
 import { validateThinkingTrace } from "@/utils/validation";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 const MIN_CHARS = 80;
 
 interface ThinkingTraceInputProps {
   value: string;
   onChange: (value: string) => void;
-  /** Called whenever validity changes so parent can gate the Next button */
   onValidChange?: (isValid: boolean) => void;
 }
 
@@ -22,6 +17,7 @@ export default function ThinkingTraceInput({
   onChange,
   onValidChange,
 }: ThinkingTraceInputProps) {
+  const { t } = useLanguage();
   const { valid, charCount } = validateThinkingTrace(value);
   const remaining = Math.max(0, MIN_CHARS - charCount);
 
@@ -34,13 +30,13 @@ export default function ThinkingTraceInput({
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-neutral-700">
-        Thinking Trace
-        <span className="ml-1 text-xs text-neutral-500">(minimum {MIN_CHARS} characters)</span>
+        {t("scenario.thinkingTrace")}
+        <span className="ml-1 text-xs text-neutral-500">{t("scenario.thinkingMin", { n: MIN_CHARS })}</span>
       </label>
       <textarea
         value={value}
         onChange={handleChange}
-        placeholder="Show your reasoning process — what assumptions are you making, what are you ruling out, what's your approach? Example: I am assuming..., I need to decide..., I am ruling out..., so my approach is..."
+        placeholder={t("scenario.thinkingPlaceholder")}
         rows={8}
         className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
@@ -50,13 +46,13 @@ export default function ThinkingTraceInput({
       />
       <div className="flex justify-between text-xs">
         {value.length > 0 && !valid ? (
-          <span className="text-red-600">{remaining} more characters needed</span>
+          <span className="text-red-600">{t("scenario.charsNeeded", { n: remaining })}</span>
         ) : valid ? (
-          <span className="text-brand-primary">Looks good</span>
+          <span className="text-brand-primary">{t("scenario.looksGood")}</span>
         ) : (
-          <span className="text-neutral-500">Start typing your thinking trace…</span>
+          <span className="text-neutral-500">{t("scenario.startTyping")}</span>
         )}
-        <span className="text-neutral-500">{charCount} chars</span>
+        <span className="text-neutral-500">{t("scenario.charCount", { n: charCount })}</span>
       </div>
     </div>
   );

@@ -3,12 +3,14 @@
 import React from "react";
 import type { SkillFingerprint, DimensionName } from "@/types";
 import { TrendingDownIcon } from "@/components/ui/Icons";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface WeakDimensionBannerProps {
   fingerprint: SkillFingerprint;
 }
 
 export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBannerProps) {
+  const { t } = useLanguage();
   const weakest = (Object.entries(fingerprint) as [DimensionName, number][])
     .sort((a, b) => a[1] - b[1])[0];
 
@@ -24,13 +26,15 @@ export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBanner
 
       <div className="flex-1 min-w-0">
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-brand-primary mb-1">
-          Growth Opportunity
+          {t("weak.eyebrow")}
         </p>
         <h3 className="text-xl font-bold text-brand-deep tracking-tight">
-          Enhance your <span className="text-brand-primary">{dimension}</span>
+          {t("weak.title", { dimension }).split(dimension)[0]}
+          <span className="text-brand-primary">{dimension}</span>
+          {t("weak.title", { dimension }).split(dimension)[1] ?? ""}
         </h3>
         <p className="text-sm text-neutral-500 mt-1">
-          Currently at {score}% — focusing on this dimension will yield the highest cognitive gains.
+          {t("weak.detail", { score })}
         </p>
       </div>
 

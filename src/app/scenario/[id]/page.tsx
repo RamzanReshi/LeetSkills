@@ -13,12 +13,9 @@ import ThinkingTraceInput from "@/components/scenario/ThinkingTraceInput";
 import ResponseInput from "@/components/scenario/ResponseInput";
 import { useSkillStore } from "@/store/useSkillStore";
 import { validateResponse, validateThinkingTrace } from "@/utils/validation";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 const scenarios = MVP_SCENARIOS as Scenario[];
-const AI_UNAVAILABLE_MESSAGE =
-  "AI feedback is currently unavailable. Your answer is saved locally on this page. Please try again in a moment.";
-const AI_TEMPORARILY_UNAVAILABLE_MESSAGE =
-  "AI feedback is temporarily unavailable. Please try again later.";
 
 type EvaluateErrorPayload = {
   error?:
@@ -53,7 +50,10 @@ type EvaluateErrorPayload = {
 export default function ScenarioPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const scenarioId = params.id as string;
+  const AI_UNAVAILABLE_MESSAGE = t("scenario.aiUnavailable");
+  const AI_TEMPORARILY_UNAVAILABLE_MESSAGE = t("scenario.aiTempUnavailable");
 
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? null;
   const activeDraft = useSkillStore((s) => s.activeDrafts[scenarioId]);
@@ -83,9 +83,9 @@ export default function ScenarioPage() {
     if (scenario) {
       document.title = `${scenario.title} - LeetSkills`;
     } else {
-      document.title = "Scenario - LeetSkills";
+      document.title = t("scenario.metaTitle");
     }
-  }, [scenario]);
+  }, [scenario, t]);
 
   useEffect(() => {
     if (!hydrated || !activeDraft) return;
@@ -243,8 +243,8 @@ export default function ScenarioPage() {
   if (!scenario) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-brand-deep">Scenario not found</h1>
-        <p className="mt-2 text-neutral-500">No scenario with ID &quot;{scenarioId}&quot; exists.</p>
+        <h1 className="text-2xl font-bold text-brand-deep">{t("scenario.notFound")}</h1>
+        <p className="mt-2 text-neutral-500">{t("scenario.notFoundDetail", { id: scenarioId })}</p>
       </main>
     );
   }
@@ -252,14 +252,21 @@ export default function ScenarioPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
       <div className="flex gap-2 text-xs font-medium text-neutral-500">
-        {(["Read", "Think", "Respond", "Submitting"] as const).map((label, i) => (
+        {(
+          [
+            ["scenario.step.read", "Read"],
+            ["scenario.step.think", "Think"],
+            ["scenario.step.respond", "Respond"],
+            ["scenario.step.submitting", "Submitting"],
+          ] as const
+        ).map(([key, fallback], i) => (
           <span
-            key={label}
+            key={fallback}
             className={`rounded-full px-2 py-0.5 ${
               step === i + 1 ? "bg-brand-mint text-brand-primary" : ""
             }`}
           >
-            {i + 1}. {label}
+            {i + 1}. {t(key)}
           </span>
         ))}
       </div>
@@ -268,7 +275,7 @@ export default function ScenarioPage() {
         <div className="space-y-6">
           <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
           <button onClick={handleStart} className="btn-primary w-full">
-            Start - timer begins now
+            {t("scenario.start")}
           </button>
         </div>
       )}
@@ -286,7 +293,7 @@ export default function ScenarioPage() {
             disabled={!traceValid}
             className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Next - write your response
+            {t("scenario.next")}
           </button>
         </div>
       )}
@@ -315,7 +322,7 @@ export default function ScenarioPage() {
             disabled={!traceValid || !responseValid}
             className="btn-action w-full disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {error ? (errorRetryable ? "Try again" : "Try again later") : "Submit for evaluation"}
+            {error ? (errorRetryable ? t("scenario.tryAgain") : t("scenario.tryAgainLater")) : t("scenario.submit")}
           </button>
         </div>
       )}
@@ -326,7 +333,7 @@ export default function ScenarioPage() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
-          <p className="text-sm font-medium">Evaluating your submission...</p>
+          <p className="text-sm font-medium">{t("scenario.evaluating")}</p>
         </div>
       )}
     </main>

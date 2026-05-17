@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function ResetPasswordForm() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +17,7 @@ export default function ResetPasswordForm() {
     setError(null);
 
     if (!isSupabaseConfigured) {
-      setError("Supabase is not configured. Add the public project URL and anon key.");
+      setError(t("auth.notConfigured"));
       return;
     }
 
@@ -24,7 +26,7 @@ export default function ResetPasswordForm() {
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("auth.passwordsNoMatch"));
       return;
     }
 
@@ -38,7 +40,7 @@ export default function ResetPasswordForm() {
       router.push("/dashboard");
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Unable to update password.");
+      setError(caughtError instanceof Error ? caughtError.message : t("auth.updateFailed"));
     } finally {
       setLoading(false);
     }
@@ -47,7 +49,7 @@ export default function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-neutral-700">New password</span>
+        <span className="text-sm font-semibold text-neutral-700">{t("auth.newPassword")}</span>
         <input
           name="password"
           type="password"
@@ -59,7 +61,7 @@ export default function ResetPasswordForm() {
       </label>
 
       <label className="block">
-        <span className="text-sm font-semibold text-neutral-700">Confirm password</span>
+        <span className="text-sm font-semibold text-neutral-700">{t("auth.confirmPassword")}</span>
         <input
           name="confirmPassword"
           type="password"
@@ -81,7 +83,7 @@ export default function ResetPasswordForm() {
         disabled={loading}
         className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Updating..." : "Update password"}
+        {loading ? t("auth.updating") : t("auth.updatePassword")}
       </button>
     </form>
   );

@@ -6,6 +6,7 @@
 
 import React from "react";
 import type { Scenario } from "@/types";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface ScenarioPromptProps {
   scenario: Scenario;
@@ -19,6 +20,7 @@ function formatTime(seconds: number): string {
 }
 
 export default function ScenarioPrompt({ scenario, timeRemaining }: ScenarioPromptProps) {
+  const { t } = useLanguage();
   const isLow = timeRemaining <= 60;
 
   return (
@@ -55,7 +57,7 @@ export default function ScenarioPrompt({ scenario, timeRemaining }: ScenarioProm
         {scenario.prompt_text}
       </p>
       <p className="text-xs text-neutral-500">
-        Time limit: {Math.floor(scenario.time_limit_seconds / 60)} minutes
+        {t("scenario.timeLimit", { m: Math.floor(scenario.time_limit_seconds / 60) })}
       </p>
     </div>
   );

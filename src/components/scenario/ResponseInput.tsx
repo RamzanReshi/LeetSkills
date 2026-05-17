@@ -1,17 +1,12 @@
-// ============================================================
-// LeetSkills MVP — Response Input
-// Owner: Ramzan (Scenarios & AI Evaluation)
-// ============================================================
-
 "use client";
 
 import React from "react";
 import { validateResponse } from "@/utils/validation";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface ResponseInputProps {
   value: string;
   onChange: (value: string) => void;
-  /** Called whenever validity changes so parent can gate the Submit button */
   onValidChange?: (isValid: boolean) => void;
 }
 
@@ -20,6 +15,7 @@ export default function ResponseInput({
   onChange,
   onValidChange,
 }: ResponseInputProps) {
+  const { t } = useLanguage();
   const { valid } = validateResponse(value);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,12 +27,12 @@ export default function ResponseInput({
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-neutral-700">
-        Your Response
+        {t("scenario.yourResponse")}
       </label>
       <textarea
         value={value}
         onChange={handleChange}
-        placeholder="Write your final, structured response to the scenario."
+        placeholder={t("scenario.responsePlaceholder")}
         rows={10}
         className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
@@ -45,7 +41,7 @@ export default function ResponseInput({
         }`}
       />
       {value.length > 0 && !valid && (
-        <p className="text-xs text-red-600">Response cannot be empty.</p>
+        <p className="text-xs text-red-600">{t("scenario.responseEmpty")}</p>
       )}
     </div>
   );

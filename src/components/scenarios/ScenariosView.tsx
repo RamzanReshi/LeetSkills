@@ -14,8 +14,10 @@ import { useSkillStore } from "@/store/useSkillStore";
 import CategoryTabs from "./CategoryTabs";
 import ScenarioToolbar from "./ScenarioToolbar";
 import ScenarioTable from "./ScenarioTable";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function ScenariosView() {
+  const { t } = useLanguage();
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,9 +98,9 @@ export default function ScenariosView() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-10 animate-fade-in">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-deep">Scenarios</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-brand-deep">{t("scenarios.title")}</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Real-world situations for university and workplace readiness — think through them, respond, get evaluated.
+          {t("scenarios.subtitle")}
         </p>
       </header>
 

@@ -4,6 +4,7 @@ import React from "react";
 import SkillRadarChart from "@/components/fingerprint/SkillRadarChart";
 import { DASHBOARD_DIMENSIONS } from "@/data/mvp-content";
 import type { DimensionName, SkillFingerprint } from "@/types";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface FingerprintHeroProps {
   fingerprint: SkillFingerprint;
@@ -23,23 +24,24 @@ const DIMENSION_CONFIG: Record<DimensionName, { description: string; color: stri
     return acc;
   }, {} as Record<DimensionName, { description: string; color: string; lightBg: string }>);
 
-function getStrengthLabel(score: number) {
-  if (score >= 80) return "Strong";
-  if (score >= 60) return "Developing";
-  return "Needs Focus";
+function strengthKey(score: number) {
+  if (score >= 80) return "fingerprint.strong";
+  if (score >= 60) return "fingerprint.developing";
+  return "fingerprint.needsFocus";
 }
 
-function getOverallLabel(avg: number) {
-  if (avg >= 85) return "Expert";
-  if (avg >= 70) return "Proficient";
-  if (avg >= 50) return "Developing";
-  return "Beginner";
+function overallKey(avg: number) {
+  if (avg >= 85) return "fingerprint.expert";
+  if (avg >= 70) return "fingerprint.proficient";
+  if (avg >= 50) return "fingerprint.developing";
+  return "fingerprint.beginner";
 }
 
 export default function FingerprintHero({
   fingerprint,
   attemptCount = 0,
 }: FingerprintHeroProps) {
+  const { t } = useLanguage();
   const dimensions = Object.entries(fingerprint) as [DimensionName, number][];
   const average =
     dimensions.reduce((total, [, score]) => total + score, 0) /
@@ -53,10 +55,10 @@ export default function FingerprintHero({
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:mb-8 sm:gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-brand-primary">
-            Skill Profile
+            {t("fingerprint.eyebrow")}
           </p>
           <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-brand-deep sm:text-3xl">
-            Your Skill Fingerprint
+            {t("fingerprint.title")}
           </h2>
         </div>
         <div className="flex gap-3">
@@ -65,13 +67,13 @@ export default function FingerprintHero({
               {Math.round(average)}
             </p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-              {getOverallLabel(average)}
+              {t(overallKey(average))}
             </p>
           </div>
           <div className="min-w-[72px] rounded-xl bg-neutral-50 px-4 py-2.5 text-center ring-1 ring-neutral-200 sm:min-w-[80px] sm:rounded-2xl sm:px-5 sm:py-3">
             <p className="text-2xl font-black leading-none text-brand-deep sm:text-3xl">{attemptCount}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-              Scenarios
+              {t("fingerprint.scenarios")}
             </p>
           </div>
         </div>
@@ -132,7 +134,7 @@ export default function FingerprintHero({
                   className="mt-1.5 text-[10px] font-bold uppercase tracking-wider"
                   style={{ color: cfg.color }}
                 >
-                  {getStrengthLabel(score)}
+                  {t(strengthKey(score))}
                 </p>
               </div>
             );

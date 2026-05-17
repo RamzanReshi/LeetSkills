@@ -21,14 +21,17 @@ import {
   getAccountRole,
   useAuth,
 } from "@/components/auth/AuthProvider";
+import { useLanguage } from "@/i18n/LanguageProvider";
+import LanguageSwitcher from "@/i18n/LanguageSwitcher";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const dropdownLinks = [
-  { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
-  { name: "Scenarios", href: "/scenarios", icon: BookIcon },
-  { name: "Learning Path", href: "/path", icon: CompassIcon },
-  { name: "Profile", href: "/profile", icon: UserIcon },
-  { name: "Settings", href: "/settings", icon: SettingsIcon },
-];
+  { key: "nav.dashboard", href: "/dashboard", icon: DashboardIcon },
+  { key: "nav.scenarios", href: "/scenarios", icon: BookIcon },
+  { key: "nav.learningPath", href: "/path", icon: CompassIcon },
+  { key: "nav.profile", href: "/profile", icon: UserIcon },
+  { key: "nav.settings", href: "/settings", icon: SettingsIcon },
+] as const;
 
 function getInitials(name: string) {
   return name
@@ -39,11 +42,11 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function strengthLabel(score: number) {
-  if (score >= 80) return "Strong";
-  if (score >= 60) return "Developing";
-  if (score > 0) return "Needs focus";
-  return "Not started";
+function strengthLabelKey(score: number) {
+  if (score >= 80) return "nav.profileStrong";
+  if (score >= 60) return "nav.profileDeveloping";
+  if (score > 0) return "nav.profileNeedsFocus";
+  return "nav.profileNotStarted";
 }
 
 export default function Navbar() {
@@ -61,6 +64,7 @@ export default function Navbar() {
   const syncWithUser = useSkillStore((s) => s.syncWithUser);
   const resetSession = useSkillStore((s) => s.resetSession);
   const { user, profile, signOut } = useAuth();
+  const { t } = useLanguage();
   const isSignedIn = Boolean(user);
   const displayName = getAccountDisplayName(user, profile);
   const role = getAccountRole(profile);
@@ -170,6 +174,8 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher compact />
+
           <div className="relative hidden md:block">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <SearchIcon className="h-4 w-4 text-neutral-400" />
@@ -178,7 +184,7 @@ export default function Navbar() {
               type="text"
               value={navSearch}
               onChange={(event) => setNavSearch(event.target.value)}
-              placeholder="Search scenarios"
+              placeholder={t("nav.search")}
               className="h-8 w-40 rounded-md bg-neutral-100 pl-9 pr-3 text-sm transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-300"
             />
           </div>
@@ -187,7 +193,7 @@ export default function Navbar() {
             {isSignedIn ? (
               <button
                 type="button"
-                aria-label="Open profile menu"
+                aria-label={t("nav.openProfile")}
                 aria-expanded={profileOpen}
                 onClick={() => {
                   setProfileOpen((open) => !open);
@@ -203,13 +209,13 @@ export default function Navbar() {
                   href="/login"
                   className="rounded-lg px-3 py-1.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-brand-primary"
                 >
-                  Sign in
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/signup"
                   className="rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover"
                 >
-                  Create account
+                  {t("nav.createAccount")}
                 </Link>
               </div>
             )}
@@ -231,7 +237,7 @@ export default function Navbar() {
                     href="/settings"
                     onClick={() => setProfileOpen(false)}
                     className="rounded-lg border border-neutral-300 p-1.5 text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
-                    aria-label="Open settings"
+                    aria-label={t("nav.openSettings")}
                   >
                     <SettingsIcon className="h-4 w-4" />
                   </Link>
@@ -240,14 +246,14 @@ export default function Navbar() {
                     onClick={() => setProfileOpen(false)}
                     className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-mint"
                   >
-                    View -&gt;
+                    {t("nav.view")} -&gt;
                   </Link>
                 </div>
               </div>
 
               <div className="mb-4 border-y border-neutral-200 py-3">
                 <div className="mb-2 flex items-center justify-between text-xs font-semibold text-neutral-700">
-                  <span>Scenario progress</span>
+                  <span>{t("nav.scenarioProgress")}</span>
                   <span className="text-brand-primary">
                     {completed}/{SCENARIOS_META.length} - {progress}%
                   </span>
@@ -265,19 +271,19 @@ export default function Navbar() {
                       {averageScore === null ? "-" : averageScore}
                     </p>
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-                      Avg score
+                      {t("nav.avgScore")}
                     </p>
                   </div>
                   <div>
                     <p className="text-lg font-black text-brand-deep">{completed}</p>
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-                      Completed
+                      {t("nav.completed")}
                     </p>
                   </div>
                   <div>
                     <p className="text-lg font-black text-brand-deep">{completedAttempts.length}</p>
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-                      Attempts
+                      {t("nav.attempts")}
                     </p>
                   </div>
                 </div>
@@ -285,7 +291,7 @@ export default function Navbar() {
 
               <div className="mb-4">
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
-                  Skill fingerprint
+                  {t("nav.skillFingerprint")}
                 </p>
                 <div className="space-y-2">
                   {Object.entries(fingerprint).map(([name, score]) => (
@@ -303,21 +309,13 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <div className="mb-4 flex items-center justify-between gap-3 rounded-lg bg-neutral-50 px-3 py-2">
-                <div>
-                  <p className="text-xs font-semibold text-brand-deep">Text size</p>
-                  <p className="text-[11px] text-neutral-500">Applies site-wide</p>
-                </div>
-                <div className="flex items-center rounded-lg border border-neutral-200 bg-white p-1 text-neutral-500">
-                  <span className="px-2 text-xs">A</span>
-                  <span className="rounded-md bg-brand-mint px-2 text-sm font-bold text-brand-primary">A</span>
-                  <span className="px-2 text-base font-semibold">A</span>
-                </div>
+              <div className="mb-4">
+                <ThemeToggle detail="Applies across the app." />
               </div>
 
               <div className="flex items-center justify-between gap-3">
                 <span className="text-[11px] text-neutral-500">
-                  {strengthLabel(Math.max(...Object.values(fingerprint)))} profile
+                  {t(strengthLabelKey(Math.max(...Object.values(fingerprint))))}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -325,7 +323,7 @@ export default function Navbar() {
                     onClick={resetSession}
                     className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
                   >
-                    Reset
+                    {t("nav.reset")}
                   </button>
                   <button
                     type="button"
@@ -335,7 +333,7 @@ export default function Navbar() {
                     }}
                     className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
                   >
-                    Sign out
+                    {t("nav.signOut")}
                   </button>
                 </div>
               </div>
@@ -351,7 +349,7 @@ export default function Navbar() {
                 setProfileOpen(false);
               }}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100"
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-label={mobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
@@ -366,10 +364,10 @@ export default function Navbar() {
                 {(isSignedIn
                   ? dropdownLinks
                   : [
-                      { name: "Sign in", href: "/login", icon: UserIcon },
-                      { name: "Create account", href: "/signup", icon: UserIcon },
-                    ]
-                ).map(({ href, name, icon: Icon }) => {
+                      { key: "nav.signIn", href: "/login", icon: UserIcon },
+                      { key: "nav.createAccount", href: "/signup", icon: UserIcon },
+                    ] as const
+                ).map(({ href, key, icon: Icon }) => {
                   const active = isActiveLink(href);
                   return (
                     <Link
@@ -383,7 +381,7 @@ export default function Navbar() {
                       }`}
                     >
                       <Icon className="h-4 w-4" />
-                      <span>{name}</span>
+                      <span>{t(key)}</span>
                     </Link>
                   );
                 })}
