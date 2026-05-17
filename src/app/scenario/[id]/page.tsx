@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MVP_SCENARIOS } from "@/data/mvp-content";
 import type { AttemptErrorState, Evaluation, Scenario } from "@/types";
@@ -12,6 +12,7 @@ import ScenarioPrompt from "@/components/scenario/ScenarioPrompt";
 import ThinkingTraceInput from "@/components/scenario/ThinkingTraceInput";
 import ResponseInput from "@/components/scenario/ResponseInput";
 import { useSkillStore } from "@/store/useSkillStore";
+import { validateResponse, validateThinkingTrace } from "@/utils/validation";
 
 const scenarios = MVP_SCENARIOS as Scenario[];
 const AI_UNAVAILABLE_MESSAGE =
@@ -76,6 +77,7 @@ export default function ScenarioPage() {
   const [errorAction, setErrorAction] = useState<string | null>(null);
   const [failureCount, setFailureCount] = useState(0);
   const [startedAt, setStartedAt] = useState<number | undefined>(undefined);
+  const initializedDraftScenarioRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (scenario) {
@@ -87,9 +89,17 @@ export default function ScenarioPage() {
 
   useEffect(() => {
     if (!hydrated || !activeDraft) return;
+    if (initializedDraftScenarioRef.current === scenarioId) return;
+    initializedDraftScenarioRef.current = scenarioId;
+
     const timeout = window.setTimeout(() => {
-      setThinkingTrace(activeDraft.user_input.thinking_trace);
-      setResponse(activeDraft.user_input.response);
+      const savedThinkingTrace = activeDraft.user_input.thinking_trace;
+      const savedResponse = activeDraft.user_input.response;
+
+      setThinkingTrace(savedThinkingTrace);
+      setResponse(savedResponse);
+      setTraceValid(validateThinkingTrace(savedThinkingTrace).valid);
+      setResponseValid(validateResponse(savedResponse).valid);
       setStartedAt(activeDraft.started_at);
       setError(activeDraft.last_failure?.message ?? null);
       setErrorRetryable(activeDraft.last_failure?.retryable ?? true);
@@ -103,7 +113,7 @@ export default function ScenarioPage() {
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [activeDraft, hydrated]);
+  }, [activeDraft, hydrated, scenarioId]);
 
   useEffect(() => {
     if (!timerRunning || timeRemaining <= 0) return;
