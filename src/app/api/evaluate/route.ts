@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MVP_SCENARIOS } from "@/data/mvp-content";
 import { evaluateSubmission } from "@/lib/claude";
-import { getFallbackEvaluation } from "@/lib/fallbackEvaluation";
+import { classifyAiProviderError } from "@/lib/providers/errors";
 import { validateThinkingTrace, validateResponse } from "@/utils/validation";
 import type { Scenario, Submission } from "@/types";
 
@@ -54,7 +54,41 @@ export async function POST(request: NextRequest) {
     const evaluation = await evaluateSubmission(scenario, submission);
     return NextResponse.json(evaluation, { status: 200 });
   } catch (err) {
-    console.error("Unhandled error in /api/evaluate:", err);
-    return NextResponse.json(getFallbackEvaluation(scenario), { status: 200 });
+    const issue = classifyAiProviderError(err);
+    console.error("AI evaluation failed:", issue);
+
+    const isDev = process.env.NODE_ENV === "development";
+    const providerStatus = {
+      provider: issue.provider,
+      status: issue.status,
+    };
+    const errorPayload = {
+      code: issue.code,
+      message: issue.userMessage,
+      action: issue.userAction,
+      retryable: issue.retryable,
+      provider_status: providerStatus,
+    };
+
+    return NextResponse.json(
+      {
+        error: errorPayload,
+        code: issue.code,
+        message: issue.userMessage,
+        action: issue.userAction,
+        retryable: issue.retryable,
+        provider_status: providerStatus,
+        details: isDev
+          ? {
+              provider: issue.provider,
+              model: issue.model,
+              message: issue.message,
+              action: issue.action,
+              raw: issue.rawMessage,
+            }
+          : undefined,
+      },
+      { status: issue.status },
+    );
   }
 }

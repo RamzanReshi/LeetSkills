@@ -78,8 +78,8 @@ export default function FingerprintHero({
       </div>
 
       <div className="grid min-w-0 gap-8 lg:grid-cols-[1fr_1.5fr] lg:items-start">
-        <div className="relative flex items-center justify-center py-4">
-          <div className="relative z-10 w-full aspect-square max-w-[280px] mx-auto">
+        <div className="relative flex min-w-0 items-center justify-center py-4">
+          <div className="relative z-10 mx-auto aspect-square w-full min-w-0 max-w-[280px]">
             <SkillRadarChart fingerprint={fingerprint} size="lg" />
           </div>
         </div>

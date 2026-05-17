@@ -57,7 +57,7 @@ export default function ThinkingTraceInput({
       <textarea
         value={value}
         onChange={handleChange}
-        placeholder="Show your reasoning process — what assumptions are you making, what are you ruling out, what's your approach?"
+        placeholder="Show your reasoning process — what assumptions are you making, what are you ruling out, what's your approach? Example: I am assuming..., I need to decide..., I am ruling out..., so my approach is..."
         rows={8}
         className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid

@@ -3,7 +3,7 @@ import AppShell from "@/components/shell/AppShell";
 import ScenariosView from "@/components/scenarios/ScenariosView";
 
 export const metadata = {
-  title: "Scenarios — LeetSkills",
+  title: "Scenarios - LeetSkills",
 };
 
 export default function ScenariosPage() {

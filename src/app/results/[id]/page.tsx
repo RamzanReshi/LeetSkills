@@ -19,14 +19,32 @@ export default function ResultsPage() {
   const router = useRouter();
   const scenarioId = params.id as string;
 
-  const history = useSkillStore((s) => s.history);
-  const fingerprint = useSkillStore((s) => s.fingerprint);
+  const completedAttempts = useSkillStore((s) => s.completedAttempts);
+  const hydrated = useSkillStore((s) => s.hydrated);
 
-  const evaluation = [...history]
-    .reverse()
-    .find((e) => e.scenario_id === scenarioId);
+  const attempt = hydrated
+    ? [...completedAttempts].reverse().find((entry) => entry.scenario_id === scenarioId)
+    : undefined;
 
-  if (!evaluation) {
+  const scenario = attempt ? getScenarioById(attempt.ai_feedback.scenario_id) : undefined;
+
+  React.useEffect(() => {
+    if (scenario) {
+      document.title = `Evaluation: ${scenario.title} - LeetSkills`;
+    } else {
+      document.title = "Evaluation - LeetSkills";
+    }
+  }, [scenario]);
+
+  if (!hydrated) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-brand-deep">Loading results...</h1>
+      </main>
+    );
+  }
+
+  if (!attempt) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-brand-deep">No results yet</h1>
@@ -40,7 +58,7 @@ export default function ResultsPage() {
     );
   }
 
-  const scenario = getScenarioById(evaluation.scenario_id);
+  const evaluation = attempt.ai_feedback;
   const weakestScore = [...evaluation.skill_scores].sort(
     (a, b) => a.rating_0_to_4 - b.rating_0_to_4 || b.weight - a.weight,
   )[0];
@@ -56,6 +74,11 @@ export default function ResultsPage() {
             {scenario?.path_title ?? evaluation.path_id}
           </p>
           <h1 className="text-xl font-bold text-brand-deep">Your Results</h1>
+          {attempt.fallback_used ? (
+            <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Fallback evaluation was used. Scores are saved locally but should be retried for calibrated AI feedback.
+            </p>
+          ) : null}
         </div>
         <div className="text-right">
           <p className="font-mono text-3xl font-black text-brand-primary">
@@ -103,7 +126,7 @@ export default function ResultsPage() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
           Updated Skill Fingerprint
         </h3>
-        <SkillRadarChart fingerprint={fingerprint} />
+        <SkillRadarChart fingerprint={attempt.fingerprint_after} />
       </div>
 
       <button onClick={() => router.push("/dashboard")} className="btn-primary w-full">

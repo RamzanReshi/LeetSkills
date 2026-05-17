@@ -4,16 +4,51 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MVP_SCENARIOS } from "@/data/mvp-content";
-import type { Scenario, Evaluation } from "@/types";
+import type { AttemptErrorState, Evaluation, Scenario } from "@/types";
 import ScenarioPrompt from "@/components/scenario/ScenarioPrompt";
 import ThinkingTraceInput from "@/components/scenario/ThinkingTraceInput";
 import ResponseInput from "@/components/scenario/ResponseInput";
 import { useSkillStore } from "@/store/useSkillStore";
+import { validateResponse, validateThinkingTrace } from "@/utils/validation";
 
 const scenarios = MVP_SCENARIOS as Scenario[];
+const AI_UNAVAILABLE_MESSAGE =
+  "AI feedback is currently unavailable. Your answer is saved locally on this page. Please try again in a moment.";
+const AI_TEMPORARILY_UNAVAILABLE_MESSAGE =
+  "AI feedback is temporarily unavailable. Please try again later.";
+
+type EvaluateErrorPayload = {
+  error?:
+    | string
+    | {
+        code?: string;
+        message?: string;
+        action?: string;
+        retryable?: boolean;
+        provider_status?: {
+          provider?: string;
+          status?: number;
+        };
+      };
+  code?: string;
+  message?: string;
+  action?: string;
+  retryable?: boolean;
+  provider_status?: {
+    provider?: string;
+    status?: number;
+  };
+  details?: {
+    provider?: string;
+    model?: string;
+    message?: string;
+    action?: string;
+    raw?: string;
+  };
+};
 
 export default function ScenarioPage() {
   const params = useParams();
@@ -21,7 +56,14 @@ export default function ScenarioPage() {
   const scenarioId = params.id as string;
 
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? null;
-  const addEvaluation = useSkillStore((s) => s.addEvaluation);
+  const activeDraft = useSkillStore((s) => s.activeDrafts[scenarioId]);
+  const hydrated = useSkillStore((s) => s.hydrated);
+  const recordScenarioStarted = useSkillStore((s) => s.recordScenarioStarted);
+  const updateScenarioDraft = useSkillStore((s) => s.updateScenarioDraft);
+  const recordScenarioSubmitted = useSkillStore((s) => s.recordScenarioSubmitted);
+  const recordEvaluationFailure = useSkillStore((s) => s.recordEvaluationFailure);
+  const recordRetryStarted = useSkillStore((s) => s.recordRetryStarted);
+  const completeScenarioAttempt = useSkillStore((s) => s.completeScenarioAttempt);
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [timeRemaining, setTimeRemaining] = useState(scenario?.time_limit_seconds ?? 0);
@@ -31,6 +73,47 @@ export default function ScenarioPage() {
   const [traceValid, setTraceValid] = useState(false);
   const [responseValid, setResponseValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorRetryable, setErrorRetryable] = useState<boolean>(true);
+  const [errorAction, setErrorAction] = useState<string | null>(null);
+  const [failureCount, setFailureCount] = useState(0);
+  const [startedAt, setStartedAt] = useState<number | undefined>(undefined);
+  const initializedDraftScenarioRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (scenario) {
+      document.title = `${scenario.title} - LeetSkills`;
+    } else {
+      document.title = "Scenario - LeetSkills";
+    }
+  }, [scenario]);
+
+  useEffect(() => {
+    if (!hydrated || !activeDraft) return;
+    if (initializedDraftScenarioRef.current === scenarioId) return;
+    initializedDraftScenarioRef.current = scenarioId;
+
+    const timeout = window.setTimeout(() => {
+      const savedThinkingTrace = activeDraft.user_input.thinking_trace;
+      const savedResponse = activeDraft.user_input.response;
+
+      setThinkingTrace(savedThinkingTrace);
+      setResponse(savedResponse);
+      setTraceValid(validateThinkingTrace(savedThinkingTrace).valid);
+      setResponseValid(validateResponse(savedResponse).valid);
+      setStartedAt(activeDraft.started_at);
+      setError(activeDraft.last_failure?.message ?? null);
+      setErrorRetryable(activeDraft.last_failure?.retryable ?? true);
+      setErrorAction(activeDraft.last_failure?.action ?? null);
+      setFailureCount(activeDraft.last_failure?.failure_count ?? (activeDraft.last_failure ? 1 : 0));
+      if (activeDraft.last_failure || activeDraft.user_input.response.trim()) {
+        setStep(3);
+      } else if (activeDraft.user_input.thinking_trace.trim()) {
+        setStep(2);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [activeDraft, hydrated, scenarioId]);
 
   useEffect(() => {
     if (!timerRunning || timeRemaining <= 0) return;
@@ -41,18 +124,29 @@ export default function ScenarioPage() {
   }, [timerRunning, timeRemaining]);
 
   const handleStart = useCallback(() => {
+    const timestamp = recordScenarioStarted(scenarioId);
+    setStartedAt(timestamp);
     setTimerRunning(true);
     setStep(2);
-  }, []);
+  }, [recordScenarioStarted, scenarioId]);
 
   const handleNextToResponse = useCallback(() => {
+    updateScenarioDraft(scenarioId, { thinking_trace: thinkingTrace, response });
     setStep(3);
-  }, []);
+  }, [response, scenarioId, thinkingTrace, updateScenarioDraft]);
 
   const handleSubmit = useCallback(async () => {
+    if (!scenario) return;
+    const userInput = { thinking_trace: thinkingTrace, response };
+    if (error) {
+      recordRetryStarted(scenarioId);
+    }
+    const submitTimestamp = recordScenarioSubmitted(scenarioId, userInput);
     setStep(4);
     setTimerRunning(false);
     setError(null);
+    setErrorRetryable(true);
+    setErrorAction(null);
 
     try {
       const res = await fetch("/api/evaluate", {
@@ -66,19 +160,85 @@ export default function ScenarioPage() {
       });
 
       if (!res.ok) {
-        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(payload?.error ?? "Evaluation failed");
+        const payload = (await res.json().catch(() => null)) as EvaluateErrorPayload | null;
+        if (payload?.details) {
+          console.warn("[evaluate] dev details:", payload.details);
+        }
+        const structuredError = typeof payload?.error === "object" ? payload.error : undefined;
+        const providerStatus = structuredError?.provider_status ?? payload?.provider_status;
+        const nextFailureCount = (activeDraft?.last_failure?.failure_count ?? failureCount) + 1;
+        const errorState: AttemptErrorState = {
+          message:
+            nextFailureCount > 1
+              ? AI_TEMPORARILY_UNAVAILABLE_MESSAGE
+              : structuredError?.message ?? payload?.message ?? (typeof payload?.error === "string" ? payload.error : AI_UNAVAILABLE_MESSAGE),
+          code: structuredError?.code ?? payload?.code,
+          action:
+            structuredError?.action ??
+            payload?.action ??
+            "Retry the submission in a moment. Your thinking trace and final response remain on this page.",
+          provider: providerStatus?.provider ?? payload?.details?.provider,
+          provider_status: providerStatus?.status,
+          model: payload?.details?.model,
+          retryable: structuredError?.retryable ?? payload?.retryable ?? true,
+          failure_count: nextFailureCount,
+          fallback_used: false,
+        };
+        recordEvaluationFailure(scenarioId, userInput, errorState);
+        setError(errorState.message);
+        setErrorRetryable(errorState.retryable ?? true);
+        setErrorAction(errorState.action ?? null);
+        setFailureCount(nextFailureCount);
+        setStep(3);
+        return;
       }
 
-      const evaluation: Evaluation = await res.json();
-      addEvaluation(evaluation);
+      const evaluation = (await res.json()) as Evaluation & {
+        fallback_used?: boolean;
+        error_state?: AttemptErrorState;
+      };
+      completeScenarioAttempt({
+        scenario,
+        evaluation,
+        userInput,
+        startedAt,
+        submittedAt: submitTimestamp,
+        fallbackUsed: Boolean(evaluation.fallback_used),
+        errorState: evaluation.error_state,
+      });
       router.push(`/results/${scenarioId}`);
     } catch (err) {
-      console.error("Submit failed:", err);
-      setError(err instanceof Error ? err.message : "Something went wrong submitting your response. Please try again.");
+      console.warn("[evaluate] submit failed:", err);
+      const nextFailureCount = (activeDraft?.last_failure?.failure_count ?? failureCount) + 1;
+      const userMessage = nextFailureCount > 1 ? AI_TEMPORARILY_UNAVAILABLE_MESSAGE : AI_UNAVAILABLE_MESSAGE;
+      recordEvaluationFailure(scenarioId, userInput, {
+        message: userMessage,
+        action: "Retry the submission in a moment. Your thinking trace and final response remain on this page.",
+        retryable: true,
+        failure_count: nextFailureCount,
+        fallback_used: false,
+      });
+      setError(userMessage);
+      setErrorRetryable(true);
+      setErrorAction("Retry the submission in a moment. Your thinking trace and final response remain on this page.");
+      setFailureCount(nextFailureCount);
       setStep(3);
     }
-  }, [addEvaluation, scenarioId, thinkingTrace, response, router]);
+  }, [
+    activeDraft,
+    completeScenarioAttempt,
+    error,
+    failureCount,
+    recordEvaluationFailure,
+    recordRetryStarted,
+    recordScenarioSubmitted,
+    response,
+    router,
+    scenario,
+    scenarioId,
+    startedAt,
+    thinkingTrace,
+  ]);
 
   if (!scenario) {
     return (
@@ -133,21 +293,29 @@ export default function ScenarioPage() {
 
       {step === 3 && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-neutral-300 bg-neutral-100 p-3 text-xs text-neutral-500">
-            Thinking trace saved ({thinkingTrace.length} chars). Now write your final response.
-          </div>
+          <ScenarioPrompt scenario={scenario} timeRemaining={timeRemaining} />
+          <ThinkingTraceInput
+            value={thinkingTrace}
+            onChange={setThinkingTrace}
+            onValidChange={setTraceValid}
+          />
           <ResponseInput
             value={response}
             onChange={setResponse}
             onValidChange={setResponseValid}
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <p className="font-semibold">{error}</p>
+              {errorAction && <p className="mt-1 text-amber-800">{errorAction}</p>}
+            </div>
+          )}
           <button
             onClick={handleSubmit}
-            disabled={!responseValid}
+            disabled={!traceValid || !responseValid}
             className="btn-action w-full disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Submit for evaluation
+            {error ? (errorRetryable ? "Try again" : "Try again later") : "Submit for evaluation"}
           </button>
         </div>
       )}

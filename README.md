@@ -1,81 +1,193 @@
 # LeetSkills MVP
 
-A web app where users complete real-world scenarios through structured reasoning, receive AI-evaluated multidimensional feedback, and continuously build an evolving Skill Fingerprint.
+LeetSkills is a web app where users complete real-world scenarios through structured reasoning, receive AI-evaluated multidimensional feedback, and build an evolving Skill Fingerprint.
+
+Current status:
+
+- Demo-ready: yes
+- MVP-ready: not fully
+- Persistence: browser localStorage for scenario progress
+- Auth: optional Supabase Auth and profile data when configured
+- Active content: 30 scenarios across 6 learning paths
 
 ## Tech Stack
 
 | Tech | Purpose |
-|------|---------|
-| Next.js 14 | Framework (App Router) |
-| Tailwind CSS | Styling |
-| Zustand | State management |
-| Recharts | Radar chart visualization |
-| Framer Motion | Animations |
-| Claude (Anthropic) | AI evaluation |
-| localStorage | Session persistence |
-| Vercel | Hosting |
+| --- | --- |
+| Next.js 16 | App Router framework |
+| React 19 | UI runtime |
+| Tailwind CSS v4 | Styling and design tokens |
+| Zustand | Client state management |
+| localStorage | Browser scenario progress persistence |
+| Recharts | Skill Fingerprint radar chart |
+| Framer Motion | Animation dependency |
+| Anthropic SDK | Claude evaluation provider |
+| Google GenAI SDK | Optional Gemini evaluation provider |
+| Supabase | Optional auth and profile storage |
+
+## Product Scope
+
+The current app includes:
+
+- 30 scenario prompts in `src/data/mvp-content.ts`
+- 6 learning paths in `src/data/mvp-content.ts`
+- Scenario browser at `/scenarios`
+- Scenario solve flow at `/scenario/[id]`
+- Evaluation results at `/results/[id]`
+- Dashboard at `/dashboard`
+- Learning paths page at `/path`
+- Profile page at `/profile`
+- Optional login, signup, password reset, and auth callback routes
+- AI evaluation API route at `/api/evaluate`
+- Zustand/localStorage progress tracking
+- Optional Supabase Auth with a `leetskill.profiles` table
+- 6-axis Skill Fingerprint
+
+The current app does not include:
+
+- Database persistence for scenario progress and evaluations
+- Admin dashboard
+- Payments
+- Leaderboards
+- Production analytics
+- Complete OpenAI provider support
+
+## Skill Fingerprint
+
+The current Skill Fingerprint uses 6 axes:
+
+| Axis | Meaning |
+| --- | --- |
+| Decomposition | Breaks problems into useful parts. |
+| Pattern Recognition | Recognizes useful patterns, solution approaches, or likely causes. |
+| Execution Quality | Turns plans into reliable action. |
+| Communication | Explains clearly for the audience. |
+| Judgment | Makes practical tradeoffs under constraints. |
+| Adaptability | Collaborates and adjusts under ambiguity. |
+
+The fingerprint is calculated in `src/store/useSkillStore.ts` from saved evaluation history. Rubric-level scores are normalized to 0-100 and mapped into the 6 dashboard dimensions defined in `src/data/mvp-content.ts`.
+
+## Routes
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Redirects to `/dashboard` |
+| `/dashboard` | Main dashboard with fingerprint, next scenario, and weakest dimension |
+| `/scenarios` | Scenario browser with filters |
+| `/scenario/[id]` | Scenario prompt, thinking trace, response, and submit flow |
+| `/results/[id]` | AI feedback, scores, recommended next scenario, and updated fingerprint |
+| `/path` | Learning paths overview |
+| `/quest` | Redirects to `/path` |
+| `/profile` | Local profile, stats, fingerprint bars, and reset progress |
+| `/login` | Supabase sign-in page |
+| `/signup` | Supabase account creation page |
+| `/forgot-password` | Password reset request page |
+| `/reset-password` | Password update page |
+| `/auth/callback` | Supabase auth callback route |
+| `/api/evaluate` | Server route for AI evaluation |
+
+When Supabase env vars are present, `/dashboard`, `/scenarios`, `/path`, `/quest`, `/profile`, `/scenario/*`, and `/results/*` are protected routes. Without Supabase env vars, the app runs in anonymous local demo mode.
+
+## AI Evaluation
+
+`POST /api/evaluate` accepts:
+
+```json
+{
+  "scenario_id": "SE-01",
+  "thinking_trace": "at least 80 characters",
+  "response": "final response"
+}
+```
+
+Provider behavior:
+
+- Claude is the default provider.
+- Gemini is optional with `AI_PROVIDER=gemini`.
+- If live AI evaluation or parsing fails, the route returns a classified JSON error with a suggested action.
+
+Environment variables currently expected by the code:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+AI_PROVIDER=claude
+ANTHROPIC_API_KEY=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+See `.env.local.example` for the full template.
 
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Set up environment variables
-cp .env.local.example .env.local
-# Add your ANTHROPIC_API_KEY to .env.local
-
-# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+Open [http://localhost:3000](http://localhost:3000). The root route redirects to `/dashboard`.
 
-## Team & Workflows
-
-| Contributor | Role | Branch | Workflow Doc |
-|-------------|------|--------|--------------|
-| **Reshi** | Foundation & Infrastructure | `feat/foundation` | [WORKFLOW_RESHI.md](docs/WORKFLOW_RESHI.md) |
-| **Ramzan** | Scenarios & AI Evaluation | `feat/evaluation` | [WORKFLOW_RAMZAN.md](docs/WORKFLOW_RAMZAN.md) |
-| **Yousef** | UI/UX & Dashboard | `feat/ui-dashboard` | [WORKFLOW_YOUSEF.md](docs/WORKFLOW_YOUSEF.md) |
+For live Claude evaluation, set `ANTHROPIC_API_KEY` in `.env.local`. To enable Supabase Auth, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`, then apply `supabase/migrations/leetskilldb_schema.sql`. See `docs/SUPABASE_AUTH.md` for setup details.
 
 ## Project Structure
 
-```
+```text
 src/
-├── app/                    # Next.js App Router pages
-│   ├── api/evaluate/       # POST /api/evaluate (Claude)
+├── app/
+│   ├── api/evaluate/       # POST /api/evaluate
+│   ├── auth/callback/      # Supabase auth callback
 │   ├── dashboard/          # Dashboard page
-│   ├── scenario/[id]/      # Scenario flow page
-│   └── results/[id]/       # Evaluation results page
+│   ├── forgot-password/    # Password reset request
+│   ├── login/              # Login page
+│   ├── path/               # Learning paths page
+│   ├── profile/            # Profile page
+│   ├── quest/              # Redirects to /path
+│   ├── reset-password/     # Password update
+│   ├── scenario/[id]/      # Scenario solve flow
+│   ├── results/[id]/       # Evaluation results
+│   ├── scenarios/          # Scenario browser
+│   └── signup/             # Signup page
 ├── components/
-│   ├── ui/                 # Shared primitives (Reshi)
-│   ├── scenario/           # Scenario flow components (Ramzan)
-│   ├── evaluation/         # Score display components (Yousef)
-│   ├── fingerprint/        # Radar chart (Yousef)
-│   └── dashboard/          # Dashboard sections (Yousef)
-├── data/                   # Static scenario JSON (Ramzan)
-├── lib/                    # Claude API + evaluation pipeline (Ramzan)
-├── store/                  # Zustand state management (Reshi)
-├── types/                  # Shared TypeScript types (Reshi)
-└── utils/                  # Helpers (Reshi + Ramzan)
+│   ├── dashboard/          # Dashboard sections
+│   ├── evaluation/         # Feedback and score display
+│   ├── fingerprint/        # Radar chart
+│   ├── path/               # Learning path cards
+│   ├── profile/            # Profile view
+│   ├── scenario/           # Scenario solve components
+│   ├── scenarios/          # Scenario browser components
+│   ├── shell/              # App shell and sidebar
+│   └── ui/                 # Shared primitives/icons
+├── data/                   # Active MVP content and metadata
+├── lib/                    # Evaluation prompt, parser, fallback, providers
+│   └── supabase/           # Supabase browser/server/middleware clients
+├── store/                  # Zustand session store
+├── types/                  # Shared TypeScript types
+└── utils/                  # Validation and localStorage helpers
 ```
 
-## Build Phases
+## MVP Readiness
 
-1. **Phase 1 — Foundation** (Reshi): Project setup, routing, UI primitives, state management
-2. **Phase 2 — Content + Evaluation** (Ramzan): Scenarios, Claude integration, API route
-3. **Phase 3 — Product Experience** (Yousef + Ramzan): Dashboard, radar chart, scenario flow
-4. **Phase 4 — Reliability + Polish** (All): Error handling, loading states, deployment QA
+Demo-ready: yes.
 
-## Product Loop
+MVP-ready: not fully.
 
-1. Scenario appears with constraints and timer
-2. User writes a mandatory thinking trace (≥ 80 chars)
-3. User writes a response
-4. AI returns multi-dimensional scores with feedback
-5. Skill Fingerprint visibly updates
+Main blockers:
 
----
+- Dashboard needs better metrics.
+- Skill Fingerprint needs clearer meaning and empty/fallback states.
+- AI provider failures need a product-level retry or fallback decision.
+- Scenario progress and evaluations are not persisted to a database.
+- No admin dashboard.
+- No automated tests or smoke tests.
+- Some unfinished UI remains: navbar search, timer TODO, hardcoded profile data.
 
-See [LeetSkills_MVP_PRD.md](LeetSkills_MVP_PRD.md) for the full product requirements document.
+## Next Priority
+
+1. Improve dashboard.
+2. Improve Skill Fingerprint.
+3. Improve AI fallback/error handling UX.
+4. Add smoke tests.
+5. Clean unfinished UI: navbar search, timer TODO, hardcoded profile data.
+
+See [LeetSkills_MVP_PRD.md](LeetSkills_MVP_PRD.md) for the current product requirements document.

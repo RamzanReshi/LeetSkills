@@ -12,9 +12,14 @@ export function buildEvaluationPrompt(scenario: Scenario): string {
     )
     .join("\n");
 
-  const firstSkill = scenario.skills_graded[0];
   const nextScenario = scenario.recommended_next_scenario_id ?? null;
   const nextScenarioJson = nextScenario ? `"${nextScenario}"` : "null";
+  const skillScoreTemplate = scenario.skills_graded
+    .map(
+      (skill) =>
+        `    { "skill": "${skill.skill}", "rating_0_to_4": <integer 0-4>, "weight": ${skill.weight}, "weighted_score": <number>, "feedback": "<1-2 specific sentences>" }`,
+    )
+    .join(",\n");
 
   return `You are a strict, calibrated evaluator for a scenario-based skill-development platform called LeetSkills. Score the candidate's final response to this specific scenario using only the weighted rubric below.
 
@@ -40,10 +45,11 @@ RATING SCALE:
 SCORING RULES:
 - For each skill, weighted_score must equal (rating_0_to_4 / 4) * weight.
 - overall_score must equal the sum of weighted_score values, rounded to the nearest whole number.
+- skill_scores must include exactly one object for every rubric skill, in the same order shown below.
 - Be strict and scenario-specific. Do not reward generic advice that misses the prompt.
-- strengths should name what went well, tied to the strongest skill(s).
-- improvements should name what to improve, tied to the weakest skill(s).
-- improved_example_response should be a concise stronger answer the learner could study.
+- strengths must be a non-empty JSON array of strings naming what went well, tied to the strongest skill(s).
+- improvements must be a non-empty JSON array of strings naming what to improve, tied to the weakest skill(s).
+- improved_example_response must be a concise stronger answer string the learner could study.
 - recommended_next_scenario_id should be ${nextScenarioJson} unless a different listed scenario is clearly better for the learner's weakness.
 
 OUTPUT FORMAT - respond with ONLY a valid JSON object, no markdown, no explanation, no text before or after:
@@ -53,7 +59,7 @@ OUTPUT FORMAT - respond with ONLY a valid JSON object, no markdown, no explanati
   "difficulty": "${scenario.difficulty}",
   "overall_score": <integer 0-100>,
   "skill_scores": [
-    { "skill": "${firstSkill?.skill ?? "Skill"}", "rating_0_to_4": <integer 0-4>, "weight": ${firstSkill?.weight ?? 0}, "weighted_score": <number>, "feedback": "<1-2 specific sentences>" }
+${skillScoreTemplate}
   ],
   "strengths": ["<specific strength>"],
   "improvements": ["<specific improvement>"],

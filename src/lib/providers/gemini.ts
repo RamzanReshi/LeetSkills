@@ -10,13 +10,13 @@ export const geminiProvider: EvaluationProvider = {
 
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+      model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
       contents: userMessage,
       config: {
         systemInstruction: systemPrompt,
         responseMimeType: "application/json",
         temperature: 0.2,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 4096,
       },
     });
 
