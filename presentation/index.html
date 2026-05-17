@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeetSkills — Platform Comparison Presentation</title>
+
+  <!-- RevealJS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" />
+
+  <style>
+    /* ─── Brand Colors ─── */
+    :root {
+      --ls-purple: #7c3aed;
+      --ls-purple-light: #a78bfa;
+      --ls-blue: #2563eb;
+      --ls-cyan: #06b6d4;
+      --ls-green: #10b981;
+      --ls-orange: #f59e0b;
+      --ls-red: #ef4444;
+      --ls-bg-dark: #0f0f1a;
+      --ls-card: rgba(255,255,255,0.05);
+      --ls-border: rgba(124,58,237,0.35);
+    }
+
+    .reveal-viewport { background: var(--ls-bg-dark); }
+
+    /* ─── Section Headers ─── */
+    .reveal h1, .reveal h2 { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .reveal h1 { font-size: 2.4em; }
+    .reveal h2 { font-size: 1.6em; }
+    .reveal h3 { font-size: 1.2em; color: var(--ls-purple-light); }
+
+    /* ─── Gradient Title ─── */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--ls-purple-light), var(--ls-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--ls-card);
+      border: 1px solid var(--ls-border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin: 8px;
+    }
+
+    /* ─── Three-column grid ─── */
+    .cols-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .cols-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    /* ─── Screenshot Placeholder ─── */
+    .screenshot {
+      width: 100%;
+      min-height: 200px;
+      background: rgba(255,255,255,0.04);
+      border: 2px dashed rgba(124,58,237,0.5);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.7em;
+      font-style: italic;
+      text-align: center;
+      padding: 12px;
+    }
+    .screenshot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .screenshot span { display: block; }
+
+    /* ─── Platform Badges ─── */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+    .badge-lc  { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b55; }
+    .badge-cw  { background: #ef444422; color: #ef4444; border: 1px solid #ef444455; }
+    .badge-ls  { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed55; }
+
+    /* ─── Comparison Table ─── */
+    table.compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72em;
+    }
+    table.compare th {
+      padding: 10px 14px;
+      text-align: center;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid var(--ls-border);
+    }
+    table.compare td {
+      padding: 9px 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      vertical-align: middle;
+    }
+    table.compare tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+    table.compare .feature-name {
+      text-align: left;
+      font-weight: 600;
+      color: var(--ls-purple-light);
+    }
+    .check { color: var(--ls-green); font-size: 1.1em; }
+    .cross { color: var(--ls-red); font-size: 1.1em; }
+    .partial { color: var(--ls-orange); font-size: 1.1em; }
+
+    /* ─── Flow Steps ─── */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .step {
+      background: rgba(124,58,237,0.2);
+      border: 1px solid var(--ls-border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.65em;
+      text-align: center;
+      min-width: 90px;
+    }
+    .step-num {
+      display: block;
+      font-size: 1.4em;
+      font-weight: 700;
+      color: var(--ls-purple-light);
+    }
+    .arrow { color: var(--ls-purple-light); font-size: 1.2em; }
+
+    /* ─── Skill Dimension Pills ─── */
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px; }
+    .pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.65em;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .pill-1 { background: #7c3aed22; color: #a78bfa; border-color: #7c3aed55; }
+    .pill-2 { background: #2563eb22; color: #60a5fa; border-color: #2563eb55; }
+    .pill-3 { background: #06b6d422; color: #22d3ee; border-color: #06b6d455; }
+    .pill-4 { background: #10b98122; color: #34d399; border-color: #10b98155; }
+    .pill-5 { background: #f59e0b22; color: #fbbf24; border-color: #f59e0b55; }
+    .pill-6 { background: #ec489922; color: #f472b6; border-color: #ec489955; }
+
+    /* ─── Quote block ─── */
+    blockquote.big {
+      border-left: 4px solid var(--ls-purple);
+      padding: 14px 20px;
+      background: var(--ls-card);
+      border-radius: 0 10px 10px 0;
+      font-style: italic;
+      font-size: 1em;
+      margin: 20px 0;
+    }
+
+    /* ─── Section divider slide ─── */
+    .section-divider { text-align: center; }
+    .section-number {
+      font-size: 4em;
+      font-weight: 700;
+      opacity: 0.15;
+      line-height: 1;
+    }
+    .section-title { font-size: 1.8em; margin-top: -10px; }
+
+    /* ─── Small text ─── */
+    .small { font-size: 0.65em; color: rgba(255,255,255,0.5); }
+
+    /* ─── Highlight box ─── */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1));
+      border: 1px solid var(--ls-border);
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin: 16px 0;
+    }
+
+    /* ─── Icon + text row ─── */
+    .icon-row { display: flex; align-items: flex-start; gap: 12px; margin: 10px 0; }
+    .icon-row .icon { font-size: 1.4em; flex-shrink: 0; margin-top: 2px; }
+    .icon-row .text { font-size: 0.75em; text-align: left; }
+    .icon-row .text strong { color: var(--ls-purple-light); display: block; margin-bottom: 2px; }
+
+    /* ─── Score bar ─── */
+    .score-bar-wrap { margin: 6px 0; font-size: 0.68em; }
+    .score-label { display: flex; justify-content: space-between; margin-bottom: 3px; }
+    .score-bar-bg { background: rgba(255,255,255,0.1); border-radius: 999px; height: 8px; }
+    .score-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ls-purple), var(--ls-cyan)); }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 1 — TITLE
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 20% 50%, #1e0050 0%, #0f0f1a 60%)">
+    <h1 class="gradient-text" style="font-size:2.8em; margin-bottom:8px;">LeetSkills</h1>
+    <p style="font-size:1em; color:rgba(255,255,255,0.6); margin-bottom:32px;">
+      AI-Powered Skill Development — Platform Comparison &amp; Contribution Overview
+    </p>
+    <div class="cols-3" style="max-width:600px; margin: 0 auto;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🧠</div>
+        <div class="small" style="margin-top:4px;">Skill-First<br>Learning</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🤖</div>
+        <div class="small" style="margin-top:4px;">AI-Powered<br>Evaluation</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">📊</div>
+        <div class="small" style="margin-top:4px;">Fingerprint<br>Tracking</div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:32px;">Compared against: LeetCode &nbsp;·&nbsp; CodeWars</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 2 — AGENDA
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>Agenda</h2>
+    <div class="cols-2" style="max-width:700px; margin: 20px auto 0;">
+      <div class="card">
+        <div style="font-size:1.4em; margin-bottom:8px;">01</div>
+        <strong style="color:var(--ls-purple-light);">Platform Overview</strong>
+        <p class="small" style="margin-top:6px;">What each platform is and who it targets</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4em; margin-bottom:8px;">02</div>
+        <strong style="color:var(--ls-purple-light);">How Each System Works</strong>
+        <p class="small" style="margin-top:6px;">Core functionalities &amp; user workflows</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4em; margin-bottom:8px;">03</div>
+        <strong style="color:var(--ls-purple-light);">LeetSkills Key Points</strong>
+        <p class="small" style="margin-top:6px;">What makes LeetSkills different</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4em; margin-bottom:8px;">04</div>
+        <strong style="color:var(--ls-purple-light);">Our Contribution</strong>
+        <p class="small" style="margin-top:6px;">How LeetSkills builds real, lasting skills</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION DIVIDER — 01
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 80% 20%, #1e0050 0%, #0f0f1a 70%)">
+    <div class="section-divider">
+      <div class="section-number">01</div>
+      <h2 class="section-title gradient-text">Platform Overview</h2>
+      <p class="small">LeetCode &nbsp;·&nbsp; CodeWars &nbsp;·&nbsp; LeetSkills</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — LEETCODE OVERVIEW
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-lc">LeetCode</div>
+    <h2>LeetCode</h2>
+    <div class="cols-2">
+      <div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🎯</span>
+            <div class="text"><strong>Target Audience</strong>Software engineers preparing for technical interviews at top tech companies (FAANG+).</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">📚</span>
+            <div class="text"><strong>Content</strong>3,000+ algorithmic problems: arrays, trees, graphs, DP, system design. Premium subscription unlocks company-specific questions.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🏆</span>
+            <div class="text"><strong>Gamification</strong>Streaks, badges, weekly contests, global leaderboards, acceptance rate stats.</div>
+          </div>
+        </div>
+      </div>
+      <div class="screenshot">
+        <!-- Replace src with your LeetCode screenshot -->
+        <span>📸</span>
+        <span>LeetCode — Problem Page Screenshot</span>
+        <span class="small">Replace this block with an &lt;img src="screenshots/leetcode-problem.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — CODEWARS OVERVIEW
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-cw">CodeWars</div>
+    <h2>CodeWars</h2>
+    <div class="cols-2">
+      <div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🎯</span>
+            <div class="text"><strong>Target Audience</strong>Developers of all levels who want to practice coding through community-created challenges (kata).</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">⚔️</span>
+            <div class="text"><strong>Content</strong>Community-authored kata (challenges) across 50+ languages. Difficulty ranked 8 kyu (beginner) → 1 kyu (master).</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🏅</span>
+            <div class="text"><strong>Gamification</strong>Honor points, rank system (kyu/dan), solution discussion after completion, community voting on kata quality.</div>
+          </div>
+        </div>
+      </div>
+      <div class="screenshot">
+        <!-- Replace src with your CodeWars screenshot -->
+        <span>📸</span>
+        <span>CodeWars — Kata Page Screenshot</span>
+        <span class="small">Replace this block with an &lt;img src="screenshots/codewars-kata.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — LEETSKILLS OVERVIEW
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>LeetSkills</h2>
+    <div class="cols-2">
+      <div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🎯</span>
+            <div class="text"><strong>Target Audience</strong>Students, engineers, and professionals who want to develop structured thinking and transferable professional skills — not just pass interviews.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🌍</span>
+            <div class="text"><strong>Content</strong>Real-world scenarios across 6 learning paths: Software Engineering, Debugging, Communication, Teamwork, Product Thinking, AI Literacy.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">📡</span>
+            <div class="text"><strong>Progress</strong>Evolving Skill Fingerprint — a personal radar chart that grows across 6 cognitive dimensions as you complete scenarios.</div>
+          </div>
+        </div>
+      </div>
+      <div class="screenshot">
+        <!-- Replace src with your LeetSkills Home screenshot -->
+        <span>📸</span>
+        <span>LeetSkills — Home Page Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-home.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION DIVIDER — 02
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 20% 80%, #1e0050 0%, #0f0f1a 70%)">
+    <div class="section-divider">
+      <div class="section-number">02</div>
+      <h2 class="section-title gradient-text">How Each System Works</h2>
+      <p class="small">Core functionalities &amp; user workflows</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — HOW LEETCODE WORKS
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-lc">LeetCode</div>
+    <h2>How LeetCode Works</h2>
+    <div class="flow">
+      <div class="step"><span class="step-num">1</span>Browse &amp; Filter Problems</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">2</span>Read Problem Statement</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">3</span>Write Code in IDE</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">4</span>Run Test Cases</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">5</span>Submit &amp; See Pass/Fail</div>
+    </div>
+    <div class="cols-2" style="margin-top:18px;">
+      <div class="card">
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.7);">
+          ✅ Automated judge runs submitted code against hidden test cases<br><br>
+          ✅ Shows runtime percentile &amp; memory usage vs other submissions<br><br>
+          ✅ Discussion tab: see other users' solutions after submitting<br><br>
+          ✅ Contest mode: timed, competitive, ranked globally
+        </p>
+      </div>
+      <div class="screenshot" style="min-height:160px;">
+        <span>📸</span>
+        <span>LeetCode — Submission Result Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetcode-result.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — HOW CODEWARS WORKS
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-cw">CodeWars</div>
+    <h2>How CodeWars Works</h2>
+    <div class="flow">
+      <div class="step"><span class="step-num">1</span>Choose a Kata (Challenge)</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">2</span>Read Description &amp; Examples</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">3</span>Write &amp; Test Solution</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">4</span>Submit for Validation</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">5</span>View Solutions &amp; Earn Honor</div>
+    </div>
+    <div class="cols-2" style="margin-top:18px;">
+      <div class="card">
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.7);">
+          ✅ Community-created kata with quality ratings<br><br>
+          ✅ In-browser code editor with language selection<br><br>
+          ✅ Honor system: earn points per kata rank completed<br><br>
+          ✅ Clan system: group leaderboards &amp; social features<br><br>
+          ✅ Authors can create &amp; publish their own kata
+        </p>
+      </div>
+      <div class="screenshot" style="min-height:160px;">
+        <span>📸</span>
+        <span>CodeWars — Rank &amp; Honor Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/codewars-rank.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — HOW LEETSKILLS WORKS
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>How LeetSkills Works</h2>
+    <div class="flow" style="font-size:0.9em;">
+      <div class="step"><span class="step-num">1</span>Select Scenario</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">2</span>Read &amp; Think (Timed)</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">3</span>Write Thinking Trace</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">4</span>Write Final Response</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">5</span>AI Evaluates</div>
+      <span class="arrow">→</span>
+      <div class="step"><span class="step-num">6</span>Fingerprint Updates</div>
+    </div>
+    <div class="cols-2" style="margin-top:16px;">
+      <div class="card">
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.7);">
+          ✅ Mandatory <strong>Thinking Trace</strong> (≥80 chars) — forces reasoning before answering<br><br>
+          ✅ Claude AI evaluates across <strong>6 skill dimensions</strong> with rubric scores (0–4)<br><br>
+          ✅ Feedback: strengths, improvements, improved example<br><br>
+          ✅ Skill Fingerprint radar chart updates after every scenario<br><br>
+          ✅ Recommends your next scenario based on weakest skills
+        </p>
+      </div>
+      <div class="screenshot" style="min-height:160px;">
+        <span>📸</span>
+        <span>LeetSkills — Scenario Flow Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-scenario.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — LEETSKILLS EVALUATION DEEP DIVE
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>The Evaluation Engine</h2>
+    <div class="cols-2">
+      <div>
+        <div class="card">
+          <strong style="color:var(--ls-purple-light); font-size:0.8em;">AI Scoring (per skill, 0–4)</strong>
+          <div class="score-bar-wrap" style="margin-top:10px;">
+            <div class="score-label"><span>Decomposition</span><span>3 / 4</span></div>
+            <div class="score-bar-bg"><div class="score-bar-fill" style="width:75%;"></div></div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-label"><span>Pattern Recognition</span><span>4 / 4</span></div>
+            <div class="score-bar-bg"><div class="score-bar-fill" style="width:100%;"></div></div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-label"><span>Communication</span><span>2 / 4</span></div>
+            <div class="score-bar-bg"><div class="score-bar-fill" style="width:50%;"></div></div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-label"><span>Judgment</span><span>3 / 4</span></div>
+            <div class="score-bar-bg"><div class="score-bar-fill" style="width:75%;"></div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:8px;">
+          <p class="small" style="color:rgba(255,255,255,0.7); text-align:left;">
+            Each skill has an <strong>excellence definition</strong> in the rubric. Claude scores against it and explains <em>why</em> — not just a pass/fail.
+          </p>
+        </div>
+      </div>
+      <div class="screenshot">
+        <span>📸</span>
+        <span>LeetSkills — Results / Score Card Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-results.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION DIVIDER — 03
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 50% 50%, #1e0050 0%, #0f0f1a 70%)">
+    <div class="section-divider">
+      <div class="section-number">03</div>
+      <h2 class="section-title gradient-text">LeetSkills Key Points</h2>
+      <p class="small">What makes us different</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — COMPARISON TABLE
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>Feature Comparison</h2>
+    <table class="compare" style="margin-top:16px;">
+      <thead>
+        <tr>
+          <th class="feature-name">Feature</th>
+          <th>🟡 LeetCode</th>
+          <th>🔴 CodeWars</th>
+          <th>🟣 LeetSkills</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name">Real-world scenarios</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Forced reasoning / thinking trace</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Multi-dimensional skill evaluation</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">AI-generated qualitative feedback</td>
+          <td><span class="partial">~</span> <span class="small">(premium)</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Evolving skill fingerprint (radar)</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Personalized next-scenario recommendation</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Non-coding skill paths (communication, teamwork)</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Coding problems / competitive programming</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span> <span class="small">(SE path)</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Community / social features</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span> <span class="small">(roadmap)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — SKILL FINGERPRINT
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>The Skill Fingerprint</h2>
+    <p class="small" style="margin-bottom:14px;">Your personal growth radar — 6 cognitive dimensions tracked across every scenario</p>
+    <div class="pills">
+      <span class="pill pill-1">🔍 Decomposition</span>
+      <span class="pill pill-2">🔗 Pattern Recognition</span>
+      <span class="pill pill-3">⚙️ Execution Quality</span>
+      <span class="pill pill-4">💬 Communication</span>
+      <span class="pill pill-5">⚖️ Judgment</span>
+      <span class="pill pill-6">🔄 Adaptability</span>
+    </div>
+    <div class="cols-2" style="margin-top:16px;">
+      <div class="card">
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.75);">
+          • Updates automatically after <strong>every</strong> completed scenario<br><br>
+          • Weighted average across all past evaluations<br><br>
+          • Persists across sessions via localStorage<br><br>
+          • Dashboard shows radar chart + dimension scores<br><br>
+          • Weakest dimension drives next recommendation
+        </p>
+      </div>
+      <div class="screenshot">
+        <span>📸</span>
+        <span>LeetSkills — Dashboard / Skill Fingerprint Radar</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-dashboard.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — 6 LEARNING PATHS
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>6 Learning Paths</h2>
+    <div class="cols-3" style="margin-top:16px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">💻</div>
+        <strong class="small" style="color:var(--ls-purple-light);">Software Engineering</strong>
+        <p class="small">Problem decomposition, debugging, system design thinking</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🐛</div>
+        <strong class="small" style="color:var(--ls-blue);">Debugging &amp; Quality</strong>
+        <p class="small">Diagnosis, test strategies, prevention mindset</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">✍️</div>
+        <strong class="small" style="color:var(--ls-cyan);">Professional Comm.</strong>
+        <p class="small">Writing clarity, audience awareness, async comms</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🤝</div>
+        <strong class="small" style="color:var(--ls-green);">Teamwork &amp; Conflict</strong>
+        <p class="small">Collaboration, feedback, conflict resolution</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🧩</div>
+        <strong class="small" style="color:var(--ls-orange);">Product Thinking</strong>
+        <p class="small">User empathy, feature prioritization, tradeoffs</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6em;">🤖</div>
+        <strong class="small" style="color:var(--ls-red);">AI Literacy</strong>
+        <p class="small">Responsible AI use, prompt design, privacy awareness</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION DIVIDER — 04
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 80% 80%, #1e0050 0%, #0f0f1a 70%)">
+    <div class="section-divider">
+      <div class="section-number">04</div>
+      <h2 class="section-title gradient-text">Our Contribution</h2>
+      <p class="small">How LeetSkills builds real, lasting skills</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — THE PROBLEM WITH CURRENT PLATFORMS
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>The Problem With Existing Platforms</h2>
+    <blockquote class="big">
+      "You can solve 500 LeetCode problems and still struggle in your first real engineering job — because the skill that matters is <em>thinking through ambiguity</em>, not memorizing a binary tree traversal."
+    </blockquote>
+    <div class="cols-3" style="margin-top:8px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.4em; margin-bottom:6px;">⚠️</div>
+        <strong class="small" style="color:var(--ls-orange);">Pattern Memorization</strong>
+        <p class="small">Platforms reward memorizing solutions, not building thinking muscle</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.4em; margin-bottom:6px;">⚠️</div>
+        <strong class="small" style="color:var(--ls-orange);">Binary Feedback</strong>
+        <p class="small">Pass/fail tells you <em>what</em> — not <em>why</em> or <em>how to grow</em></p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.4em; margin-bottom:6px;">⚠️</div>
+        <strong class="small" style="color:var(--ls-orange);">Narrow Skill Scope</strong>
+        <p class="small">Only coding — ignores communication, judgment, teamwork</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — THE AI DEPENDENCY PROBLEM
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>The AI Shortcut Trap</h2>
+    <div class="highlight-box" style="text-align:center;">
+      <p style="font-size:0.85em;">
+        When users can paste a problem into ChatGPT and get a solution instantly,<br>
+        <strong>the exercise becomes copy-paste, not learning.</strong>
+      </p>
+    </div>
+    <div class="cols-2" style="margin-top:12px;">
+      <div class="card">
+        <strong style="color:var(--ls-red); font-size:0.8em;">❌ The Shortcut Path</strong>
+        <p class="small" style="color:rgba(255,255,255,0.7); margin-top:8px;">
+          1. See problem<br>
+          2. Copy to AI<br>
+          3. Paste solution<br>
+          4. Submit &amp; move on<br><br>
+          <em>Result: No reasoning developed. No skill retained.</em>
+        </p>
+      </div>
+      <div class="card">
+        <strong style="color:var(--ls-green); font-size:0.8em;">✅ The LeetSkills Path</strong>
+        <p class="small" style="color:rgba(255,255,255,0.7); margin-top:8px;">
+          1. Read scenario<br>
+          2. <strong>Write thinking trace first</strong> (your reasoning, ≥80 chars)<br>
+          3. Then write your response<br>
+          4. AI evaluates <em>your process</em>, not the answer<br><br>
+          <em>Result: Reasoning becomes the habit.</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — HOW WE ENFORCE INDEPENDENT THINKING
+  ════════════════════════════════════════════ -->
+  <section>
+    <div class="badge badge-ls">LeetSkills</div>
+    <h2>How We Enforce Independent Thinking</h2>
+    <div class="cols-2">
+      <div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">📝</span>
+            <div class="text">
+              <strong>Mandatory Thinking Trace</strong>
+              Users must write their reasoning process <em>before</em> their final answer. Minimum 80 characters enforced — no thinking, no submission.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">⏱️</span>
+            <div class="text">
+              <strong>Timed Scenarios</strong>
+              Each scenario has a time limit (10–15 min). Urgency discourages multi-tab AI consultation and encourages immediate thinking.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="icon-row">
+            <span class="icon">🔍</span>
+            <div class="text">
+              <strong>Process-Based Scoring</strong>
+              The rubric rewards <em>how you think</em>, not whether the answer matches a model solution. Copying an AI response without reasoning scores poorly.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screenshot">
+        <span>📸</span>
+        <span>LeetSkills — Thinking Trace Input Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-thinking.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — THE CONTRIBUTION
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>Our Contribution to Skill Development</h2>
+    <div class="cols-2" style="margin-top:14px;">
+      <div>
+        <div class="icon-row">
+          <span class="icon">🧠</span>
+          <div class="text">
+            <strong>Cognitive Habit Formation</strong>
+            By requiring a thinking trace every time, users build the habit of reasoning through problems — a skill that transfers to any context.
+          </div>
+        </div>
+        <div class="icon-row" style="margin-top:12px;">
+          <span class="icon">📊</span>
+          <div class="text">
+            <strong>Visible, Honest Progress</strong>
+            The Skill Fingerprint shows actual growth across 6 dimensions — not just a streak counter. Users know exactly where they need to improve.
+          </div>
+        </div>
+        <div class="icon-row" style="margin-top:12px;">
+          <span class="icon">🎯</span>
+          <div class="text">
+            <strong>Transferable Skills, Not Trivia</strong>
+            Scenarios simulate real professional decisions. Skills like decomposition, judgment, and communication apply on day 1 of any job.
+          </div>
+        </div>
+        <div class="icon-row" style="margin-top:12px;">
+          <span class="icon">🔁</span>
+          <div class="text">
+            <strong>Adaptive Learning Loop</strong>
+            The AI recommends your next scenario based on your weakest skill dimension — making every session targeted, not random.
+          </div>
+        </div>
+      </div>
+      <div class="screenshot">
+        <span>📸</span>
+        <span>LeetSkills — Feedback Panel Screenshot</span>
+        <span class="small">Replace with &lt;img src="screenshots/leetskills-feedback.png"&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — FINAL COMPARISON SUMMARY
+  ════════════════════════════════════════════ -->
+  <section>
+    <h2>Where Each Platform Excels</h2>
+    <div class="cols-3" style="margin-top:16px;">
+      <div class="card">
+        <div class="badge badge-lc" style="margin-bottom:10px;">LeetCode</div>
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.75);">
+          ✅ Best for <strong>technical interview prep</strong><br><br>
+          ✅ Largest problem bank<br><br>
+          ✅ Company-specific questions<br><br>
+          ✅ Competitive programming<br><br>
+          ❌ No reasoning development<br>
+          ❌ No professional skill tracking
+        </p>
+      </div>
+      <div class="card">
+        <div class="badge badge-cw" style="margin-bottom:10px;">CodeWars</div>
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.75);">
+          ✅ Best for <strong>language practice</strong><br><br>
+          ✅ Community &amp; social learning<br><br>
+          ✅ Wide language support<br><br>
+          ✅ Fun gamification<br><br>
+          ❌ No qualitative feedback<br>
+          ❌ No skill dimension tracking
+        </p>
+      </div>
+      <div class="card">
+        <div class="badge badge-ls" style="margin-bottom:10px;">LeetSkills</div>
+        <p class="small" style="text-align:left; color:rgba(255,255,255,0.75);">
+          ✅ Best for <strong>professional growth</strong><br><br>
+          ✅ Real-world decision scenarios<br><br>
+          ✅ Forces independent reasoning<br><br>
+          ✅ AI feedback on your thinking<br><br>
+          ✅ 6-dimension skill fingerprint<br>
+          ✅ Non-coding skills included
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE — CLOSING
+  ════════════════════════════════════════════ -->
+  <section data-background-gradient="radial-gradient(ellipse at 50% 30%, #1e0050 0%, #0f0f1a 65%)">
+    <h1 class="gradient-text" style="font-size:2.4em;">LeetSkills</h1>
+    <p style="font-size:0.95em; color:rgba(255,255,255,0.7); max-width:600px; margin:16px auto;">
+      The platform built for the learner who wants to actually <em>think better</em> —
+      not just pass a test.
+    </p>
+    <div class="highlight-box" style="max-width:560px; margin:24px auto; text-align:center;">
+      <p style="font-size:0.8em; margin:0;">
+        <strong>Skills you build by thinking for yourself</strong><br>
+        are skills you keep for life.
+      </p>
+    </div>
+    <div class="pills" style="margin-top:20px;">
+      <span class="pill pill-1">🔍 Decomposition</span>
+      <span class="pill pill-2">🔗 Pattern Recognition</span>
+      <span class="pill pill-3">⚙️ Execution</span>
+      <span class="pill pill-4">💬 Communication</span>
+      <span class="pill pill-5">⚖️ Judgment</span>
+      <span class="pill pill-6">🔄 Adaptability</span>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+    controls: true,
+    progress: true,
+    center: true,
+    width: 1200,
+    height: 700,
+    margin: 0.04,
+    plugins: []
+  });
+</script>
+</body>
+</html>
