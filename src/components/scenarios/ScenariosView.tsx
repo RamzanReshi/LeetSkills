@@ -15,10 +15,15 @@ import CategoryTabs from "./CategoryTabs";
 import ScenarioToolbar from "./ScenarioToolbar";
 import ScenarioTable from "./ScenarioTable";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { useLocalizeScenario, useSkillLabel } from "@/i18n/content";
+import { PATH_CONTENT, SCENARIO_CONTENT } from "@/i18n/contentDictionaries";
 
 export default function ScenariosView() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const localize = useLocalizeScenario();
+  const skillLabel = useSkillLabel();
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
+  void localize;
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryParam = searchParams?.get("category") ?? null;
@@ -72,6 +77,24 @@ export default function ScenariosView() {
     }
   }
 
+  const localizedMeta = useMemo(() => {
+    return SCENARIOS_META.map((s) => {
+      const override = SCENARIO_CONTENT[s.id]?.[locale];
+      if (!override) return s;
+      const localizedTitle = override.title;
+      const localizedCategoryLabel = override.path_title;
+      const extraSearch = [localizedTitle, localizedCategoryLabel, override.prompt_text]
+        .join(" ")
+        .toLowerCase();
+      return {
+        ...s,
+        title: localizedTitle,
+        categoryLabel: localizedCategoryLabel,
+        searchText: `${s.searchText} ${extraSearch}`,
+      };
+    });
+  }, [locale]);
+
   const filtered = useMemo(() => {
     const terms = search
       .trim()
@@ -79,7 +102,7 @@ export default function ScenariosView() {
       .split(/\s+/)
       .filter(Boolean);
 
-    return SCENARIOS_META.filter(
+    return localizedMeta.filter(
       (s) => effectiveCategory === "all" || s.category === effectiveCategory,
     )
       .filter((s) => activeSkill === "all" || s.skill === activeSkill)
@@ -89,7 +112,7 @@ export default function ScenariosView() {
           terms.length === 0 ||
           terms.every((term) => s.searchText.includes(term)),
       );
-  }, [activeSkill, difficulty, effectiveCategory, search]);
+  }, [activeSkill, difficulty, effectiveCategory, localizedMeta, search]);
 
   const completedCount = SCENARIOS_META.filter((s) =>
     completedScenarioIds.includes(s.id),
@@ -106,7 +129,10 @@ export default function ScenariosView() {
 
       <div className="mb-5">
         <CategoryTabs
-          categories={SCENARIO_CATEGORIES}
+          categories={SCENARIO_CATEGORIES.map((c) => {
+            const override = c.id !== "all" ? PATH_CONTENT[c.id]?.[locale] : undefined;
+            return override ? { ...c, label: override.title } : c;
+          })}
           activeId={effectiveCategory}
           onSelect={handleCategorySelect}
         />
@@ -118,7 +144,9 @@ export default function ScenariosView() {
           onSearchChange={handleSearchChange}
           difficulty={difficulty}
           onDifficultyChange={setDifficulty}
-          skillTopics={SKILL_TOPICS}
+          skillTopics={SKILL_TOPICS.map((topic) =>
+            topic.id === "all" ? topic : { ...topic, label: skillLabel(topic.label) },
+          )}
           activeSkill={activeSkill}
           onSkillChange={setActiveSkill}
           completed={completedCount}

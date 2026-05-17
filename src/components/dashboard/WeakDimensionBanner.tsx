@@ -4,6 +4,7 @@ import React from "react";
 import type { SkillFingerprint, DimensionName } from "@/types";
 import { TrendingDownIcon } from "@/components/ui/Icons";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { useDimensionLabel } from "@/i18n/content";
 
 interface WeakDimensionBannerProps {
   fingerprint: SkillFingerprint;
@@ -11,12 +12,14 @@ interface WeakDimensionBannerProps {
 
 export default function WeakDimensionBanner({ fingerprint }: WeakDimensionBannerProps) {
   const { t } = useLanguage();
+  const dimensionLabel = useDimensionLabel();
   const weakest = (Object.entries(fingerprint) as [DimensionName, number][])
     .sort((a, b) => a[1] - b[1])[0];
 
   if (!weakest || weakest[1] === 0) return null;
 
-  const [dimension, score] = weakest;
+  const [dimensionKey, score] = weakest;
+  const dimension = dimensionLabel(dimensionKey);
 
   return (
     <section className="glass-card w-full max-w-4xl p-6 flex items-center gap-6 border-l-4 border-l-brand-primary animate-fade-in [animation-delay:400ms]">

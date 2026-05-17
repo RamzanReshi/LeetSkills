@@ -5,6 +5,7 @@ import SkillRadarChart from "@/components/fingerprint/SkillRadarChart";
 import { DASHBOARD_DIMENSIONS } from "@/data/mvp-content";
 import type { DimensionName, SkillFingerprint } from "@/types";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { useDimensionLabel, useDimensionDescription } from "@/i18n/content";
 
 interface FingerprintHeroProps {
   fingerprint: SkillFingerprint;
@@ -42,6 +43,8 @@ export default function FingerprintHero({
   attemptCount = 0,
 }: FingerprintHeroProps) {
   const { t } = useLanguage();
+  const dimensionLabel = useDimensionLabel();
+  const dimensionDescription = useDimensionDescription();
   const dimensions = Object.entries(fingerprint) as [DimensionName, number][];
   const average =
     dimensions.reduce((total, [, score]) => total + score, 0) /
@@ -108,10 +111,10 @@ export default function FingerprintHero({
                       style={{ backgroundColor: cfg.color }}
                     />
                     <h3 className="break-words text-sm font-bold leading-tight" style={{ color: cfg.color }}>
-                      {dimension}
+                      {dimensionLabel(dimension)}
                     </h3>
                     <p className="mt-0.5 hidden text-xs leading-snug text-neutral-500 min-[420px]:block">
-                      {cfg.description}
+                      {dimensionDescription(dimension, cfg.description)}
                     </p>
                   </div>
                   <span

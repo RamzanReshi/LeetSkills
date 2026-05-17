@@ -19,7 +19,38 @@ import { DASHBOARD_DIMENSIONS, getDashboardDimensionsForSkill } from "@/data/mvp
 import { loadSession, saveSession, clearSession } from "@/utils/localStorage";
 import { createClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { fetchAttempts, insertAttempt } from "@/lib/supabase/attemptsSync";
+import { fetchAttempts, fetchAttemptsHead, insertAttempt } from "@/lib/supabase/attemptsSync";
+
+const SYNC_CACHE_KEY = "leetskills_sync_meta";
+const SYNC_TTL_MS = 60_000;
+
+type SyncMeta = {
+  userId: string;
+  count: number;
+  maxCompletedAt: string | null;
+  syncedAt: number;
+};
+
+function loadSyncMeta(): SyncMeta | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(SYNC_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as SyncMeta) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSyncMeta(meta: SyncMeta) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(SYNC_CACHE_KEY, JSON.stringify(meta));
+  } catch {
+    // ignore quota
+  }
+}
+
+const inFlightSyncs = new Map<string, Promise<void>>();
 
 interface SkillStore extends SessionData {
   completedAttempts: CompletedAttempt[];
@@ -27,6 +58,8 @@ interface SkillStore extends SessionData {
   activeDrafts: Record<string, ScenarioDraft>;
   hydrated: boolean;
   currentUserId: string | null;
+  attemptsSyncing: boolean;
+  syncedUserId: string | null;
   hydrateSession: () => void;
   syncWithUser: (userId: string | null) => Promise<void>;
   recordScenarioStarted: (scenarioId: string) => number;
@@ -118,7 +151,10 @@ function normalizeSession(session: SessionData | null): SessionData | null {
   if (!Array.isArray(session.completedScenarioIds)) return null;
 
   const completedAttempts = Array.isArray(session.completedAttempts)
-    ? session.completedAttempts.filter(isCompletedAttempt)
+    ? session.completedAttempts.filter(isCompletedAttempt).map((attempt) => ({
+        ...attempt,
+        syncStatus: attempt.syncStatus === "syncing" ? "local_only" : attempt.syncStatus,
+      }))
     : [];
   const history = completedAttempts.length > 0
     ? completedAttempts.map((attempt) => attempt.ai_feedback)
@@ -208,6 +244,8 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
   completedScenarioIds: [],
   hydrated: false,
   currentUserId: null,
+  attemptsSyncing: false,
+  syncedUserId: null,
 
   hydrateSession: () => {
     const session = normalizeSession(loadSession());
@@ -238,74 +276,136 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
 
     set({ currentUserId: userId });
 
-    if (!userId || !isSupabaseConfigured) return;
+    if (!userId || !isSupabaseConfigured) {
+      set({ attemptsSyncing: false, syncedUserId: userId });
+      return;
+    }
 
-    const fetchStartedAt = Date.now();
-    const client = createClient();
-    const remote = await fetchAttempts(client, userId);
-    if (remote === null) return; // fetch failed — keep local intact
+    // Dedupe concurrent calls for same user.
+    const existing = inFlightSyncs.get(userId);
+    if (existing) return existing;
 
-    set((state) => {
-      // Drop any attempts that were completed *after* the fetch began —
-      // they're newer than what the server could've returned.
-      const safeLocal = state.completedAttempts.filter(
-        (a) => a.timestamps.completed_at <= fetchStartedAt,
+    set({ attemptsSyncing: true });
+
+    const uploadPending = async (client: ReturnType<typeof createClient>) => {
+      const pending = get().completedAttempts.filter(
+        (a) => a.syncStatus === "local_only" || a.syncStatus === "sync_failed",
       );
-      const newerLocal = state.completedAttempts.filter(
-        (a) => a.timestamps.completed_at > fetchStartedAt,
-      );
-      const merged = mergeAttemptsById(safeLocal, remote);
-      const finalAttempts = mergeAttemptsById(merged, newerLocal);
+      for (const attempt of pending) {
+        set((state) => ({
+          completedAttempts: setAttemptSyncStatus(state.completedAttempts, attempt.id, "syncing"),
+        }));
+        const ok = await insertAttempt(client, attempt, userId);
+        set((state) => {
+          const updated = setAttemptSyncStatus(
+            state.completedAttempts,
+            attempt.id,
+            ok ? "synced" : "sync_failed",
+          );
+          const newState: SessionData = {
+            fingerprint: state.fingerprint,
+            history: state.history,
+            completedAttempts: updated,
+            events: state.events,
+            activeDrafts: state.activeDrafts,
+            completedScenarioIds: state.completedScenarioIds,
+          };
+          saveSession(newState);
+          return { completedAttempts: updated };
+        });
+      }
+    };
 
-      const remoteIds = new Set(remote.map((a) => a.id));
-      const tagged = finalAttempts.map<CompletedAttempt>((a) => {
-        if (remoteIds.has(a.id)) return { ...a, syncStatus: "synced" };
-        if (a.syncStatus === "synced") return { ...a, syncStatus: "sync_failed" };
-        return { ...a, syncStatus: a.syncStatus ?? "local_only" };
-      });
+    const doFullSync = async (
+      client: ReturnType<typeof createClient>,
+    ): Promise<{ count: number; maxCompletedAt: string | null } | null> => {
+      const fetchStartedAt = Date.now();
+      const remote = await fetchAttempts(client, userId);
+      if (remote === null) return null;
 
-      const newHistory = attemptsToHistory(tagged);
-      const newFingerprint = calculateFingerprint(newHistory);
-      const newCompletedIds = attemptsToScenarioIds(tagged);
-
-      const newState: SessionData = {
-        fingerprint: newFingerprint,
-        history: newHistory,
-        completedAttempts: tagged,
-        events: state.events,
-        activeDrafts: state.activeDrafts,
-        completedScenarioIds: newCompletedIds,
-      };
-      saveSession(newState);
-      return { ...newState, hydrated: true };
-    });
-
-    // Upload anything still local-only or sync_failed.
-    const pending = get().completedAttempts.filter(
-      (a) => a.syncStatus === "local_only" || a.syncStatus === "sync_failed",
-    );
-    for (const attempt of pending) {
-      set((state) => ({
-        completedAttempts: setAttemptSyncStatus(state.completedAttempts, attempt.id, "syncing"),
-      }));
-      const ok = await insertAttempt(client, attempt, userId);
       set((state) => {
-        const updated = setAttemptSyncStatus(
-          state.completedAttempts,
-          attempt.id,
-          ok ? "synced" : "sync_failed",
+        const safeLocal = state.completedAttempts.filter(
+          (a) => a.timestamps.completed_at <= fetchStartedAt,
         );
+        const newerLocal = state.completedAttempts.filter(
+          (a) => a.timestamps.completed_at > fetchStartedAt,
+        );
+        const merged = mergeAttemptsById(safeLocal, remote);
+        const finalAttempts = mergeAttemptsById(merged, newerLocal);
+
+        const remoteIds = new Set(remote.map((a) => a.id));
+        const tagged = finalAttempts.map<CompletedAttempt>((a) => {
+          if (remoteIds.has(a.id)) return { ...a, syncStatus: "synced" };
+          if (a.syncStatus === "synced") return { ...a, syncStatus: "sync_failed" };
+          return { ...a, syncStatus: a.syncStatus ?? "local_only" };
+        });
+
+        const newHistory = attemptsToHistory(tagged);
+        const newFingerprint = calculateFingerprint(newHistory);
+        const newCompletedIds = attemptsToScenarioIds(tagged);
+
         const newState: SessionData = {
-          fingerprint: state.fingerprint,
-          history: state.history,
-          completedAttempts: updated,
+          fingerprint: newFingerprint,
+          history: newHistory,
+          completedAttempts: tagged,
           events: state.events,
           activeDrafts: state.activeDrafts,
-          completedScenarioIds: state.completedScenarioIds,
+          completedScenarioIds: newCompletedIds,
         };
         saveSession(newState);
-        return { completedAttempts: updated };
+        return { ...newState, hydrated: true };
       });
+
+      await uploadPending(client);
+
+      const maxCompletedAt = remote.reduce<string | null>((max, a) => {
+        const iso = new Date(a.timestamps.completed_at).toISOString();
+        return !max || iso > max ? iso : max;
+      }, null);
+      return { count: remote.length, maxCompletedAt };
+    };
+
+    const run = (async () => {
+      const client = createClient();
+      const meta = loadSyncMeta();
+      const sameUser = meta?.userId === userId;
+      const fresh = !!meta && sameUser && Date.now() - meta.syncedAt < SYNC_TTL_MS;
+
+      if (fresh) {
+        await uploadPending(client);
+        return;
+      }
+
+      const head = await fetchAttemptsHead(client, userId);
+      if (
+        head &&
+        meta &&
+        sameUser &&
+        head.count === meta.count &&
+        head.maxCompletedAt === meta.maxCompletedAt
+      ) {
+        saveSyncMeta({ ...meta, syncedAt: Date.now() });
+        await uploadPending(client);
+        return;
+      }
+
+      const result = await doFullSync(client);
+      if (result) {
+        saveSyncMeta({
+          userId,
+          count: result.count,
+          maxCompletedAt: result.maxCompletedAt,
+          syncedAt: Date.now(),
+        });
+      }
+    })();
+
+    inFlightSyncs.set(userId, run);
+    try {
+      await run;
+    } finally {
+      inFlightSyncs.delete(userId);
+      set({ attemptsSyncing: false, syncedUserId: userId });
     }
   },
 
@@ -591,7 +691,10 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
       completedScenarioIds: [],
     };
     clearSession();
+    if (typeof window !== "undefined") {
+      try { localStorage.removeItem(SYNC_CACHE_KEY); } catch { /* ignore */ }
+    }
     saveSession(newState);
-    set({ ...newState, hydrated: true });
+    set({ ...newState, hydrated: true, syncedUserId: null });
   },
 }));

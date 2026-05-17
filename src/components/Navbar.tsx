@@ -23,6 +23,7 @@ import {
 } from "@/components/auth/AuthProvider";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import LanguageSwitcher from "@/i18n/LanguageSwitcher";
+import { useDimensionLabel } from "@/i18n/content";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const dropdownLinks = [
@@ -49,6 +50,10 @@ function strengthLabelKey(score: number) {
   return "nav.profileNotStarted";
 }
 
+function displayScore(score: number) {
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -62,11 +67,12 @@ export default function Navbar() {
   const completedScenarioIds = useSkillStore((s) => s.completedScenarioIds);
   const hydrateSession = useSkillStore((s) => s.hydrateSession);
   const syncWithUser = useSkillStore((s) => s.syncWithUser);
-  const resetSession = useSkillStore((s) => s.resetSession);
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const { t } = useLanguage();
-  const isSignedIn = Boolean(user);
-  const displayName = getAccountDisplayName(user, profile);
+  const dimensionLabel = useDimensionLabel();
+  const authReady = !loading;
+  const isSignedIn = authReady && Boolean(user);
+  const displayName = authReady ? getAccountDisplayName(user, profile) : "";
   const role = getAccountRole(profile);
 
   useEffect(() => {
@@ -74,8 +80,9 @@ export default function Navbar() {
   }, [hydrateSession]);
 
   useEffect(() => {
+    if (loading) return;
     void syncWithUser(user?.id ?? null);
-  }, [syncWithUser, user?.id]);
+  }, [loading, syncWithUser, user?.id]);
 
   const completed = SCENARIOS_META.filter((scenario) =>
     completedScenarioIds.includes(scenario.id),
@@ -131,8 +138,14 @@ export default function Navbar() {
 
     if (!query) {
       if (pathname?.startsWith("/scenarios")) {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has("search") && !params.has("q")) return;
+
+        params.delete("search");
+        params.delete("q");
+        const nextUrl = params.toString() ? `/scenarios?${params.toString()}` : "/scenarios";
         const timeout = window.setTimeout(() => {
-          router.replace("/scenarios", { scroll: false });
+          router.replace(nextUrl, { scroll: false });
         }, 200);
 
         return () => window.clearTimeout(timeout);
@@ -189,8 +202,60 @@ export default function Navbar() {
             />
           </div>
 
+          <div ref={mobileMenuRef} className="relative md:hidden">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen((open) => !open);
+                setProfileOpen(false);
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100"
+              aria-label={mobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <CloseIcon className="h-5 w-5" />
+              ) : (
+                <MenuIcon className="h-5 w-5" />
+              )}
+            </button>
+
+            {mobileMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-3 w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/5">
+                {(authReady
+                  ? isSignedIn
+                    ? dropdownLinks
+                    : [
+                        { key: "nav.signIn", href: "/login", icon: UserIcon },
+                        { key: "nav.createAccount", href: "/signup", icon: UserIcon },
+                      ] as const
+                  : []
+                ).map(({ href, key, icon: Icon }) => {
+                  const active = isActiveLink(href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-brand-mint text-brand-primary"
+                          : "text-neutral-700 hover:bg-neutral-100 hover:text-brand-primary"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{t(key)}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div ref={profileRef} className="relative">
-            {isSignedIn ? (
+            {!authReady ? (
+              <div className="hidden h-8 w-[154px] md:block" aria-hidden="true" />
+            ) : isSignedIn ? (
               <button
                 type="button"
                 aria-label={t("nav.openProfile")}
@@ -294,37 +359,33 @@ export default function Navbar() {
                   {t("nav.skillFingerprint")}
                 </p>
                 <div className="space-y-2">
-                  {Object.entries(fingerprint).map(([name, score]) => (
-                    <div key={name} className="grid grid-cols-[1fr_120px_24px] items-center gap-2 text-xs">
-                      <span className="truncate text-neutral-700">{name}</span>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
-                        <div
-                          className="h-full rounded-full bg-brand-primary transition-all duration-700"
-                          style={{ width: `${Math.max(0, Math.min(score, 100))}%` }}
-                        />
+                  {Object.entries(fingerprint).map(([name, score]) => {
+                    const clampedScore = displayScore(score);
+                    return (
+                      <div key={name} className="grid grid-cols-[1fr_120px_24px] items-center gap-2 text-xs">
+                        <span className="truncate text-neutral-700">{dimensionLabel(name)}</span>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
+                          <div
+                            className="h-full rounded-full bg-brand-primary transition-all duration-700"
+                            style={{ width: `${clampedScore}%` }}
+                          />
+                        </div>
+                        <span className="text-right font-semibold text-brand-primary">{clampedScore}</span>
                       </div>
-                      <span className="text-right font-semibold text-brand-primary">{score}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="mb-4">
-                <ThemeToggle detail="Applies across the app." />
+                <ThemeToggle detail={t("nav.textSizeApplies")} />
               </div>
 
               <div className="flex items-center justify-between gap-3">
                 <span className="text-[11px] text-neutral-500">
-                  {t(strengthLabelKey(Math.max(...Object.values(fingerprint))))}
+                  {t(strengthLabelKey(Math.max(...Object.values(fingerprint).map(displayScore))))}
                 </span>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={resetSession}
-                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-brand-primary hover:text-brand-primary"
-                  >
-                    {t("nav.reset")}
-                  </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -338,54 +399,6 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-            )}
-          </div>
-
-          <div ref={mobileMenuRef} className="relative md:hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen((open) => !open);
-                setProfileOpen(false);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100"
-              aria-label={mobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <CloseIcon className="h-5 w-5" />
-              ) : (
-                <MenuIcon className="h-5 w-5" />
-              )}
-            </button>
-
-            {mobileMenuOpen && (
-              <div className="absolute right-0 top-full z-50 mt-3 w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/5">
-                {(isSignedIn
-                  ? dropdownLinks
-                  : [
-                      { key: "nav.signIn", href: "/login", icon: UserIcon },
-                      { key: "nav.createAccount", href: "/signup", icon: UserIcon },
-                    ] as const
-                ).map(({ href, key, icon: Icon }) => {
-                  const active = isActiveLink(href);
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                        active
-                          ? "bg-brand-mint text-brand-primary"
-                          : "text-neutral-700 hover:bg-neutral-100 hover:text-brand-primary"
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{t(key)}</span>
-                    </Link>
-                  );
-                })}
-              </div>
             )}
           </div>
         </div>

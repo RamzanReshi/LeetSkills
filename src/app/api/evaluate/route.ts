@@ -19,11 +19,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { scenario_id, thinking_trace, response } = body as {
+  const { scenario_id, thinking_trace, response, locale } = body as {
     scenario_id?: string;
     thinking_trace?: string;
     response?: string;
+    locale?: string;
   };
+  const safeLocale = locale === "ar" || locale === "tr" ? locale : "en";
 
   if (!scenario_id || typeof scenario_id !== "string") {
     return NextResponse.json({ error: "scenario_id is required" }, { status: 400 });
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest) {
   };
 
   try {
-    const evaluation = await evaluateSubmission(scenario, submission);
+    const evaluation = await evaluateSubmission(scenario, submission, safeLocale);
     return NextResponse.json(evaluation, { status: 200 });
   } catch (err) {
     const issue = classifyAiProviderError(err);

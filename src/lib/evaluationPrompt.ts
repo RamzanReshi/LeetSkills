@@ -4,7 +4,18 @@
 
 import type { Scenario } from "@/types";
 
-export function buildEvaluationPrompt(scenario: Scenario): string {
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  ar: "Arabic",
+  tr: "Turkish",
+};
+
+export function buildEvaluationPrompt(scenario: Scenario, locale: string = "en"): string {
+  const languageName = LANGUAGE_NAMES[locale] ?? "English";
+  const localizationLine =
+    locale !== "en"
+      ? `\nLOCALIZATION:\n- All natural-language string values you produce (skill_scores[].feedback, strengths[], improvements[], improved_example_response) MUST be written in ${languageName}. Do not translate JSON keys, scenario_id, path_id, difficulty enum values, skill names, or numeric scores — those must remain exactly as specified. Write feedback in ${languageName} regardless of the language the candidate's response is written in.\n`
+      : "";
   const skillLines = scenario.skills_graded
     .map(
       (skill) =>
@@ -21,7 +32,7 @@ export function buildEvaluationPrompt(scenario: Scenario): string {
     )
     .join(",\n");
 
-  return `You are a strict, calibrated evaluator for a scenario-based skill-development platform called LeetSkills. Score the candidate's final response to this specific scenario using only the weighted rubric below.
+  return `You are a strict, calibrated evaluator for a scenario-based skill-development platform called LeetSkills. Score the candidate's final response to this specific scenario using only the weighted rubric below.${localizationLine}
 
 SCENARIO:
 Path: ${scenario.path_title}

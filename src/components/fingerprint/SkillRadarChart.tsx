@@ -31,10 +31,10 @@ export default function SkillRadarChart({
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const chartSize = {
-    sm: "h-48",
-    md: "h-64",
-    lg: "h-80",
+  const chart = {
+    sm: { className: "h-48 min-h-48", height: 192 },
+    md: { className: "h-64 min-h-64", height: 256 },
+    lg: { className: "h-80 min-h-80", height: 320 },
   }[size];
 
   const data = Object.entries(fingerprint).map(([dimension, score]) => ({
@@ -43,9 +43,15 @@ export default function SkillRadarChart({
   }));
 
   return (
-    <div className={`w-full min-w-0 ${chartSize}`}>
+    <div className={`w-full min-w-0 ${chart.className}`}>
       {mounted ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+        <ResponsiveContainer
+          width="100%"
+          height={chart.height}
+          minWidth={0}
+          minHeight={chart.height}
+          initialDimension={{ width: chart.height, height: chart.height }}
+        >
           <RadarChart data={data} outerRadius="72%">
             <PolarGrid stroke="#D1D5DB" />
             <PolarAngleAxis

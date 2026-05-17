@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useLanguage } from "@/i18n/LanguageProvider";
+import { useSkillLabel } from "@/i18n/content";
 
 interface WeakestCalloutProps {
   skill: string;
@@ -9,6 +11,8 @@ interface WeakestCalloutProps {
 }
 
 export default function WeakestCallout({ skill, rating, weight }: WeakestCalloutProps) {
+  const { t } = useLanguage();
+  const skillLabel = useSkillLabel();
   return (
     <div
       className="w-full rounded-[8px] px-5 py-[14px] flex items-center justify-between gap-4"
@@ -27,10 +31,10 @@ export default function WeakestCallout({ skill, rating, weight }: WeakestCallout
 
         <div className="flex flex-col">
           <span className="text-ls-text font-bold text-[15px] leading-tight">
-            Weakest this attempt: {skill}
+            {t("results.weakestThisAttempt", { skill: skillLabel(skill) })}
           </span>
           <span className="text-ls-text-muted text-[13px] leading-tight mt-1">
-            Rating {rating}/4 with weight {weight} - focus here next
+            {t("results.weakestDetail", { rating, weight })}
           </span>
         </div>
       </div>

@@ -14,6 +14,7 @@ import ResponseInput from "@/components/scenario/ResponseInput";
 import { useSkillStore } from "@/store/useSkillStore";
 import { validateResponse, validateThinkingTrace } from "@/utils/validation";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { useLocalizeScenario } from "@/i18n/content";
 
 const scenarios = MVP_SCENARIOS as Scenario[];
 
@@ -50,12 +51,14 @@ type EvaluateErrorPayload = {
 export default function ScenarioPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const localize = useLocalizeScenario();
   const scenarioId = params.id as string;
   const AI_UNAVAILABLE_MESSAGE = t("scenario.aiUnavailable");
   const AI_TEMPORARILY_UNAVAILABLE_MESSAGE = t("scenario.aiTempUnavailable");
 
-  const scenario = scenarios.find((s) => s.id === scenarioId) ?? null;
+  const baseScenario = scenarios.find((s) => s.id === scenarioId) ?? null;
+  const scenario = baseScenario ? localize(baseScenario) : null;
   const activeDraft = useSkillStore((s) => s.activeDrafts[scenarioId]);
   const hydrated = useSkillStore((s) => s.hydrated);
   const recordScenarioStarted = useSkillStore((s) => s.recordScenarioStarted);
@@ -156,6 +159,7 @@ export default function ScenarioPage() {
           scenario_id: scenarioId,
           thinking_trace: thinkingTrace,
           response,
+          locale,
         }),
       });
 
@@ -225,10 +229,13 @@ export default function ScenarioPage() {
       setStep(3);
     }
   }, [
+    AI_TEMPORARILY_UNAVAILABLE_MESSAGE,
+    AI_UNAVAILABLE_MESSAGE,
     activeDraft,
     completeScenarioAttempt,
     error,
     failureCount,
+    locale,
     recordEvaluationFailure,
     recordRetryStarted,
     recordScenarioSubmitted,

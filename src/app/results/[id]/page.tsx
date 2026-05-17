@@ -13,10 +13,14 @@ import ScoreCard from "@/components/evaluation/ScoreCard";
 import FeedbackPanel from "@/components/evaluation/FeedbackPanel";
 import WeakestCallout from "@/components/evaluation/WeakestCallout";
 import SkillRadarChart from "@/components/fingerprint/SkillRadarChart";
+import { useLanguage } from "@/i18n/LanguageProvider";
+import { useLocalizeScenario } from "@/i18n/content";
 
 export default function ResultsPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
+  const localize = useLocalizeScenario();
   const scenarioId = params.id as string;
 
   const completedAttempts = useSkillStore((s) => s.completedAttempts);
@@ -26,20 +30,21 @@ export default function ResultsPage() {
     ? [...completedAttempts].reverse().find((entry) => entry.scenario_id === scenarioId)
     : undefined;
 
-  const scenario = attempt ? getScenarioById(attempt.ai_feedback.scenario_id) : undefined;
+  const baseScenario = attempt ? getScenarioById(attempt.ai_feedback.scenario_id) : undefined;
+  const scenario = baseScenario ? localize(baseScenario) : undefined;
 
   React.useEffect(() => {
     if (scenario) {
-      document.title = `Evaluation: ${scenario.title} - LeetSkills`;
+      document.title = `${scenario.title} - LeetSkills`;
     } else {
-      document.title = "Evaluation - LeetSkills";
+      document.title = t("results.metaTitle");
     }
-  }, [scenario]);
+  }, [scenario, t]);
 
   if (!hydrated) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-brand-deep">Loading results...</h1>
+        <h1 className="text-2xl font-bold text-brand-deep">{t("results.loading")}</h1>
       </main>
     );
   }
@@ -47,12 +52,12 @@ export default function ResultsPage() {
   if (!attempt) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-brand-deep">No results yet</h1>
+        <h1 className="text-2xl font-bold text-brand-deep">{t("results.noResults")}</h1>
         <p className="mt-2 text-neutral-500">
-          Complete scenario <code className="text-sm">{scenarioId}</code> to see your evaluation.
+          {t("results.completeToSee", { id: scenarioId })}
         </p>
         <button onClick={() => router.push("/dashboard")} className="btn-primary mt-6">
-          Back to Dashboard
+          {t("results.back")}
         </button>
       </main>
     );
@@ -62,9 +67,10 @@ export default function ResultsPage() {
   const weakestScore = [...evaluation.skill_scores].sort(
     (a, b) => a.rating_0_to_4 - b.rating_0_to_4 || b.weight - a.weight,
   )[0];
-  const recommended = evaluation.recommended_next_scenario_id
+  const recommendedBase = evaluation.recommended_next_scenario_id
     ? getScenarioById(evaluation.recommended_next_scenario_id)
     : null;
+  const recommended = recommendedBase ? localize(recommendedBase) : null;
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
@@ -73,10 +79,10 @@ export default function ResultsPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
             {scenario?.path_title ?? evaluation.path_id}
           </p>
-          <h1 className="text-xl font-bold text-brand-deep">Your Results</h1>
+          <h1 className="text-xl font-bold text-brand-deep">{t("results.yourResults")}</h1>
           {attempt.fallback_used ? (
             <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              Fallback evaluation was used. Scores are saved locally but should be retried for calibrated AI feedback.
+              {t("results.fallbackNotice")}
             </p>
           ) : null}
         </div>
@@ -116,7 +122,7 @@ export default function ResultsPage() {
           className="block rounded-lg border border-brand-primary/25 bg-brand-mint p-4 text-sm text-brand-deep transition-colors hover:border-brand-primary"
         >
           <span className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
-            Recommended next
+            {t("results.recommended")}
           </span>
           <span className="mt-1 block font-semibold">{recommended.id}: {recommended.title}</span>
         </Link>
@@ -124,13 +130,13 @@ export default function ResultsPage() {
 
       <div className="rounded-lg border border-neutral-300 bg-brand-card p-4 space-y-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
-          Updated Skill Fingerprint
+          {t("results.updatedFingerprint")}
         </h3>
         <SkillRadarChart fingerprint={attempt.fingerprint_after} />
       </div>
 
       <button onClick={() => router.push("/dashboard")} className="btn-primary w-full">
-        Back to Dashboard
+        {t("results.back")}
       </button>
     </main>
   );

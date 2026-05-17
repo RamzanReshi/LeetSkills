@@ -8,6 +8,7 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
   const { locale, setLocale, t } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonPadding = compact ? "px-2.5" : "px-3";
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -31,10 +32,10 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
         onClick={() => setOpen((o) => !o)}
         aria-label={t("nav.changeLanguage")}
         aria-expanded={open}
-        className="flex h-8 items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 text-xs font-semibold text-neutral-700 transition-colors hover:border-brand-primary hover:text-brand-primary"
+        className={`flex h-8 items-center gap-1.5 rounded-md border border-neutral-200 bg-white ${buttonPadding} text-xs font-semibold text-neutral-700 transition-colors hover:border-brand-primary hover:text-brand-primary`}
       >
         <span aria-hidden className="text-base leading-none">🌐</span>
-        {!compact && <span className="uppercase">{locale}</span>}
+        <span className="uppercase">{locale}</span>
       </button>
 
       {open && (

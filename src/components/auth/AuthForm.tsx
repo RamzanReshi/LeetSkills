@@ -21,8 +21,8 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const { t } = useLanguage();
   const passwordRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(() =>
-    searchParams.get("message") === "check-email"
-      ? t("auth.checkEmail")
+    searchParams.get("message") === "account-created"
+      ? t("auth.accountCreated")
       : null,
   );
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
         if (signUpError) throw signUpError;
         router.push(
-          `/login?email=${encodeURIComponent(email)}&message=check-email`,
+          `/login?email=${encodeURIComponent(email)}&message=account-created`,
         );
         return;
       }
@@ -103,7 +103,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
             type="text"
             autoComplete="name"
             required
-            className="mt-1 h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+            className="mt-1.5 h-12 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 sm:text-sm"
           />
         </label>
       )}
@@ -117,7 +117,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           defaultValue={initialEmail}
           autoFocus={!initialEmail}
           required
-          className="mt-1 h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+          className="mt-1.5 h-12 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 sm:text-sm"
         />
       </label>
 
@@ -130,7 +130,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           autoComplete={isSignup ? "new-password" : "current-password"}
           minLength={6}
           required
-          className="mt-1 h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+          className="mt-1.5 h-12 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 sm:text-sm"
         />
       </label>
 
@@ -156,7 +156,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+        className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
         {loading ? t("auth.working") : isSignup ? t("auth.signUp") : t("auth.signIn")}
       </button>

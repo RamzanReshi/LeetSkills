@@ -15,6 +15,7 @@ type Theme = "light" | "dark";
 type ThemeContextValue = {
   theme: Theme;
   isDark: boolean;
+  hydrated: boolean;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 };
@@ -49,11 +50,23 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => getInitialTheme());
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    if (!hydrated) return;
     applyTheme(theme);
-  }, [theme]);
+  }, [hydrated, theme]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const initialTheme = getInitialTheme();
+      setThemeState(initialTheme);
+      applyTheme(initialTheme);
+      setHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const setTheme = useCallback((nextTheme: Theme) => {
     setThemeState(nextTheme);
@@ -71,10 +84,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     () => ({
       theme,
       isDark: theme === "dark",
+      hydrated,
       setTheme,
       toggleTheme,
     }),
-    [setTheme, theme, toggleTheme],
+    [hydrated, setTheme, theme, toggleTheme],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

@@ -14,8 +14,12 @@ function isDev() {
 
 function logDevError(label: string, error: unknown) {
   if (isDev()) {
-    console.error(`[attemptsSync] ${label}`, error);
+    console.warn(`[attemptsSync] ${label}`, error);
   }
+}
+
+function isPostgrestError(error: unknown): error is { code?: string } {
+  return typeof error === "object" && error !== null && "code" in error;
 }
 
 function toIso(ts: number) {
@@ -88,8 +92,14 @@ export async function insertAttempt(
   try {
     const { error } = await client
       .from("completed_attempts")
-      .insert(attemptToInsert(attempt, userId));
+      .upsert(attemptToInsert(attempt, userId), {
+        onConflict: "id",
+        ignoreDuplicates: true,
+      });
     if (error) {
+      if (isPostgrestError(error) && error.code === "23505") {
+        return true;
+      }
       logDevError("insert failed", error);
       return false;
     }
@@ -97,6 +107,33 @@ export async function insertAttempt(
   } catch (error) {
     logDevError("insert threw", error);
     return false;
+  }
+}
+
+export type AttemptsHead = { count: number; maxCompletedAt: string | null };
+
+export async function fetchAttemptsHead(
+  client: Client,
+  userId: string,
+): Promise<AttemptsHead | null> {
+  try {
+    const { data, error, count } = await client
+      .from("completed_attempts")
+      .select("completed_at", { count: "exact" })
+      .eq("user_id", userId)
+      .order("completed_at", { ascending: false })
+      .limit(1);
+    if (error) {
+      logDevError("head fetch failed", error);
+      return null;
+    }
+    return {
+      count: count ?? 0,
+      maxCompletedAt: data?.[0]?.completed_at ?? null,
+    };
+  } catch (error) {
+    logDevError("head fetch threw", error);
+    return null;
   }
 }
 

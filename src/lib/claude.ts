@@ -10,8 +10,9 @@ import { getProvider } from "@/lib/providers";
 export async function evaluateSubmission(
   scenario: Scenario,
   submission: Submission,
+  locale: string = "en",
 ): Promise<Evaluation> {
-  const systemPrompt = buildEvaluationPrompt(scenario);
+  const systemPrompt = buildEvaluationPrompt(scenario, locale);
   const userMessage = [
     `SCENARIO PROMPT:\n${scenario.prompt_text}`,
     `CANDIDATE THINKING TRACE:\n${submission.thinking_trace}`,

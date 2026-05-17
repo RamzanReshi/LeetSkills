@@ -156,6 +156,10 @@ html.dark .bg-white\/20 {
   background-color: rgba(243, 245, 242, 0.1);
 }
 
+html.dark .bg-brand-deep {
+  background-color: var(--brand-dark);
+}
+
 html.dark .theme-toggle-knob {
   background-color: #FFFFFF;
   color: var(--brand-primary);
@@ -188,6 +192,46 @@ html.dark .bg-red-50 {
 
 html.dark .text-red-700 {
   color: #FCA5A5;
+}
+
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.difficulty-easy {
+  background-color: #E8F5EE;
+  color: #17633F;
+}
+
+.difficulty-medium {
+  background-color: #FFF4DD;
+  color: #9A5A13;
+}
+
+.difficulty-hard {
+  background-color: #FBEAEA;
+  color: #9A2F2F;
+}
+
+html.dark .difficulty-easy {
+  background-color: rgba(31, 138, 91, 0.16);
+  color: #66B88D;
+}
+
+html.dark .difficulty-medium {
+  background-color: rgba(201, 138, 46, 0.16);
+  color: #D6A75F;
+}
+
+html.dark .difficulty-hard {
+  background-color: rgba(185, 74, 74, 0.18);
+  color: #D98585;
 }
 
 .glass-card {

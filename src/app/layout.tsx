@@ -22,6 +22,20 @@ export const metadata: Metadata = {
   description: "Build the cognitive skills behind AI-era engineering.",
 };
 
+const themeInitScript = `
+(() => {
+  try {
+    const stored = localStorage.getItem("leetskills.theme");
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = stored === "light" || stored === "dark" ? stored : systemDark ? "dark" : "light";
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.style.colorScheme = "light";
+  }
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,6 +47,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col bg-brand-bg text-neutral-900">
         <LanguageProvider>
           <ThemeProvider>

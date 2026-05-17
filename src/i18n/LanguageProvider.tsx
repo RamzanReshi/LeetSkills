@@ -52,13 +52,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    const chosen = window.localStorage.getItem(ONBOARDED_KEY) === "true";
-    if (isLocale(stored)) {
-      setLocaleState(stored);
-    }
-    setHasOnboarded(chosen);
-    setHydrated(true);
+    const id = window.setTimeout(() => {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      const chosen = window.localStorage.getItem(ONBOARDED_KEY) === "true";
+      if (isLocale(stored)) {
+        setLocaleState(stored);
+      }
+      setHasOnboarded(chosen);
+      setHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   useEffect(() => {
