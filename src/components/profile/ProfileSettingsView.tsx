@@ -130,7 +130,7 @@ export default function ProfileSettingsView() {
   );
 
   const displayName = getAccountDisplayName(user, profile);
-  const role = getAccountRole(profile);
+  const role = getAccountRole(profile) ?? t("profile.defaultRole");
 
   useEffect(() => {
     window.localStorage.setItem(

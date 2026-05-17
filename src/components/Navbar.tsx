@@ -73,7 +73,7 @@ export default function Navbar() {
   const authReady = !loading;
   const isSignedIn = authReady && Boolean(user);
   const displayName = authReady ? getAccountDisplayName(user, profile) : "";
-  const role = getAccountRole(profile);
+  const role = getAccountRole(profile) ?? t("profile.defaultRole");
 
   useEffect(() => {
     hydrateSession();

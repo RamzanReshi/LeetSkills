@@ -19,6 +19,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
+  const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(() =>
     searchParams.get("message") === "account-created"
@@ -30,12 +31,24 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const isSignup = mode === "signup";
   const initialEmail = isSignup
     ? ""
-    : searchParams.get("email") ?? getSavedAuthEmail();
+    : searchParams.get("email") ?? "";
 
   useEffect(() => {
-    if (!isSignup && initialEmail) {
+    if (isSignup) return;
+
+    if (initialEmail) {
       passwordRef.current?.focus();
+      return;
     }
+
+    const savedEmail = getSavedAuthEmail();
+    if (savedEmail && emailRef.current && !emailRef.current.value) {
+      emailRef.current.value = savedEmail;
+      passwordRef.current?.focus();
+      return;
+    }
+
+    emailRef.current?.focus();
   }, [initialEmail, isSignup]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -113,9 +126,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         <input
           name="email"
           type="email"
+          ref={emailRef}
           autoComplete="email"
           defaultValue={initialEmail}
-          autoFocus={!initialEmail}
           required
           className="mt-1.5 h-12 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 sm:text-sm"
         />

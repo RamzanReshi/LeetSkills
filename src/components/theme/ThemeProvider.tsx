@@ -21,6 +21,7 @@ type ThemeContextValue = {
 };
 
 const STORAGE_KEY = "leetskills.theme";
+const COOKIE_KEY = "leetskills.theme";
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function isTheme(value: string | null): value is Theme {
@@ -49,8 +50,20 @@ function applyTheme(theme: Theme) {
   document.documentElement.style.colorScheme = theme;
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+function persistTheme(theme: Theme) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, theme);
+  document.cookie = `${COOKIE_KEY}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;
+}
+
+export function ThemeProvider({
+  children,
+  initialTheme = "light",
+}: {
+  children: ReactNode;
+  initialTheme?: Theme;
+}) {
+  const [theme, setThemeState] = useState<Theme>(initialTheme);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -63,6 +76,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const initialTheme = getInitialTheme();
       setThemeState(initialTheme);
       applyTheme(initialTheme);
+      persistTheme(initialTheme);
       setHydrated(true);
     }, 0);
     return () => window.clearTimeout(id);
@@ -71,9 +85,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = useCallback((nextTheme: Theme) => {
     setThemeState(nextTheme);
 
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, nextTheme);
-    }
+    persistTheme(nextTheme);
   }, []);
 
   const toggleTheme = useCallback(() => {

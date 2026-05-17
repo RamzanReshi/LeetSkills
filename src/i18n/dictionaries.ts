@@ -310,7 +310,7 @@ export const dictionaries: Record<Locale, Record<string, string>> = {
     "profile.day.fri": "Fri",
     "profile.day.sat": "Sat",
     "profile.day.sun": "Sun",
-    "profile.defaultRole": "AI-era engineering learner",
+    "profile.defaultRole": "Learner",
 
     "settings.metaTitle": "Settings - LeetSkills",
     "settings.eyebrow": "Account",
@@ -656,7 +656,7 @@ export const dictionaries: Record<Locale, Record<string, string>> = {
     "profile.day.fri": "الجمعة",
     "profile.day.sat": "السبت",
     "profile.day.sun": "الأحد",
-    "profile.defaultRole": "متعلّم في عصر الذكاء الاصطناعي",
+    "profile.defaultRole": "متعلّم",
 
     "settings.metaTitle": "الإعدادات - LeetSkills",
     "settings.eyebrow": "الحساب",
@@ -1003,7 +1003,7 @@ export const dictionaries: Record<Locale, Record<string, string>> = {
     "profile.day.fri": "Cum",
     "profile.day.sat": "Cmt",
     "profile.day.sun": "Paz",
-    "profile.defaultRole": "Yapay zeka çağı mühendislik öğrencisi",
+    "profile.defaultRole": "Öğrenci",
 
     "settings.metaTitle": "Ayarlar - LeetSkills",
     "settings.eyebrow": "Hesap",

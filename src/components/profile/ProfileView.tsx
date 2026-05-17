@@ -88,7 +88,7 @@ export default function ProfileView() {
   ];
 
   const displayName = getAccountDisplayName(user, profile);
-  const role = getAccountRole(profile);
+  const role = getAccountRole(profile) ?? t("profile.defaultRole");
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-10 animate-fade-in">

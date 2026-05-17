@@ -101,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: currentUser.id,
         email: currentUser.email ?? null,
         full_name: displayNameFromUser(currentUser),
-        role: "AI-era engineering learner",
+        role: null,
         avatar_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -236,5 +236,5 @@ export function getAccountDisplayName(user: User | null, profile: Profile | null
 }
 
 export function getAccountRole(profile: Profile | null) {
-  return profile?.role || "AI-era engineering learner";
+  return profile?.role || null;
 }

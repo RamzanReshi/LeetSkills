@@ -248,7 +248,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
   syncedUserId: null,
 
   hydrateSession: () => {
-    const session = normalizeSession(loadSession());
+    const session = normalizeSession(loadSession(get().currentUserId));
     set({
       fingerprint: session?.fingerprint ?? DEFAULT_FINGERPRINT,
       history: session?.history ?? [],
@@ -261,8 +261,9 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
   },
 
   syncWithUser: async (userId: string | null) => {
-    if (!get().hydrated) {
-      const session = normalizeSession(loadSession());
+    const previousUserId = get().currentUserId;
+    if (!get().hydrated || previousUserId !== userId) {
+      const session = normalizeSession(loadSession(userId));
       set({
         fingerprint: session?.fingerprint ?? DEFAULT_FINGERPRINT,
         history: session?.history ?? [],
@@ -271,10 +272,11 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
         activeDrafts: session?.activeDrafts ?? {},
         completedScenarioIds: session?.completedScenarioIds ?? [],
         hydrated: true,
+        currentUserId: userId,
       });
+    } else {
+      set({ currentUserId: userId });
     }
-
-    set({ currentUserId: userId });
 
     if (!userId || !isSupabaseConfigured) {
       set({ attemptsSyncing: false, syncedUserId: userId });
@@ -297,6 +299,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
         }));
         const ok = await insertAttempt(client, attempt, userId);
         set((state) => {
+          if (state.currentUserId !== userId) return {};
           const updated = setAttemptSyncStatus(
             state.completedAttempts,
             attempt.id,
@@ -310,7 +313,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
             activeDrafts: state.activeDrafts,
             completedScenarioIds: state.completedScenarioIds,
           };
-          saveSession(newState);
+          saveSession(newState, userId);
           return { completedAttempts: updated };
         });
       }
@@ -324,6 +327,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
       if (remote === null) return null;
 
       set((state) => {
+        if (state.currentUserId !== userId) return {};
         const safeLocal = state.completedAttempts.filter(
           (a) => a.timestamps.completed_at <= fetchStartedAt,
         );
@@ -352,7 +356,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           activeDrafts: state.activeDrafts,
           completedScenarioIds: newCompletedIds,
         };
-        saveSession(newState);
+        saveSession(newState, userId);
         return { ...newState, hydrated: true };
       });
 
@@ -412,7 +416,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
   recordScenarioStarted: (scenarioId: string) => {
     const timestamp = Date.now();
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const baseActiveDrafts = savedSession?.activeDrafts ?? state.activeDrafts;
       const newState: SessionData = {
         fingerprint: savedSession?.fingerprint ?? state.fingerprint,
@@ -436,7 +440,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           },
         },
       };
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     });
     return timestamp;
@@ -444,7 +448,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
 
   updateScenarioDraft: (scenarioId: string, userInput: UserInputSnapshot) =>
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const timestamp = Date.now();
       const baseActiveDrafts = savedSession?.activeDrafts ?? state.activeDrafts;
       const current = baseActiveDrafts[scenarioId];
@@ -469,14 +473,14 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           },
         },
       };
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     }),
 
   recordScenarioSubmitted: (scenarioId: string, userInput: UserInputSnapshot) => {
     const timestamp = Date.now();
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const baseActiveDrafts = savedSession?.activeDrafts ?? state.activeDrafts;
       const current = baseActiveDrafts[scenarioId];
       const newState: SessionData = {
@@ -499,7 +503,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           },
         },
       };
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     });
     return timestamp;
@@ -507,7 +511,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
 
   recordEvaluationFailure: (scenarioId, userInput, errorState) =>
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const timestamp = Date.now();
       const baseActiveDrafts = savedSession?.activeDrafts ?? state.activeDrafts;
       const current = baseActiveDrafts[scenarioId];
@@ -532,13 +536,13 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           },
         },
       };
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     }),
 
   recordRetryStarted: (scenarioId) =>
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const newState: SessionData = {
         fingerprint: savedSession?.fingerprint ?? state.fingerprint,
         history: savedSession?.history ?? state.history,
@@ -550,7 +554,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
         ],
         activeDrafts: savedSession?.activeDrafts ?? state.activeDrafts,
       };
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     }),
 
@@ -568,7 +572,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
     let completedAttempt: CompletedAttempt | null = null;
 
     set((state) => {
-      const savedSession = state.hydrated ? null : normalizeSession(loadSession());
+      const savedSession = state.hydrated ? null : normalizeSession(loadSession(state.currentUserId));
       const baseHistory = savedSession?.history ?? state.history;
       const baseCompletedAttempts = savedSession?.completedAttempts ?? state.completedAttempts;
       const baseCompletedScenarioIds = savedSession?.completedScenarioIds ?? state.completedScenarioIds;
@@ -620,7 +624,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
         ],
       };
 
-      saveSession(newState);
+      saveSession(newState, state.currentUserId);
       return { ...newState, hydrated: true };
     });
 
@@ -637,6 +641,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
           const client = createClient();
           const ok = await insertAttempt(client, toSync, userId);
           set((state) => {
+            if (state.currentUserId !== userId) return {};
             const updated = setAttemptSyncStatus(
               state.completedAttempts,
               toSync.id,
@@ -650,7 +655,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
               activeDrafts: state.activeDrafts,
               completedScenarioIds: state.completedScenarioIds,
             };
-            saveSession(newState);
+            saveSession(newState, userId);
             return { completedAttempts: updated };
           });
         } catch (error) {
@@ -658,6 +663,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
             console.error("[useSkillStore] remote insert threw", error);
           }
           set((state) => {
+            if (state.currentUserId !== userId) return {};
             const updated = setAttemptSyncStatus(
               state.completedAttempts,
               toSync.id,
@@ -671,7 +677,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
               activeDrafts: state.activeDrafts,
               completedScenarioIds: state.completedScenarioIds,
             };
-            saveSession(newState);
+            saveSession(newState, userId);
             return { completedAttempts: updated };
           });
         }
@@ -682,6 +688,7 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
   },
 
   resetSession: () => {
+    const userId = get().currentUserId;
     const newState: SessionData = {
       fingerprint: DEFAULT_FINGERPRINT,
       history: [],
@@ -690,11 +697,11 @@ export const useSkillStore = create<SkillStore>((set, get) => ({
       activeDrafts: {},
       completedScenarioIds: [],
     };
-    clearSession();
+    clearSession(userId);
     if (typeof window !== "undefined") {
       try { localStorage.removeItem(SYNC_CACHE_KEY); } catch { /* ignore */ }
     }
-    saveSession(newState);
+    saveSession(newState, userId);
     set({ ...newState, hydrated: true, syncedUserId: null });
   },
 }));

@@ -1,5 +1,5 @@
 -- ============================================================
--- Dummy seed for user 98b76052-56ac-4a7b-8b02-ba20b0aedd97
+-- Dummy seed for user 0d581538-74ba-4227-aa45-b4d011d009b7
 -- Realistic shape: uneven distribution, one retry, one weak area.
 --   SE-01 x2 (first weak 45, retry strong 85)
 --   SE-02 x1 (mid 62)
@@ -11,7 +11,7 @@
 
 do $$
 declare
-  uid uuid := '98b76052-56ac-4a7b-8b02-ba20b0aedd97';
+  uid uuid := '0d581538-74ba-4227-aa45-b4d011d009b7';
 begin
 
   ------------------------------------------------------------
