@@ -3,7 +3,7 @@ import type { EvaluationProvider } from "./types";
 
 // Hard ceiling on output tokens. Keeps spend bounded even if the model
 // tries to ramble; evaluation JSON fits comfortably under this.
-const MAX_OUTPUT_TOKENS = 1024;
+const MAX_OUTPUT_TOKENS = 4096;
 // Abort the request if the model stalls — prevents hung sockets.
 const REQUEST_TIMEOUT_MS = 60_000;
 

@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   MAX_TOTAL_INPUT_CHARS,
   estimateTokens,
+  looksLikeGibberish,
   truncateToTokenBudget,
   validateResponse,
   validateThinkingTrace,
@@ -74,6 +75,20 @@ export async function POST(request: NextRequest) {
 
   let trimmedTrace = (thinking_trace as string).trim();
   let trimmedResponse = (response as string).trim();
+
+  if (looksLikeGibberish(trimmedTrace) || looksLikeGibberish(trimmedResponse)) {
+    return NextResponse.json(
+      {
+        code: "INPUT_LOW_EFFORT",
+        message:
+          "Your submission looks like placeholder or random text. Write a genuine thinking trace and response so the AI can give meaningful feedback.",
+        action:
+          "Edit your answer with real reasoning about the scenario, then submit again.",
+        retryable: true,
+      },
+      { status: 422 },
+    );
+  }
   // Hard char ceiling — defensive; client maxLength should already enforce.
   if (trimmedTrace.length + trimmedResponse.length > MAX_TOTAL_INPUT_CHARS) {
     trimmedTrace = trimmedTrace.slice(0, MAX_TOTAL_INPUT_CHARS);

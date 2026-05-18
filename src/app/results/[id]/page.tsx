@@ -135,6 +135,12 @@ export default function ResultsPage() {
         <SkillRadarChart fingerprint={attempt.fingerprint_after} />
       </div>
 
+      <button
+        onClick={() => router.push(`/scenario/${scenarioId}`)}
+        className="btn-action w-full"
+      >
+        {t("results.tryAgainSameScenario")}
+      </button>
       <button onClick={() => router.push("/dashboard")} className="btn-primary w-full">
         {t("results.back")}
       </button>

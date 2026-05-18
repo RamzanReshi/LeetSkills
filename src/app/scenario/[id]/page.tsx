@@ -68,7 +68,7 @@ export default function ScenarioPage() {
   const recordRetryStarted = useSkillStore((s) => s.recordRetryStarted);
   const completeScenarioAttempt = useSkillStore((s) => s.completeScenarioAttempt);
 
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [timeRemaining, setTimeRemaining] = useState(scenario?.time_limit_seconds ?? 0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [thinkingTrace, setThinkingTrace] = useState("");
@@ -80,7 +80,11 @@ export default function ScenarioPage() {
   const [errorAction, setErrorAction] = useState<string | null>(null);
   const [failureCount, setFailureCount] = useState(0);
   const [startedAt, setStartedAt] = useState<number | undefined>(undefined);
+  const [timeBoost, setTimeBoost] = useState<number | null>(null);
   const initializedDraftScenarioRef = useRef<string | null>(null);
+
+  // Adding +2 min when the user chooses to continue past timeout.
+  const CONTINUE_BONUS_SECONDS = 120;
 
   useEffect(() => {
     if (scenario) {
@@ -126,6 +130,40 @@ export default function ScenarioPage() {
     return () => clearInterval(id);
   }, [timerRunning, timeRemaining]);
 
+  // When the countdown hits zero mid-attempt, lock the flow and offer a retry.
+  useEffect(() => {
+    if (timerRunning && timeRemaining === 0 && (step === 2 || step === 3)) {
+      setTimerRunning(false);
+      setStep(5);
+    }
+  }, [step, timeRemaining, timerRunning]);
+
+  const handleContinue = useCallback(() => {
+    setTimeRemaining((t) => t + CONTINUE_BONUS_SECONDS);
+    setTimerRunning(true);
+    setTimeBoost(CONTINUE_BONUS_SECONDS);
+    window.setTimeout(() => setTimeBoost(null), 1800);
+    // Return to whichever step has the most progress.
+    setStep(response.trim() || traceValid ? 3 : 2);
+  }, [response, traceValid]);
+
+  const handleTryAgain = useCallback(() => {
+    setThinkingTrace("");
+    setResponse("");
+    setTraceValid(false);
+    setResponseValid(false);
+    setError(null);
+    setErrorRetryable(true);
+    setErrorAction(null);
+    setFailureCount(0);
+    setTimeRemaining(scenario?.time_limit_seconds ?? 0);
+    setTimerRunning(false);
+    setStartedAt(undefined);
+    initializedDraftScenarioRef.current = scenarioId;
+    updateScenarioDraft(scenarioId, { thinking_trace: "", response: "" });
+    setStep(1);
+  }, [scenario?.time_limit_seconds, scenarioId, updateScenarioDraft]);
+
   const handleStart = useCallback(() => {
     const timestamp = recordScenarioStarted(scenarioId);
     setStartedAt(timestamp);
@@ -170,12 +208,19 @@ export default function ScenarioPage() {
         }
         const structuredError = typeof payload?.error === "object" ? payload.error : undefined;
         const providerStatus = structuredError?.provider_status ?? payload?.provider_status;
+        const isClientInputError = res.status === 400 || res.status === 413 || res.status === 422 || res.status === 429;
         const nextFailureCount = (activeDraft?.last_failure?.failure_count ?? failureCount) + 1;
+        const providerMessage =
+          structuredError?.message ??
+          payload?.message ??
+          (typeof payload?.error === "string" ? payload.error : AI_UNAVAILABLE_MESSAGE);
         const errorState: AttemptErrorState = {
           message:
-            nextFailureCount > 1
-              ? AI_TEMPORARILY_UNAVAILABLE_MESSAGE
-              : structuredError?.message ?? payload?.message ?? (typeof payload?.error === "string" ? payload.error : AI_UNAVAILABLE_MESSAGE),
+            isClientInputError
+              ? providerMessage
+              : nextFailureCount > 1
+                ? AI_TEMPORARILY_UNAVAILABLE_MESSAGE
+                : providerMessage,
           code: structuredError?.code ?? payload?.code,
           action:
             structuredError?.action ??
@@ -341,6 +386,43 @@ export default function ScenarioPage() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
           <p className="text-sm font-medium">{t("scenario.evaluating")}</p>
+        </div>
+      )}
+
+      {step === 5 && (
+        <div className="space-y-6">
+          <ScenarioPrompt scenario={scenario} timeRemaining={0} />
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-900">
+            <p className="font-semibold">{t("scenario.timeUp")}</p>
+            <p className="mt-1 text-red-800">{t("scenario.timeUpChoose")}</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={handleContinue}
+              className="btn-action group relative w-full overflow-hidden"
+            >
+              <span>{t("scenario.continue")}</span>
+              <span className="ml-2 inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">
+                +{Math.floor(CONTINUE_BONUS_SECONDS / 60)}:00
+              </span>
+            </button>
+            <button
+              onClick={handleTryAgain}
+              className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            >
+              {t("scenario.tryAgain")}
+            </button>
+          </div>
+          <p className="text-xs text-neutral-500">{t("scenario.timeUpHint")}</p>
+        </div>
+      )}
+
+      {timeBoost !== null && (
+        <div
+          className="pointer-events-none fixed left-1/2 top-20 z-50 -translate-x-1/2 animate-bounce rounded-full bg-brand-primary px-4 py-2 text-sm font-bold text-white shadow-lg"
+          aria-live="polite"
+        >
+          +{Math.floor(timeBoost / 60)}:00
         </div>
       )}
     </main>

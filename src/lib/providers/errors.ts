@@ -12,11 +12,14 @@ type ClassifiedAiError = {
 };
 
 const USER_MESSAGE_RETRY =
-  "AI feedback is currently unavailable. Your answer is saved locally on this page. Please try again in a moment.";
+  "Our AI evaluation servers are processing a lot of submissions right now. Your answer is saved on this page — press Try Again in a moment.";
 const USER_MESSAGE_TERMINAL =
-  "AI feedback is temporarily unavailable. Please try again later.";
-const USER_ACTION_RETRY = "Retry the submission in a moment. Your thinking trace and final response remain on this page.";
-const USER_ACTION_TERMINAL = "Try again later. Your thinking trace and final response remain on this page.";
+  "Our AI evaluation servers are under heavy load. Please wait a few minutes and try again — your work is saved.";
+const USER_MESSAGE_HIGH_DEMAND =
+  "Our AI evaluation servers are experiencing high demand right now. Wait a few moments and press Try Again — your answer is saved.";
+const USER_ACTION_RETRY = "Press Try Again in a moment. Your thinking trace and final response stay on this page.";
+const USER_ACTION_TERMINAL = "Wait a few minutes and try again. Your thinking trace and final response stay on this page.";
+const USER_ACTION_HIGH_DEMAND = "Wait a few moments, then press Try Again. Your work stays on this page.";
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -87,6 +90,27 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
       retryable: false,
       message: "The selected AI provider rejected the API key or denied access.",
       action: "Verify the backend API key, provider selection, and project permissions.",
+      provider,
+      model,
+      rawMessage,
+    };
+  }
+
+  if (
+    normalized.includes("UNAVAILABLE") ||
+    normalized.includes("OVERLOADED") ||
+    normalized.includes("HIGH DEMAND") ||
+    normalized.includes("\"CODE\":503") ||
+    normalized.includes("503")
+  ) {
+    return {
+      status: 503,
+      code: "AI_HIGH_DEMAND",
+      userMessage: USER_MESSAGE_HIGH_DEMAND,
+      userAction: USER_ACTION_HIGH_DEMAND,
+      retryable: true,
+      message: "The AI provider is reporting high demand / temporary unavailability.",
+      action: "Retry shortly. Consider exponential backoff or routing to a secondary provider for resilience.",
       provider,
       model,
       rawMessage,
