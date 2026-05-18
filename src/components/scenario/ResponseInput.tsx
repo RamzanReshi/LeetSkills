@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { validateResponse } from "@/utils/validation";
+import { MAX_RESPONSE_CHARS, validateResponse } from "@/utils/validation";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface ResponseInputProps {
@@ -16,7 +16,7 @@ export default function ResponseInput({
   onValidChange,
 }: ResponseInputProps) {
   const { t } = useLanguage();
-  const { valid } = validateResponse(value);
+  const { valid, charCount } = validateResponse(value);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -34,15 +34,23 @@ export default function ResponseInput({
         onChange={handleChange}
         placeholder={t("scenario.responsePlaceholder")}
         rows={10}
+        maxLength={MAX_RESPONSE_CHARS}
         className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
             ? "border-red-400 focus:ring-red-200"
             : "border-neutral-300 focus:ring-brand-primary/30 focus:border-brand-primary"
         }`}
       />
-      {value.length > 0 && !valid && (
-        <p className="text-xs text-red-600">{t("scenario.responseEmpty")}</p>
-      )}
+      <div className="flex justify-between text-xs">
+        {value.length > 0 && !valid ? (
+          <span className="text-red-600">{t("scenario.responseEmpty")}</span>
+        ) : (
+          <span />
+        )}
+        <span className={charCount > MAX_RESPONSE_CHARS * 0.9 ? "text-amber-600" : "text-neutral-500"}>
+          {charCount} / {MAX_RESPONSE_CHARS}
+        </span>
+      </div>
     </div>
   );
 }

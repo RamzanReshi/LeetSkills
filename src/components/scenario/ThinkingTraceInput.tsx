@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { validateThinkingTrace } from "@/utils/validation";
+import { MAX_THINKING_TRACE_CHARS, MIN_THINKING_TRACE_CHARS, validateThinkingTrace } from "@/utils/validation";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
-const MIN_CHARS = 80;
+const MIN_CHARS = MIN_THINKING_TRACE_CHARS;
+const MAX_CHARS = MAX_THINKING_TRACE_CHARS;
 
 interface ThinkingTraceInputProps {
   value: string;
@@ -38,6 +39,7 @@ export default function ThinkingTraceInput({
         onChange={handleChange}
         placeholder={t("scenario.thinkingPlaceholder")}
         rows={8}
+        maxLength={MAX_CHARS}
         className={`w-full rounded-lg border bg-brand-card px-3 py-2 text-sm leading-relaxed text-neutral-900 outline-none transition-colors focus:ring-2 ${
           value.length > 0 && !valid
             ? "border-red-400 focus:ring-red-200"
@@ -52,7 +54,9 @@ export default function ThinkingTraceInput({
         ) : (
           <span className="text-neutral-500">{t("scenario.startTyping")}</span>
         )}
-        <span className="text-neutral-500">{t("scenario.charCount", { n: charCount })}</span>
+        <span className={charCount > MAX_CHARS * 0.9 ? "text-amber-600" : "text-neutral-500"}>
+          {charCount} / {MAX_CHARS}
+        </span>
       </div>
     </div>
   );
