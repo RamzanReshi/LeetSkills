@@ -36,7 +36,7 @@ export function classifyAiProviderError(err: unknown): ClassifiedAiError {
   const provider = process.env.AI_PROVIDER ?? "claude";
   const model =
     provider === "gemini"
-      ? process.env.GEMINI_MODEL ?? "gemini-2.5-flash"
+      ? process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite"
       : undefined;
   const rawMessage = getErrorMessage(err);
   const normalized = rawMessage.toUpperCase();
